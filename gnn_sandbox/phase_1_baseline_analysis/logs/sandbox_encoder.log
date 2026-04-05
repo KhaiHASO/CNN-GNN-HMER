@@ -1,0 +1,5 @@
+2026-04-05 23:25:45 | INFO | === sandbox_encoder.py started ===
+2026-04-05 23:25:45 | INFO | Graph refinement edge stats: {'num_edges': 534.0, 'avg_out_degree': 8.34375, 'min_out_degree': 5.0, 'max_out_degree': 14.0, 'density': 0.13037109375}
+2026-04-05 23:25:45 | INFO | Encoder feature shape: (2, 8, 8, 256)
+2026-04-05 23:25:45 | INFO | Encoder mask shape: (2, 8, 8)
+2026-04-05 23:25:45 | INFO | === sandbox_encoder.py finished ===

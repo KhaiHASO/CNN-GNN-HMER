@@ -1,0 +1,208 @@
+2026-04-05 23:28:27 | INFO | === test_tree.py started ===
+2026-04-05 23:28:27 | INFO | --- Sample 1: sample_newton_binomial ---
+2026-04-05 23:28:27 | INFO | Cong thuc goc: ( x + y ) ^ { n } = \sum _ { k = 0 } ^ { n } \frac { n ! } { k ! ( n - k ) ! } x ^ { n - k } y ^ { k }
+2026-04-05 23:28:27 | INFO | Cay khong gian:
+2026-04-05 23:28:27 | INFO | [root] (
+2026-04-05 23:28:27 | INFO |   [right] x
+2026-04-05 23:28:27 | INFO |     [right] +
+2026-04-05 23:28:27 | INFO |       [right] y
+2026-04-05 23:28:27 | INFO |         [right] )
+2026-04-05 23:28:27 | INFO |           [sup] n
+2026-04-05 23:28:27 | INFO |           [right] =
+2026-04-05 23:28:27 | INFO |             [right] \sum
+2026-04-05 23:28:27 | INFO |               [below] k
+2026-04-05 23:28:27 | INFO |                 [right] =
+2026-04-05 23:28:27 | INFO |                   [right] 0
+2026-04-05 23:28:27 | INFO |               [above] n
+2026-04-05 23:28:27 | INFO |               [right] \frac
+2026-04-05 23:28:27 | INFO |                 [below] k
+2026-04-05 23:28:27 | INFO |                   [right] !
+2026-04-05 23:28:27 | INFO |                     [right] (
+2026-04-05 23:28:27 | INFO |                       [right] n
+2026-04-05 23:28:27 | INFO |                         [right] -
+2026-04-05 23:28:27 | INFO |                           [right] k
+2026-04-05 23:28:27 | INFO |                             [right] )
+2026-04-05 23:28:27 | INFO |                               [right] !
+2026-04-05 23:28:27 | INFO |                 [above] n
+2026-04-05 23:28:27 | INFO |                   [right] !
+2026-04-05 23:28:27 | INFO |                 [right] x
+2026-04-05 23:28:27 | INFO |                   [sup] n
+2026-04-05 23:28:27 | INFO |                     [right] -
+2026-04-05 23:28:27 | INFO |                       [right] k
+2026-04-05 23:28:27 | INFO |                   [right] y
+2026-04-05 23:28:27 | INFO |                     [sup] k
+2026-04-05 23:28:27 | INFO | Danh sach canh/quan he:
+2026-04-05 23:28:27 | INFO | node=   ( idx= 1 parent=<sos> parent_idx= 0 relation=start
+2026-04-05 23:28:27 | INFO | node=   x idx= 2 parent=    ( parent_idx= 1 relation=right
+2026-04-05 23:28:27 | INFO | node=   + idx= 3 parent=    x parent_idx= 2 relation=right
+2026-04-05 23:28:27 | INFO | node=   y idx= 4 parent=    + parent_idx= 3 relation=right
+2026-04-05 23:28:27 | INFO | node=   ) idx= 5 parent=    y parent_idx= 4 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx= 6 parent=    ) parent_idx= 5 relation=sup
+2026-04-05 23:28:27 | INFO | node=   = idx= 7 parent=    ) parent_idx= 5 relation=right
+2026-04-05 23:28:27 | INFO | node=\sum idx= 8 parent=    = parent_idx= 7 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx= 9 parent= \sum parent_idx= 8 relation=below
+2026-04-05 23:28:27 | INFO | node=   = idx=10 parent=    k parent_idx= 9 relation=right
+2026-04-05 23:28:27 | INFO | node=   0 idx=11 parent=    = parent_idx=10 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx=12 parent= \sum parent_idx= 8 relation=above
+2026-04-05 23:28:27 | INFO | node=\frac idx=13 parent= \sum parent_idx= 8 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=14 parent=\frac parent_idx=13 relation=below
+2026-04-05 23:28:27 | INFO | node=   ! idx=15 parent=    k parent_idx=14 relation=right
+2026-04-05 23:28:27 | INFO | node=   ( idx=16 parent=    ! parent_idx=15 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx=17 parent=    ( parent_idx=16 relation=right
+2026-04-05 23:28:27 | INFO | node=   - idx=18 parent=    n parent_idx=17 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=19 parent=    - parent_idx=18 relation=right
+2026-04-05 23:28:27 | INFO | node=   ) idx=20 parent=    k parent_idx=19 relation=right
+2026-04-05 23:28:27 | INFO | node=   ! idx=21 parent=    ) parent_idx=20 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx=22 parent=\frac parent_idx=13 relation=above
+2026-04-05 23:28:27 | INFO | node=   ! idx=23 parent=    n parent_idx=22 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx=24 parent=\frac parent_idx=13 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx=25 parent=    x parent_idx=24 relation=sup
+2026-04-05 23:28:27 | INFO | node=   - idx=26 parent=    n parent_idx=25 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=27 parent=    - parent_idx=26 relation=right
+2026-04-05 23:28:27 | INFO | node=   y idx=28 parent=    x parent_idx=24 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=29 parent=    y parent_idx=28 relation=sup
+2026-04-05 23:28:27 | INFO | --- Sample 2: sample_nested_sigma_matrix ---
+2026-04-05 23:28:27 | INFO | Cong thuc goc: \sum _ { i = 1 } ^ { m } \sum _ { j = 1 } ^ { n } \sqrt [ 3 ] { \begin{matrix} i ^ { 2 } & j \\ i + j & i - j \end{matrix} }
+2026-04-05 23:28:27 | INFO | Cay khong gian:
+2026-04-05 23:28:27 | INFO | [root] \sum
+2026-04-05 23:28:27 | INFO |   [below] i
+2026-04-05 23:28:27 | INFO |     [right] =
+2026-04-05 23:28:27 | INFO |       [right] 1
+2026-04-05 23:28:27 | INFO |   [above] m
+2026-04-05 23:28:27 | INFO |   [right] \sum
+2026-04-05 23:28:27 | INFO |     [below] j
+2026-04-05 23:28:27 | INFO |       [right] =
+2026-04-05 23:28:27 | INFO |         [right] 1
+2026-04-05 23:28:27 | INFO |     [above] n
+2026-04-05 23:28:27 | INFO |     [right] \sqrt
+2026-04-05 23:28:27 | INFO |       [leftup] 3
+2026-04-05 23:28:27 | INFO |       [inside] \begin{matrix}
+2026-04-05 23:28:27 | INFO |         [Mstart] i
+2026-04-05 23:28:27 | INFO |           [sup] 2
+2026-04-05 23:28:27 | INFO |           [right] &
+2026-04-05 23:28:27 | INFO |             [right] j
+2026-04-05 23:28:27 | INFO |               [nextline] i
+2026-04-05 23:28:27 | INFO |                 [right] +
+2026-04-05 23:28:27 | INFO |                   [right] j
+2026-04-05 23:28:27 | INFO |                     [right] &
+2026-04-05 23:28:27 | INFO |                       [right] i
+2026-04-05 23:28:27 | INFO |                         [right] -
+2026-04-05 23:28:27 | INFO |                           [right] j
+2026-04-05 23:28:27 | INFO | Danh sach canh/quan he:
+2026-04-05 23:28:27 | INFO | node=\sum idx= 1 parent=<sos> parent_idx= 0 relation=start
+2026-04-05 23:28:27 | INFO | node=   i idx= 2 parent= \sum parent_idx= 1 relation=below
+2026-04-05 23:28:27 | INFO | node=   = idx= 3 parent=    i parent_idx= 2 relation=right
+2026-04-05 23:28:27 | INFO | node=   1 idx= 4 parent=    = parent_idx= 3 relation=right
+2026-04-05 23:28:27 | INFO | node=   m idx= 5 parent= \sum parent_idx= 1 relation=above
+2026-04-05 23:28:27 | INFO | node=\sum idx= 6 parent= \sum parent_idx= 1 relation=right
+2026-04-05 23:28:27 | INFO | node=   j idx= 7 parent= \sum parent_idx= 6 relation=below
+2026-04-05 23:28:27 | INFO | node=   = idx= 8 parent=    j parent_idx= 7 relation=right
+2026-04-05 23:28:27 | INFO | node=   1 idx= 9 parent=    = parent_idx= 8 relation=right
+2026-04-05 23:28:27 | INFO | node=   n idx=10 parent= \sum parent_idx= 6 relation=above
+2026-04-05 23:28:27 | INFO | node=\sqrt idx=11 parent= \sum parent_idx= 6 relation=right
+2026-04-05 23:28:27 | INFO | node=   3 idx=12 parent=\sqrt parent_idx=11 relation=leftup
+2026-04-05 23:28:27 | INFO | node=\begin{matrix} idx=13 parent=\sqrt parent_idx=11 relation=inside
+2026-04-05 23:28:27 | INFO | node=   i idx=14 parent=\begin{matrix} parent_idx=13 relation=Mstart
+2026-04-05 23:28:27 | INFO | node=   2 idx=15 parent=    i parent_idx=14 relation=sup
+2026-04-05 23:28:27 | INFO | node=   & idx=16 parent=    i parent_idx=14 relation=right
+2026-04-05 23:28:27 | INFO | node=   j idx=17 parent=    & parent_idx=16 relation=right
+2026-04-05 23:28:27 | INFO | node=   i idx=18 parent=    j parent_idx=17 relation=nextline
+2026-04-05 23:28:27 | INFO | node=   + idx=19 parent=    i parent_idx=18 relation=right
+2026-04-05 23:28:27 | INFO | node=   j idx=20 parent=    + parent_idx=19 relation=right
+2026-04-05 23:28:27 | INFO | node=   & idx=21 parent=    j parent_idx=20 relation=right
+2026-04-05 23:28:27 | INFO | node=   i idx=22 parent=    & parent_idx=21 relation=right
+2026-04-05 23:28:27 | INFO | node=   - idx=23 parent=    i parent_idx=22 relation=right
+2026-04-05 23:28:27 | INFO | node=   j idx=24 parent=    - parent_idx=23 relation=right
+2026-04-05 23:28:27 | INFO | --- Sample 3: sample_limit_continued_frac ---
+2026-04-05 23:28:27 | INFO | Cong thuc goc: \lim _ { x \rightarrow \infty } \frac { 1 } { 1 + \frac { 1 } { x + \sqrt { x ^ { 2 } + 1 } } }
+2026-04-05 23:28:27 | INFO | Cay khong gian:
+2026-04-05 23:28:27 | INFO | [root] \lim
+2026-04-05 23:28:27 | INFO |   [below] x
+2026-04-05 23:28:27 | INFO |     [right] \rightarrow
+2026-04-05 23:28:27 | INFO |       [right] \infty
+2026-04-05 23:28:27 | INFO |   [right] \frac
+2026-04-05 23:28:27 | INFO |     [below] 1
+2026-04-05 23:28:27 | INFO |       [right] +
+2026-04-05 23:28:27 | INFO |         [right] \frac
+2026-04-05 23:28:27 | INFO |           [below] x
+2026-04-05 23:28:27 | INFO |             [right] +
+2026-04-05 23:28:27 | INFO |               [right] \sqrt
+2026-04-05 23:28:27 | INFO |                 [inside] x
+2026-04-05 23:28:27 | INFO |                   [sup] 2
+2026-04-05 23:28:27 | INFO |                   [right] +
+2026-04-05 23:28:27 | INFO |                     [right] 1
+2026-04-05 23:28:27 | INFO |           [above] 1
+2026-04-05 23:28:27 | INFO |     [above] 1
+2026-04-05 23:28:27 | INFO | Danh sach canh/quan he:
+2026-04-05 23:28:27 | INFO | node=\lim idx= 1 parent=<sos> parent_idx= 0 relation=start
+2026-04-05 23:28:27 | INFO | node=   x idx= 2 parent= \lim parent_idx= 1 relation=below
+2026-04-05 23:28:27 | INFO | node=\rightarrow idx= 3 parent=    x parent_idx= 2 relation=right
+2026-04-05 23:28:27 | INFO | node=\infty idx= 4 parent=\rightarrow parent_idx= 3 relation=right
+2026-04-05 23:28:27 | INFO | node=\frac idx= 5 parent= \lim parent_idx= 1 relation=right
+2026-04-05 23:28:27 | INFO | node=   1 idx= 6 parent=\frac parent_idx= 5 relation=below
+2026-04-05 23:28:27 | INFO | node=   + idx= 7 parent=    1 parent_idx= 6 relation=right
+2026-04-05 23:28:27 | INFO | node=\frac idx= 8 parent=    + parent_idx= 7 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx= 9 parent=\frac parent_idx= 8 relation=below
+2026-04-05 23:28:27 | INFO | node=   + idx=10 parent=    x parent_idx= 9 relation=right
+2026-04-05 23:28:27 | INFO | node=\sqrt idx=11 parent=    + parent_idx=10 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx=12 parent=\sqrt parent_idx=11 relation=inside
+2026-04-05 23:28:27 | INFO | node=   2 idx=13 parent=    x parent_idx=12 relation=sup
+2026-04-05 23:28:27 | INFO | node=   + idx=14 parent=    x parent_idx=12 relation=right
+2026-04-05 23:28:27 | INFO | node=   1 idx=15 parent=    + parent_idx=14 relation=right
+2026-04-05 23:28:27 | INFO | node=   1 idx=16 parent=\frac parent_idx= 8 relation=above
+2026-04-05 23:28:27 | INFO | node=   1 idx=17 parent=\frac parent_idx= 5 relation=above
+2026-04-05 23:28:27 | INFO | --- Sample 4: sample_calculus_monster ---
+2026-04-05 23:28:27 | INFO | Cong thuc goc: \iint _ { D } \sum _ { k = 0 } ^ { \infty } \frac { \partial ^ { k } f } { \partial x ^ { k } } ( x - x _ { 0 } ) ^ { k } d x d y
+2026-04-05 23:28:27 | INFO | Cay khong gian:
+2026-04-05 23:28:27 | INFO | [root] \iint
+2026-04-05 23:28:27 | INFO |   [below] D
+2026-04-05 23:28:27 | INFO |   [right] \sum
+2026-04-05 23:28:27 | INFO |     [below] k
+2026-04-05 23:28:27 | INFO |       [right] =
+2026-04-05 23:28:27 | INFO |         [right] 0
+2026-04-05 23:28:27 | INFO |     [above] \infty
+2026-04-05 23:28:27 | INFO |     [right] \frac
+2026-04-05 23:28:27 | INFO |       [below] \partial
+2026-04-05 23:28:27 | INFO |         [right] x
+2026-04-05 23:28:27 | INFO |           [sup] k
+2026-04-05 23:28:27 | INFO |       [above] \partial
+2026-04-05 23:28:27 | INFO |         [sup] k
+2026-04-05 23:28:27 | INFO |         [right] f
+2026-04-05 23:28:27 | INFO |       [right] (
+2026-04-05 23:28:27 | INFO |         [right] x
+2026-04-05 23:28:27 | INFO |           [right] -
+2026-04-05 23:28:27 | INFO |             [right] x
+2026-04-05 23:28:27 | INFO |               [sub] 0
+2026-04-05 23:28:27 | INFO |               [right] )
+2026-04-05 23:28:27 | INFO |                 [sup] k
+2026-04-05 23:28:27 | INFO |                 [right] d
+2026-04-05 23:28:27 | INFO |                   [right] x
+2026-04-05 23:28:27 | INFO |                     [right] d
+2026-04-05 23:28:27 | INFO |                       [right] y
+2026-04-05 23:28:27 | INFO | Danh sach canh/quan he:
+2026-04-05 23:28:27 | INFO | node=\iint idx= 1 parent=<sos> parent_idx= 0 relation=start
+2026-04-05 23:28:27 | INFO | node=   D idx= 2 parent=\iint parent_idx= 1 relation=below
+2026-04-05 23:28:27 | INFO | node=\sum idx= 3 parent=\iint parent_idx= 1 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx= 4 parent= \sum parent_idx= 3 relation=below
+2026-04-05 23:28:27 | INFO | node=   = idx= 5 parent=    k parent_idx= 4 relation=right
+2026-04-05 23:28:27 | INFO | node=   0 idx= 6 parent=    = parent_idx= 5 relation=right
+2026-04-05 23:28:27 | INFO | node=\infty idx= 7 parent= \sum parent_idx= 3 relation=above
+2026-04-05 23:28:27 | INFO | node=\frac idx= 8 parent= \sum parent_idx= 3 relation=right
+2026-04-05 23:28:27 | INFO | node=\partial idx= 9 parent=\frac parent_idx= 8 relation=below
+2026-04-05 23:28:27 | INFO | node=   x idx=10 parent=\partial parent_idx= 9 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=11 parent=    x parent_idx=10 relation=sup
+2026-04-05 23:28:27 | INFO | node=\partial idx=12 parent=\frac parent_idx= 8 relation=above
+2026-04-05 23:28:27 | INFO | node=   k idx=13 parent=\partial parent_idx=12 relation=sup
+2026-04-05 23:28:27 | INFO | node=   f idx=14 parent=\partial parent_idx=12 relation=right
+2026-04-05 23:28:27 | INFO | node=   ( idx=15 parent=\frac parent_idx= 8 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx=16 parent=    ( parent_idx=15 relation=right
+2026-04-05 23:28:27 | INFO | node=   - idx=17 parent=    x parent_idx=16 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx=18 parent=    - parent_idx=17 relation=right
+2026-04-05 23:28:27 | INFO | node=   0 idx=19 parent=    x parent_idx=18 relation=sub
+2026-04-05 23:28:27 | INFO | node=   ) idx=20 parent=    x parent_idx=18 relation=right
+2026-04-05 23:28:27 | INFO | node=   k idx=21 parent=    ) parent_idx=20 relation=sup
+2026-04-05 23:28:27 | INFO | node=   d idx=22 parent=    ) parent_idx=20 relation=right
+2026-04-05 23:28:27 | INFO | node=   x idx=23 parent=    d parent_idx=22 relation=right
+2026-04-05 23:28:27 | INFO | node=   d idx=24 parent=    x parent_idx=23 relation=right
+2026-04-05 23:28:27 | INFO | node=   y idx=25 parent=    d parent_idx=24 relation=right
+2026-04-05 23:28:27 | INFO | === test_tree.py finished ===

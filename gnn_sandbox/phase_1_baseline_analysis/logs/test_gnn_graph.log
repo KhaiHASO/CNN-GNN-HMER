@@ -1,0 +1,34 @@
+2026-04-05 23:25:45 | INFO | === test_gnn_graph.py started ===
+2026-04-05 23:25:45 | INFO | 1. CNN feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | 2. Flattened node tensor shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | --- Strategy: grid_4n ---
+2026-04-05 23:25:45 | INFO | 3. edge_index shape (batch 0): (2, 224) = [2, num_edges]
+2026-04-05 23:25:45 | INFO | 4. edge stats (batch 0): num_edges=224 avg_out_degree=3.50 min_out_degree=2 max_out_degree=4 density=0.0547
+2026-04-05 23:25:45 | INFO | 5. GNN backend: fallback mean message passing (grid_4n)
+2026-04-05 23:25:45 | INFO | 6. GNN output node shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | 7. Reshaped feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | --- Strategy: grid_8n ---
+2026-04-05 23:25:45 | INFO | 4. edge_index shape (batch 0): (2, 420) = [2, num_edges]
+2026-04-05 23:25:45 | INFO | 5. edge stats (batch 0): num_edges=420 avg_out_degree=6.56 min_out_degree=3 max_out_degree=8 density=0.1025
+2026-04-05 23:25:45 | INFO | 6. GNN backend: fallback mean message passing (grid_8n)
+2026-04-05 23:25:45 | INFO | 7. GNN output node shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | 8. Reshaped feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | --- Strategy: feature_knn_k8 ---
+2026-04-05 23:25:45 | INFO | 5. edge_index shape (batch 0): (2, 596) = [2, num_edges]
+2026-04-05 23:25:45 | INFO | 6. edge stats (batch 0): num_edges=596 avg_out_degree=9.31 min_out_degree=8 max_out_degree=15 density=0.1455
+2026-04-05 23:25:45 | INFO | 7. GNN backend: fallback mean message passing (feature_knn_k8)
+2026-04-05 23:25:45 | INFO | 8. GNN output node shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | 9. Reshaped feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | --- Strategy: topk_similarity_15pct ---
+2026-04-05 23:25:45 | INFO | 6. edge_index shape (batch 0): (2, 666) = [2, num_edges]
+2026-04-05 23:25:45 | INFO | 7. edge stats (batch 0): num_edges=666 avg_out_degree=10.41 min_out_degree=9 max_out_degree=16 density=0.1626
+2026-04-05 23:25:45 | INFO | 8. GNN backend: fallback mean message passing (topk_similarity_15pct)
+2026-04-05 23:25:45 | INFO | 9. GNN output node shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | 10. Reshaped feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | --- Strategy: hybrid_grid4_plus_knn4 ---
+2026-04-05 23:25:45 | INFO | 7. edge_index shape (batch 0): (2, 536) = [2, num_edges]
+2026-04-05 23:25:45 | INFO | 8. edge stats (batch 0): num_edges=536 avg_out_degree=8.38 min_out_degree=6 max_out_degree=12 density=0.1309
+2026-04-05 23:25:45 | INFO | 9. GNN backend: fallback mean message passing (hybrid_grid4_plus_knn4)
+2026-04-05 23:25:45 | INFO | 10. GNN output node shape: (2, 64, 256) = [batch, num_nodes, channels]
+2026-04-05 23:25:45 | INFO | 11. Reshaped feature map shape: (2, 256, 8, 8) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | === test_gnn_graph.py finished ===

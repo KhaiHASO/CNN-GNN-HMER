@@ -1,0 +1,11 @@
+2026-04-05 23:28:26 | INFO | === test_data.py started ===
+2026-04-05 23:28:26 | INFO | 1. Dataset -> Encoder tensor shape: (4, 1, 400, 700) = [batch, channel, height, width]
+2026-04-05 23:28:26 | INFO | 2. Sample names: sample_newton_binomial, sample_nested_sigma_matrix, sample_limit_continued_frac, sample_calculus_monster
+2026-04-05 23:28:26 | INFO | 3. Caption lengths: [48, 45, 33, 50]
+2026-04-05 23:28:26 | INFO | 4. Input batch stats: shape=(4, 1, 400, 700), min=-4.3036, max=4.4864, mean=0.0004, std=0.7355
+2026-04-05 23:28:26 | INFO | 5. Active mask pixels per sample: [120000, 150000, 160000, 175000]
+2026-04-05 23:28:27 | INFO | 6. Encoder output feature shape: (4, 25, 44, 256)
+2026-04-05 23:28:27 | INFO | 7. Encoder feature stats: shape=(4, 25, 44, 256), min=-4.8708, max=4.4795, mean=0.0000, std=1.0000
+2026-04-05 23:28:27 | INFO | 8. Encoder output mask shape: (4, 25, 44)
+2026-04-05 23:28:27 | INFO | 9. Active output mask pixels per sample: [494, 608, 625, 704]
+2026-04-05 23:28:27 | INFO | === test_data.py finished ===

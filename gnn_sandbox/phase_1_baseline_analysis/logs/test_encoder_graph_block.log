@@ -1,0 +1,9 @@
+2026-04-05 23:25:45 | INFO | === test_encoder_graph_block.py started ===
+2026-04-05 23:25:45 | INFO | 1. Input image shape: (2, 1, 128, 128) = [batch, channels, height, width]
+2026-04-05 23:25:45 | INFO | 2. CNN feature map shape: (2, 180, 8, 8) = [batch, channels, h', w']
+2026-04-05 23:25:45 | INFO | 3. Projected feature map shape: (2, 256, 8, 8) = [batch, d_model, h', w']
+2026-04-05 23:25:45 | INFO | 4. Refined feature map shape: (2, 256, 8, 8) = [batch, d_model, h', w']
+2026-04-05 23:25:45 | INFO | 5. Final encoder feature shape: (2, 8, 8, 256) = [batch, h', w', d_model]
+2026-04-05 23:25:45 | INFO | 6. Downsampled mask shape: (2, 8, 8) = [batch, h', w']
+2026-04-05 23:25:45 | INFO | 7. Graph stats: num_edges=522 avg_out_degree=8.16 min_out_degree=6 max_out_degree=11 density=0.1274
+2026-04-05 23:25:45 | INFO | === test_encoder_graph_block.py finished ===

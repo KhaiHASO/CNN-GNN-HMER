@@ -1,0 +1,6 @@
+2026-04-05 23:18:56 | INFO | === sandbox_dataset.py started ===
+2026-04-05 23:18:56 | INFO | fname: sample_newton_binomial
+2026-04-05 23:18:56 | INFO | num images: 1
+2026-04-05 23:18:56 | INFO | first image shape: (1, 200, 600)
+2026-04-05 23:18:56 | INFO | caption: ( x + y ) ^ { n } = \sum _ { k = 0 } ^ { n } \frac { n ! } { k ! ( n - k ) ! } x ^ { n - k } y ^ { k }
+2026-04-05 23:18:56 | INFO | === sandbox_dataset.py finished ===

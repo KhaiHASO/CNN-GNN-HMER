@@ -1,0 +1,26 @@
+2026-04-05 23:28:28 | INFO | === Phase 2 started ===
+2026-04-05 23:28:28 | INFO | Phase name: GNN Design & Edge Generation
+2026-04-05 23:28:28 | INFO | 1. Dataset -> Encoder tensor shape: (4, 1, 400, 700) = [batch, channel, height, width]
+2026-04-05 23:28:28 | INFO | 2. Sample names: sample_newton_binomial, sample_nested_sigma_matrix, sample_limit_continued_frac, sample_calculus_monster
+2026-04-05 23:28:28 | INFO | 3. Caption lengths: [48, 45, 33, 50]
+2026-04-05 23:28:28 | INFO | 4. Shared input batch stats: shape=(4, 1, 400, 700), min=-4.3036, max=4.4864, mean=0.0004, std=0.7355
+2026-04-05 23:28:28 | INFO | 5. Shared active mask pixels per sample: [120000, 150000, 160000, 175000]
+2026-04-05 23:28:28 | INFO | --- Phase 1 baseline on shared data ---
+2026-04-05 23:28:28 | INFO | 6. Phase 1 feature shape: (4, 25, 44, 256)
+2026-04-05 23:28:28 | INFO | 7. Phase 1 feature stats: shape=(4, 25, 44, 256), min=-4.8233, max=4.8835, mean=-0.0000, std=1.0000
+2026-04-05 23:28:28 | INFO | 8. Phase 1 mask shape: (4, 25, 44)
+2026-04-05 23:28:28 | INFO | 9. Phase 1 active output mask pixels: [494, 608, 625, 704]
+2026-04-05 23:28:28 | INFO | --- Phase 2 graph refinement on shared data ---
+2026-04-05 23:28:28 | INFO | 10. CNN feature map before graph block: (4, 180, 25, 44)
+2026-04-05 23:28:28 | INFO | 11. Projected feature map before graph block: (4, 256, 25, 44)
+2026-04-05 23:28:28 | INFO | 12. Graph stats: num_edges=10906 avg_out_degree=9.91 min_out_degree=6 max_out_degree=34 density=0.0090
+2026-04-05 23:28:28 | INFO | 13. Phase 2 feature shape: (4, 25, 44, 256)
+2026-04-05 23:28:28 | INFO | 14. Phase 2 feature stats: shape=(4, 25, 44, 256), min=-5.0021, max=5.6626, mean=-0.0000, std=1.0000
+2026-04-05 23:28:28 | INFO | 15. Phase 2 mask shape: (4, 25, 44)
+2026-04-05 23:28:28 | INFO | 16. Phase 2 active output mask pixels: [494, 608, 625, 704]
+2026-04-05 23:28:28 | INFO | --- Comparison with Phase 1 ---
+2026-04-05 23:28:28 | INFO | 17. Mean absolute feature delta: 0.948782
+2026-04-05 23:28:28 | INFO | 18. Max absolute feature delta: 5.947979
+2026-04-05 23:28:28 | INFO | 19. Cosine similarity per sample: [0.305156, 0.280963, 0.284457, 0.288165]
+2026-04-05 23:28:28 | INFO | 20. Conclusion: Phase 2 giu nguyen giao dien tensor cua Phase 1 (same_feature_shape=True, same_mask=True) nhung bo sung message passing tren do thi hybrid voi 10906 canh/batch-0. Dieu nay tao bien doi dac trung co kiem soat (mean_abs_delta=0.948782) ma khong lam vo luong du lieu dau ra cua encoder.
+2026-04-05 23:28:28 | INFO | === Phase 2 finished ===
