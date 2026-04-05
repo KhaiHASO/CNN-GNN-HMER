@@ -1,0 +1,56 @@
+Dưới đây là phương án tái cấu trúc lại thư mục gnn_sandbox và Hệ thống Prompt (Prompt Agent) để chúng ta chính thức bước vào Phase 2: GNN Design & Edge Generation.
+
+1. Tái cấu trúc thư mục gnn_sandbox
+Chúng ta sẽ chia sandbox thành các module độc lập. Mở terminal và chạy các lệnh sau tại thư mục gnn_sandbox:
+
+Bash
+# Tạo các thư mục cho từng Phase
+mkdir phase_1_baseline_analysis
+mkdir phase_2_gnn_design
+mkdir phase_3_hybrid_integration
+
+# Di chuyển các file phân tích lý thuyết và dữ liệu vào Phase 1
+mv sandbox_dataset.py phase_1_baseline_analysis/
+mv sandbox_latex2gtd.py phase_1_baseline_analysis/
+mv test_data.py phase_1_baseline_analysis/
+mv test_tree.py phase_1_baseline_analysis/
+
+# Di chuyển các file liên quan đến việc chế tạo GNN vào Phase 2
+mv sandbox_encoder.py phase_2_gnn_design/
+mv test_gnn_graph.py phase_2_gnn_design/
+
+# Tạo thêm một file tiện ích để viết các thuật toán tạo cạnh cho đồ thị
+touch phase_2_gnn_design/graph_utils.py
+Cấu trúc thư mục hiện tại của bạn sẽ trông rất gọn gàng như thế này:
+
+Plaintext
+gnn_sandbox/
+├── phase_1_baseline_analysis/  <-- Đã hoàn thành (Hiểu Data & Cây Không gian)
+├── phase_2_gnn_design/         <-- Đang thực hiện (Tập trung toàn lực thiết kế GNN)
+│   ├── graph_utils.py          <-- Nơi chứa các hàm tự viết như k_nearest_neighbors() hay grid_edges()
+│   ├── sandbox_encoder.py      <-- Nơi nhúng GNN vào DenseNet
+│   └── test_gnn_graph.py       <-- Script chạy giả lập kiểm tra kích thước ma trận
+└── phase_3_hybrid_integration/ <-- Tương lai (Đưa code từ Phase 2 trở lại repo chính để train)
+2. Prompt Agent cho Phase 2 (Copy phần bên dưới)
+Bất cứ khi nào bạn bắt đầu phiên code cho Phase 2, hãy gửi đoạn prompt này cho tôi để thiết lập ngay lập tức tư duy thuật toán đồ thị:
+
+Plaintext
+[SYSTEM PROMPT - HMER PHASE 2: GNN DESIGN & EDGE GENERATION]
+
+Hãy tiếp tục đóng vai là Chuyên gia Nghiên cứu AI và Kỹ sư Thuật toán đồ thị. Cùng tôi giải quyết Phase 2 trong luận văn thạc sĩ: "Xây dựng kiến trúc đồ thị cho bài toán HMER".
+
+1. Ngữ cảnh kỹ thuật:
+- Môi trường: Thư mục `gnn_sandbox/phase_2_gnn_design`.
+- Trạng thái đầu vào: CNN đã trích xuất ra Feature Map có kích thước `[Batch, Channels, Height, Width]` (ví dụ: `[2, 256, 8, 8]`).
+- Đã flatten (cán phẳng) lưới 2D này thành danh sách các Node có dạng `[Batch, Num_Nodes, Channels]` (ví dụ: `[2, 64, 256]`).
+
+2. Mục tiêu trọng tâm của Phase 2:
+- Chuyển đổi lưới pixel thành đồ thị: Viết các hàm (trong `graph_utils.py`) để sinh ra ma trận kề `edge_index` định nghĩa mối quan hệ giữa các pixel này.
+- Bài toán cần giải: Thiết kế thuật toán tạo cạnh (Edge Generation) – nên dùng Local Grid Connection (nối các điểm kề nhau), K-Nearest Neighbors (KNN trên không gian đặc trưng), hay Fully Connected có chọn lọc?
+- Xây dựng lớp GNN: Sử dụng PyTorch Geometric (như `GATConv` hoặc `GCNConv`) để các node trao đổi thông tin (Message Passing) dựa trên `edge_index` vừa tạo, sau đó reshape về dạng ban đầu `[2, 256, 8, 8]`.
+
+3. Yêu cầu hỗ trợ:
+- Tập trung vào tính toán ma trận và thuật toán đồ thị. Không bàn về huấn luyện (training) hay GPU ở giai đoạn này.
+- Code đề xuất phải tương thích với PyTorch và PyTorch Geometric.
+- Luôn in ra / comment rõ sự thay đổi hình dáng (shape) của tensor qua từng dòng code.
+- Giải thích rõ cơ sở toán học hoặc lý thuyết không gian khi đề xuất một thuật toán tạo cạnh.

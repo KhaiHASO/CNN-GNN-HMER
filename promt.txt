@@ -1,0 +1,99 @@
+Chiến lược tách các file cốt lõi ra một không gian cô lập (sandbox) là một nước đi rất thông minh. Nó giúp bạn tránh bị phân tâm bởi hàng tá file config, log hay luồng huấn luyện của PyTorch Lightning, tập trung 100% vào việc phát triển thuật toán cốt lõi cho luận văn.
+
+### 1. Đề xuất tên thư mục làm việc
+Để thể hiện tính chuyên nghiệp và đúng với bản chất công việc nghiên cứu thuật toán, bạn nên tạo một thư mục ngang hàng với `baseline`. 
+
+Một số gợi ý tên thư mục:
+* `gnn_sandbox` (Ngắn gọn, thể hiện đây là nơi "nghịch" và thử nghiệm GNN).
+* `algo_prototyping` (Nhấn mạnh việc phát triển nguyên mẫu thuật toán).
+* `hybrid_modules` (Tập trung vào các module lai).
+
+Giả sử chúng ta chọn tên **`gnn_sandbox`**.
+
+---
+
+### 2. Thiết lập không gian và sao chép file
+Mở terminal tại thư mục gốc `CNN-GNN-HMER`, chạy các lệnh sau để tạo không gian làm việc:
+
+```bash
+mkdir gnn_sandbox
+cd gnn_sandbox
+
+# Copy 3 file mục tiêu sang thư mục mới
+cp ../baseline/tamer/model/encoder.py ./sandbox_encoder.py
+cp ../baseline/tamer/datamodule/latex2gtd.py ./sandbox_latex2gtd.py
+cp ../baseline/tamer/datamodule/dataset.py ./sandbox_dataset.py
+
+# Tạo các file script để test độc lập
+touch test_data.py test_tree.py test_gnn_graph.py
+```
+*Lưu ý: Khi copy ra ngoài, các file này có thể bị lỗi import (ví dụ `from tamer...`). Bạn cứ mở chúng ra, comment (#) hoặc xóa các dòng import không cần thiết đi. Mục tiêu của chúng ta là lấy **logic cốt lõi**, không phải chạy nguyên file.*
+
+---
+
+### 3. Các bước nghiên cứu xác đáng nhất cho từng file
+
+Dưới đây là kế hoạch "mổ xẻ" chi tiết cho 3 script bạn vừa tạo:
+
+#### Bước 1: Làm chủ chiều dữ liệu với `test_data.py` (Focus vào `sandbox_dataset.py`)
+Mục tiêu ở đây là giả lập lại đúng shape của tensor mà `encoder.py` sẽ nhận được từ `dataset.py`.
+1. **Nghiên cứu:** Mở `sandbox_dataset.py` ra đọc hàm `__getitem__`. Bạn sẽ thấy thay vì trả về 1 ảnh `[C, H, W]`, nó trả về một cục `imgs` đã được gom nhóm.
+2. **Thực hành:** Trong `test_data.py`, bạn viết một đoạn code dùng `torch.randn` để tạo ra một tensor y hệt như những gì dataloader sẽ đẩy ra.
+```python
+import torch
+
+# Giả lập 1 "mega-batch" đầu vào như dataset của TAMER (ví dụ batch size = 8, ảnh 1 kênh màu xám, kích thước 128x128)
+dummy_batch = torch.randn(8, 1, 128, 128)
+print(f"1. Dữ liệu từ Dataset đi vào Encoder: {dummy_batch.shape}")
+```
+
+#### Bước 2: Thấu hiểu không gian Toán học với `test_tree.py` (Focus vào `sandbox_latex2gtd.py`)
+Mục tiêu là hiểu cách tác giả định nghĩa "Trên", "Dưới", "Trong", "Ngoài" – đây chính là nhãn (ground truth) để mạng GNN của bạn học theo.
+1. **Nghiên cứu:** Mở `sandbox_latex2gtd.py`, tìm các class hoặc dictionary định nghĩa các quan hệ không gian (thường là `Above`, `Below`, `Right`, `Inside`).
+2. **Thực hành:** Import hàm parse chuỗi của họ vào `test_tree.py`, đưa vào một công thức LaTeX cơ bản và in ra cấu trúc.
+```python
+# Ví dụ cấu trúc của test_tree.py
+# (Bạn cần chỉnh lại import tùy theo cách bạn cắt gọt file latex2gtd.py)
+from sandbox_latex2gtd import tex2tree 
+
+latex_formula = "x ^ { 2 } + y _ { i }"
+tree_structure = tex2tree(latex_formula)
+
+print(f"Công thức gốc: {latex_formula}")
+print(f"Cây không gian do TAMER sinh ra:\n{tree_structure}")
+# Phân tích xem chữ 'x' và số '2' được nối với nhau bằng loại cạnh (edge) gì.
+```
+
+#### Bước 3: Phác thảo Kiến trúc Lai trên `test_gnn_graph.py` (Focus vào `sandbox_encoder.py`)
+
+Đây là bước quan trọng nhất quyết định thành bại của mô hình lai.
+1. **Nghiên cứu:** Mở `sandbox_encoder.py`. Kéo xuống cuối hàm `forward`, tìm chỗ cái mạng DenseNet nhả ra `feature_map` (dạng `[B, C, H, W]`). 
+2. **Thực hành:** Dùng PyTorch Geometric để viết nháp luồng chuyển đổi: **Lưới 2D -> Đồ thị -> GNN -> Lưới 2D**.
+```python
+import torch
+import torch.nn.functional as F
+
+# 1. Giả lập feature map đầu ra của CNN (B=2, Channels=256, H=8, W=8)
+cnn_out = torch.randn(2, 256, 8, 8) 
+B, C, H, W = cnn_out.shape
+
+# 2. FLATTEN: Chuyển feature map thành danh sách các Node
+# Shape sẽ thành [B, H*W, C] -> [2, 64, 256]. Có 64 nodes, mỗi node dài 256
+nodes = cnn_out.view(B, C, -1).permute(0, 2, 1) 
+print(f"Shape của các Node: {nodes.shape}")
+
+# 3. EDGE GENERATION (Bài toán khó nhất):
+# Bạn phải tự viết thuật toán tạo ma trận kề (edge_index) ở đây.
+# Ví dụ: nối các điểm kề nhau kề nhau trong lưới 8x8.
+# dummy_edge_index = ... 
+
+# 4. GNN FORWARD: 
+# Đưa nodes và dummy_edge_index qua mạng GATConv (PyTorch Geometric)
+# gnn_out = gat_layer(nodes, dummy_edge_index)
+
+# 5. RESHAPE: Trả lại hình dáng ban đầu cho Decoder
+# output = gnn_out.permute(0, 2, 1).view(B, C, H, W)
+# print(f"Shape trả về cho Decoder: {output.shape}")
+```
+
+Bằng cách cô lập vào thư mục `gnn_sandbox` và chạy 3 file test trên thuần túy bằng lệnh `python`, bạn hoàn toàn không cần đụng đến GPU hay khởi động training loop mất thời gian. Khi thuật toán tại bước 3 (tạo `edge_index` và chạy qua `GATConv`) in ra shape chuẩn xác, bạn mới mang đoạn code đó dán ngược trở lại thư mục `baseline` để bắt đầu train nghiệm thu trên máy RTX 3070.

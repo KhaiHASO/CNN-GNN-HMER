@@ -55,6 +55,7 @@ conda install pytorch=1.8.1 torchvision=0.2.2 cudatoolkit=11.1 pillow=8.4.0 -c p
 conda install pytorch-lightning=1.4.9 torchmetrics=0.6.0 -c conda-forge
 # evaluating dependency
 conda install pandoc=1.19.2.1 -c conda-forge
+conda install torchvision
 pip install -e .
  ```
 ## Dataset Preparation
