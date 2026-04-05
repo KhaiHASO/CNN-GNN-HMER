@@ -62,7 +62,7 @@ instance/
 .scrapy
 
 # Large project artifacts
-data/
+data/crohme
 lightning_logs/**/checkpoints/
 *.ckpt
 *.tfevents.*
