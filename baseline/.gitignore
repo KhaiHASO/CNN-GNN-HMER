@@ -63,6 +63,5 @@ instance/
 
 # Large project artifacts
 data/crohme
-lightning_logs/**/checkpoints/
 *.ckpt
 *.tfevents.*
