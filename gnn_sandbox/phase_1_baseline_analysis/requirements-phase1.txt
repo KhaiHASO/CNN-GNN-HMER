@@ -1,4 +1,0 @@
-numpy
-torch
-# Optional: enables GATConv in test_gnn_graph.py instead of fallback mean message passing
-torch-geometric
