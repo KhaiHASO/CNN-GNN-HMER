@@ -1,0 +1,2 @@
+config,total_images,total_valid_graphs,valid_graph_rate,avg_token_count,avg_node_count,avg_edge_count,avg_max_depth,pct_has_frac,pct_has_sqrt,pct_has_sup,pct_has_sub
+p0,50,40,0.8,59.52,39.075,57.075,5.225,0.35,0.175,0.45,0.55
