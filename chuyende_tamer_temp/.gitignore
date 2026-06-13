@@ -1,0 +1,6 @@
+# Ignore large dataset and checkpoint files
+*.zip
+*.pkl
+*.ckpt
+lightning_logs/
+lightning_logs_debug/
