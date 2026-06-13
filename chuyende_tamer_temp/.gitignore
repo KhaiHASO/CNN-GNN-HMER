@@ -1,6 +1,12 @@
-# Ignore large dataset and checkpoint files
-*.zip
+# Ignore generated dataset and checkpoint files
 *.pkl
 *.ckpt
 lightning_logs/
 lightning_logs_debug/
+outputs/
+wandb/
+0-cnn-transformer-baseline/data/
+1-cnn-gnn/data/
+data/crohme/
+data/CROHME_extracted/
+!data/CROHME.zip

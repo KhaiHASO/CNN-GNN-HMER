@@ -18,6 +18,8 @@ __pycache__/
 outputs/
 outputs_refactor/
 data/
+!chuyende_tamer_temp/data/
+!chuyende_tamer_temp/data/CROHME.zip
 models/*
 !models/README.md
 dist/

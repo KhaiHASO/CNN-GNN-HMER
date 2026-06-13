@@ -25,7 +25,7 @@ Có 3 cách để xác thực API Key của WandB, được kiểm tra theo th�
 
 2. **Kaggle Secrets (Khuyên dùng cho Kaggle Script)**:
    - Vào Notebook -> Add-ons -> Secrets.
-   - Thêm secret mới với Label: `wandb_api_key` và Value: `YOUR_WANDB_API_KEY`.
+   - Thêm secret mới với Label: `WANDB_API_KEY` và Value: `YOUR_WANDB_API_KEY`.
    - Script `train.py` (nếu đã được cấu hình thêm) có thể tự động đọc. Tuy nhiên, sử dụng tham số dòng lệnh ở trên là cách trực tiếp nhất nếu bạn không muốn sửa code để đọc secret. *Trong phiên bản hiện tại, chúng tôi ưu tiên dùng tham số dòng lệnh hoặc biến môi trường.*
 
 3. **Biến môi trường**:
@@ -37,11 +37,11 @@ Có 3 cách để xác thực API Key của WandB, được kiểm tra theo th�
 ### Lệnh chạy mẫu trên Kaggle
 ```bash
 !source /kaggle/working/miniconda/bin/activate tamer && \
-python train.py \
+   python train.py \
 --config config/crohme.yaml \
 --trainer.max_epochs=200 \
 --trainer.gpus=2 \
---wandb_api_key=3010beaefcbb3ca747099418f4dd36cd474cc81c
+--wandb_api_key=YOUR_WANDB_API_KEY
 ```
 
 ## Các tính năng

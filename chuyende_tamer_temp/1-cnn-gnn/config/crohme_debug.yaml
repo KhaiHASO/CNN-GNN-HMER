@@ -31,7 +31,7 @@ model:
   cross_coverage: true
   self_coverage: true
   # GAT (Graph Attention Network) - optional
-  use_gat: false  # Set to true to enable GAT layers
+  use_gat: true  # CNN-GNN variant: enable GAT layers
   gat_num_layers: 2
   gat_num_heads: 8
   gat_hidden_dim: null  # null means use d_model

@@ -19,21 +19,23 @@ Dự án này triển khai mô hình **TAMER** (Two-way Attention-based Model fo
 
 TAMER là một kiến trúc mạnh mẽ kết hợp giữa CNN và Transformer để chuyển đổi hình ảnh biểu thức toán học viết tay thành chuỗi LaTeX. Dự án này bao gồm hai phiên bản chính:
 
-1.  **0-baseline**: Phiên bản chuẩn sử dụng DenseNet làm Encoder và Transformer làm Decoder.
-2.  **1-gat**: Phiên bản nâng cấp tích hợp **Graph Attention Networks (GAT)** vào bộ mã hóa (Encoder) để tăng cường khả năng trích xuất đặc trưng không gian và cấu trúc của biểu thức.
+1.  **0-cnn-transformer-baseline**: Phiên bản chuẩn sử dụng DenseNet làm Encoder và Transformer làm Decoder.
+2.  **1-cnn-gnn**: Phiên bản lai **CNN-GNN** tích hợp Graph Attention Networks (GAT) vào bộ mã hóa để tăng cường khả năng trích xuất đặc trưng không gian và cấu trúc của biểu thức.
 
 ## 📁 Cấu trúc dự án
 
 ```
 ChuyenDe-Tamer/
-├── 0-baseline/          # Phiên bản TAMER gốc (DenseNet + Transformer)
-├── 1-gat/               # Phiên bản nâng cao (DenseNet + GAT + Transformer)
+├── 0-cnn-transformer-baseline/ # Phiên bản TAMER gốc (DenseNet + Transformer)
+├── 1-cnn-gnn/                 # Phiên bản lai CNN-GNN (DenseNet + GAT + Transformer)
 │   ├── tamer/
 │   │   ├── model/
 │   │   │   ├── gat.py   # Cài đặt lớp Graph Attention
 │   │   │   └── encoder.py # Encoder tích hợp GAT
 │   │   └── ...
-├── KetQua/              # Lưu trữ kết quả thực nghiệm
+├── data/
+│   └── CROHME.zip             # Dataset duy nhất, notebook sẽ tự giải nén khi chạy Kaggle
+├── KAGGLE_RUN_ALL_CNN_GNN_HMER.ipynb
 └── README.md            # Tài liệu dự án
 ```
 
@@ -49,7 +51,7 @@ GAT cho phép mô hình coi bản đồ đặc trưng (feature map) như một �
 
 ### Kiến trúc chi tiết (Implementation Details)
 
-Module GAT được cài đặt trong `1-gat/tamer/model/gat.py` và `1-gat/tamer/model/encoder.py`.
+Module GAT được cài đặt trong `1-cnn-gnn/tamer/model/gat.py` và `1-cnn-gnn/tamer/model/encoder.py`.
 
 1.  **Xây dựng Đồ thị (Graph Construction)**:
     *   Feature map đầu ra từ DenseNet có kích thước `[H, W, D]`.
@@ -80,14 +82,14 @@ Cài đặt các gói phụ thuộc:
 
 ```bash
 # Cài đặt cho phiên bản GAT (Khuyên dùng)
-cd 1-gat
+cd 1-cnn-gnn
 pip install -r requirements.txt
 pip install -e .
 ```
 
 Nếu muốn chạy baseline:
 ```bash
-cd 0-baseline
+cd 0-cnn-transformer-baseline
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -100,7 +102,7 @@ pip install -e .
 
 ```bash
 # Di chuyển vào thư mục source code
-cd 1-gat
+cd 1-cnn-gnn
 
 # Chạy huấn luyện với file config mặc định
 python train.py fit --config config/crohme.yaml
@@ -114,7 +116,7 @@ python train.py fit --config config/crohme_debug.yaml
 Sử dụng các script trong thư mục `eval/` để đánh giá mô hình đã huấn luyện.
 
 ```bash
-cd 1-gat/eval
+cd 1-cnn-gnn/eval
 
 # Đánh giá trên tập dữ liệu CROHME
 bash eval_crohme.sh
