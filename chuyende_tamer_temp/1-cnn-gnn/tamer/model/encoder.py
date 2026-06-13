@@ -216,7 +216,7 @@ class Encoder(pl.LightningModule):
                     adj[:, down_idx, node_idx] = 1
         
         # Mask out padding nodes (set their connections to 0)
-        mask_flat = mask.view(b, n_nodes)  # [b, n_nodes]
+        mask_flat = mask.reshape(b, n_nodes)  # [b, n_nodes]
         padding_mask = (mask_flat == 1)  # True for padding
         adj = adj.masked_fill(padding_mask.unsqueeze(1), 0)
         adj = adj.masked_fill(padding_mask.unsqueeze(2), 0)
