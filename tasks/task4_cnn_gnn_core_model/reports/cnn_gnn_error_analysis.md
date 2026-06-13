@@ -1,10 +1,10 @@
 # Phân tích Lỗi Hệ thống: CNN-GNN vs UniMERNet (Error Analysis Report)
 
-Tài liệu này so sánh, phân tích các loại lỗi đặc trưng giữa mô hình lai **CNN-GNN/GAT** và mô hình end-to-end **UniMERNet** dựa trên kết quả thực nghiệm từ Task 1 đến Task 4.
+Tài liệu này so sánh, phân tích các loại lỗi đặc trưng giữa mô hình lai **CNN-GNN/GAT** (tham chiếu kiến trúc **GETD**) và mô hình end-to-end **UniMERNet** dựa trên kết quả thực nghiệm từ Task 1 đến Task 4 và lý thuyết từ các nghiên cứu liên quan.
 
 ---
 
-## 1. Các lỗi điển hình của UniMERNet (Mô hình dựa trên Chuỗi - Sequence-based)
+## 1. Các lỗi điển hình của UniMERNet (Mô hình chuỗi phẳng - Sequence-based)
 
 Qua thực nghiệm trên 50 ảnh mẫu viết tay ở Task 1 và Task 2, UniMERNet gặp các lỗi điển hình liên quan đến mất cân đối cú pháp hoặc nhầm lẫn ký tự cục bộ:
 
@@ -17,27 +17,28 @@ Qua thực nghiệm trên 50 ảnh mẫu viết tay ở Task 1 và Task 2, UniME
 
 ---
 
-## 2. Các lỗi điển hình của CNN-GNN/GAT (Mô hình dựa trên Đồ thị - Graph-based)
+## 2. Các lỗi điển hình của CNN-GNN/GAT (Mô hình lai Đồ thị - Graph-based)
 
-Mặc dù đạt kết quả khả quan **52.27% ExpRate** trên CROHME, mô hình lai CNN-GNN/GAT có những lỗi đặc thù liên quan đến chất lượng đồ thị bố cục (Layout Graph):
+Mặc dù đạt kết quả khả quan **52.27% ExpRate** trên CROHME (theo công bố của hướng nghiên cứu lai), mô hình lai CNN-GNN/GAT có những lỗi đặc thù liên quan đến chất lượng đồ thị bố cục (Layout Graph):
 
 1. **Lỗi phát hiện ký hiệu sai (Symbol Detection Miss / False Alarm)**:
-   * *Hiện tượng*: Tầng CNN/YOLO bỏ sót các ký hiệu nhỏ như dấu chấm phụ, dấu phẩy, hoặc các nét gạch ngang phân số quá mảnh.
+   * *Hiện tượng*: Tầng CNN/YOLO (YOLOv5 trong kiến trúc GETD) bỏ sót các ký hiệu nhỏ như dấu chấm phụ, dấu phẩy, hoặc các nét gạch ngang phân số quá mảnh.
    * *Hệ quả*: Một ký hiệu bị bỏ sót sẽ làm mất hoàn toàn nút tương ứng trên đồ thị, dẫn đến việc giải mã LaTeX bị thiếu thành phần hoặc sai lệch cấu trúc nghiêm trọng.
 2. **Lỗi phân loại sai mối quan hệ không gian (Spatial Relation Classification Error)**:
    * *Hiện tượng*: Nhầm lẫn giữa quan hệ đứng ngang hàng (Horizontal) và quan hệ số mũ (Superscript) hoặc chỉ số dưới (Subscript).
-   * *Ví dụ*: Biểu thức $x_i$ bị nhận nhầm thành $xi$ hoặc $x^i$ do nét viết tay của người dùng bị lệch hoặc có độ cao không đồng đều.
+   * *Ví dụ*: Biểu thức $x_i$ bị nhận nhầm thành $xi$ hoặc $x^i$ do nét viết tay của người dùng bị lệch hoặc có độ cao không đồng đều, ảnh hưởng đến kết quả xây dựng đồ thị tầm nhìn Line-of-Sight (LOS).
    * *Hệ quả*: GNN nhận thông tin từ các cạnh sai lệch sẽ truyền thông điệp sai (wrong message passing), khiến Decoder sinh ra cấu trúc LaTeX không đúng thực tế.
 
 ---
 
 ## 3. Ưu thế của việc mô hình hóa bằng Đồ thị (Graph Modeling Benefits)
 
-Mô hình hóa dưới dạng Đồ thị Bố cục Ký hiệu (Symbol Layout Graph) mang lại các điểm ưu việt cốt lõi mà các mô hình giải mã chuỗi phẳng như UniMERNet không có:
+Mô hình hóa dưới dạng Đồ thị Bố cục Ký hiệu (Symbol Layout Graph) mang lại các điểm ưu việt cốt lõi đã được kiểm chứng trong các nghiên cứu **GETD (Tang et al., 2024)** và **GRN**:
 
 * **Bảo toàn cấu trúc 2 chiều**: Cấu trúc đồ thị phản ánh trực tiếp quan hệ không gian vật lý (trên, dưới, trong, ngoài). Điều này giúp khống chế cú pháp LaTeX cực kỳ tốt, ngăn chặn các lỗi sinh token ngẫu nhiên gây mất cân đối ngoặc.
-* **Cơ chế truyền tin tường minh (Explicit Message Passing)**: Mạng chú ý đồ thị GAT cho phép các nút ký hiệu tương tác trực tiếp với các nút lân cận dựa trên khoảng cách địa lý 2D, thay vì phải phụ thuộc vào khoảng cách token trong chuỗi 1D.
+* **Cơ chế truyền tin tường minh (Explicit Message Passing)**: Mạng chú ý đồ thị GAT cho phép các nút ký hiệu tương tác trực tiếp với các nút lân cận dựa trên khoảng cách địa lý 2D (qua thuật toán Line-of-Sight), thay vì phải phụ thuộc vào khoảng cách token trong chuỗi 1D của Transformer phẳng.
 * **Hỗ trợ hậu xử lý dựa trên luật (Rule-based Post-processing)**: Đồ thị AST xây dựng từ Task 3 cho phép kiểm tra trực quan các lỗi cấu trúc (như nút `frac` bắt buộc phải có hai nhánh con là tử số và mẫu số). Nếu thiếu, mô hình có thể tự động sửa đổi cấu trúc đồ thị trước khi xuất chuỗi LaTeX.
+* **Tính giải thích được (Interpretability)**: Theo luận điểm từ bài báo **Graph-to-Graph (G2G)**, việc có một đồ thị trung gian giúp người dùng/nhà nghiên cứu nhìn rõ được lý do mô hình nhận dạng đúng/sai (ví dụ: mô hình sai vì vẽ nhầm cạnh nối giữa $x$ và $2$ chứ không phải do giải mã token ngẫu nhiên).
 
 ---
 

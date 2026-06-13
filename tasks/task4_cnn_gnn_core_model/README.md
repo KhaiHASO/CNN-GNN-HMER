@@ -1,6 +1,6 @@
 # Task 4: Đóng gói Mô hình CNN-GNN Chính thức (Official CNN-GNN Core Model Packaging)
 
-Thư mục này thực hiện **Task 4: Đóng gói lại mô hình CNN-GNN chính thức của đề tài** nhằm đưa mô hình lai CNN-GNN/GAT trở lại trung tâm luận văn, đồng thời định vị UniMERNet là mô hình baseline đối chứng.
+Thư mục này thực hiện **Task 4: Đóng gói lại mô hình CNN-GNN chính thức của đề tài** nhằm đưa mô hình lai CNN-GNN/GAT trở lại trung tâm luận văn, dựa trên nghiên cứu chính thức **GETD (Tang et al., 2024)** đăng trên tạp chí *Pattern Recognition*.
 
 ---
 
@@ -9,7 +9,7 @@ Thư mục này thực hiện **Task 4: Đóng gói lại mô hình CNN-GNN chí
 ```text
 tasks/task4_cnn_gnn_core_model/
 ├── docs/
-│   ├── architecture_cnn_gnn.md       # Giải thích chi tiết kiến trúc lai đề xuất (CNN/YOLO + GAT + Transformer Decoder)
+│   ├── architecture_cnn_gnn.md       # Giải thích chi tiết kiến trúc lai đề xuất (YOLOv5 + Line-of-Sight + GAT + Decoder)
 │   ├── model_role_in_thesis.md       # Phân định rõ vai trò CNN-GNN (chính) vs UniMERNet (baseline đối chứng)
 │   ├── recovered_assets.md           # Báo cáo kết quả quét tài nguyên mô hình trên máy local
 │   └── milestone_04_cnn_gnn_core.md  # Cột mốc hoàn thành Task 4 và câu trả lời phục vụ Hội đồng
@@ -31,41 +31,35 @@ tasks/task4_cnn_gnn_core_model/
 
 ---
 
-## 2. Hướng dẫn sử dụng các Kịch bản (Scripts Usage)
+## 2. Tài liệu Tham khảo Chính (Core Reference & Literature)
 
-### 2.1. Quét tài nguyên hệ thống
-Để kiểm tra lại các tài nguyên liên quan đến CNN-GNN trong repo:
+| Hạng mục | Tên công trình / Tài liệu tham khảo | Ý nghĩa đối với Luận văn |
+| :--- | :--- | :--- |
+| **Kiến trúc chính** | **GETD**: *Offline HMER with Graph Encoder and Transformer Decoder* (PR 2024) | Thiết lập luồng xử lý: YOLOv5 $\rightarrow$ Line-of-Sight Graph $\rightarrow$ Graph Encoder $\rightarrow$ Transformer Decoder. |
+| **Nền tảng lý thuyết** | **GRN**: *Offline HMER via Graph Reasoning Network* | Cung cấp luận điểm bảo vệ sự cần thiết của GNN trong việc học cấu trúc 2D phức tạp của biểu thức toán học. |
+| **Lý thuyết đồ thị** | **Graph-to-Graph (G2G)**: *Towards Accurate and Interpretable Online HMER* (AAAI) | Hỗ trợ lập luận về khả năng giải thích được (interpretability) của biểu diễn đồ thị. |
+| **Mã nguồn bổ trợ** | **math_online_egat** (GitHub) | Tham khảo triển khai thực tế của mạng chú ý đồ thị GAT/EGAT trên biểu thức toán học. |
+
+---
+
+## 3. Hướng dẫn sử dụng các Kịch bản (Scripts Usage)
+
+### 3.1. Quét tài nguyên hệ thống
 ```bash
 python tasks/task4_cnn_gnn_core_model/scripts/scan_cnn_gnn_assets.py
 ```
 
-### 2.2. Thử nghiệm chạy suy luận (Inference Test)
-Kịch bản chạy thử nghiệm trên máy local (sẽ đưa ra cảnh báo thiếu checkpoint):
+### 3.2. Thử nghiệm chạy suy luận (Inference Test)
 ```bash
 python tasks/task4_cnn_gnn_core_model/scripts/run_cnn_gnn_inference.py
 ```
 
-### 2.3. Đánh giá mô hình trên CROHME
-Hiển thị kết quả đánh giá CROHME kế thừa từ chuyên đề nghiên cứu:
+### 3.3. Đánh giá mô hình trên CROHME
 ```bash
 python tasks/task4_cnn_gnn_core_model/scripts/evaluate_cnn_gnn.py
 ```
 
-### 2.4. Tổng hợp bảng số liệu so sánh
-Tự động kết hợp dữ liệu từ Task 2 và Task 3 với kết quả CNN-GNN để ghi ra tệp `comparison_cnn_gnn_vs_unimernet.csv`:
+### 3.4. Tổng hợp bảng số liệu so sánh
 ```bash
 python tasks/task4_cnn_gnn_core_model/scripts/compare_with_unimernet.py
 ```
-
----
-
-## 3. 6 Câu hỏi Cốt lõi của Hội đồng (Core Q&A for Defense)
-
-| Câu hỏi | Vị trí và Ý nghĩa của Câu trả lời |
-| :--- | :--- |
-| **CNN nằm ở đâu?** | Ở tầng trích xuất đặc trưng visual ban đầu và phát hiện các hộp bao ký hiệu (YOLO/ResNet). |
-| **GNN nằm ở đâu?** | Nằm ở bộ mã hóa (GNN/GAT Encoder) để thực hiện truyền thông điệp giữa các nút lân cận trên đồ thị bố cục. |
-| **Graph là gì?** | Đồ thị bố cục ký hiệu (Symbol Layout Graph): Ký hiệu là nút (Node), quan hệ hình học 2D là cạnh (Edge). |
-| **Sinh LaTeX ra sao?** | Giải mã thông tin đồ thị từ GNN bằng cơ chế Cross-attention của Transformer Decoder để sinh ra chuỗi LaTeX. |
-| **Kết quả mô hình cũ?** | Đạt **52.27% ExpRate** trên tập kiểm thử CROHME chuẩn quốc tế. |
-| **Vai trò UniMERNet?** | Chỉ làm mô hình baseline đối chứng (SOTA hiện tại), không phải mô hình đề xuất. |
