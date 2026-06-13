@@ -221,11 +221,9 @@ class Encoder(pl.LightningModule):
         adj = adj.masked_fill(padding_mask.unsqueeze(1), 0)
         adj = adj.masked_fill(padding_mask.unsqueeze(2), 0)
         
-        # Self-connections for valid nodes
-        valid_mask = (mask_flat == 0)  # True for valid
+        # Self-connections for all nodes (prevents NaN in softmax for padding nodes)
         for b_idx in range(b):
-            valid_indices = valid_mask[b_idx].nonzero(as_tuple=False).squeeze(-1)
-            adj[b_idx, valid_indices, valid_indices] = 1
+            adj[b_idx, torch.arange(n_nodes, device=mask.device), torch.arange(n_nodes, device=mask.device)] = 1
         
         return adj
 

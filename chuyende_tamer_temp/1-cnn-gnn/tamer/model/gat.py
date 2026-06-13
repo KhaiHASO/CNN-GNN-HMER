@@ -84,20 +84,17 @@ class GATLayer(nn.Module):
         return h_prime
     
     def _compute_attention_scores(self, Wh1: FloatTensor, Wh2: FloatTensor) -> FloatTensor:
-        """Compute attention scores using concatenation method"""
-        b, num_heads, n, head_dim = Wh1.shape
+        """Compute attention scores using concatenation method (optimized to use O(N) memory)"""
+        # self.a has shape [2 * head_dim, 1]
+        a1 = self.a[:self.head_dim, :]
+        a2 = self.a[self.head_dim:, :]
         
-        # Expand dimensions for broadcasting
-        Wh1_expanded = Wh1.unsqueeze(3)  # [b, num_heads, n, 1, head_dim]
-        Wh2_expanded = Wh2.unsqueeze(2)  # [b, num_heads, 1, n, head_dim]
+        # Wh1 has shape [b, num_heads, n, head_dim]
+        # Wh2 has shape [b, num_heads, n, head_dim]
+        e1 = torch.matmul(Wh1, a1).squeeze(-1) # [b, num_heads, n]
+        e2 = torch.matmul(Wh2, a2).squeeze(-1) # [b, num_heads, n]
         
-        # Concatenate
-        Wh_concat = torch.cat([Wh1_expanded.repeat(1, 1, 1, n, 1), 
-                               Wh2_expanded.repeat(1, 1, n, 1, 1)], dim=-1)  # [b, num_heads, n, n, 2*head_dim]
-        
-        # Compute attention
-        e = torch.matmul(Wh_concat, self.a)  # [b, num_heads, n, n, 1]
-        e = e.squeeze(-1)  # [b, num_heads, n, n]
+        e = e1.unsqueeze(-1) + e2.unsqueeze(-2) # [b, num_heads, n, n]
         
         return e
 
