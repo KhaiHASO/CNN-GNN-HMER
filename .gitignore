@@ -1,6 +1,8 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.DS_Store
 
 # *.ipynb
 *.pth
@@ -8,7 +10,6 @@ __pycache__/
 *.tar
 *.out
 # *.log
-*.txt
 .ipynb_checkpoints/*
 
 # Ignore VS Code configuration directory
@@ -17,9 +18,64 @@ __pycache__/
 # Ignore model outputs
 outputs/
 outputs_refactor/
+wandb/
+lightning_logs/
+lightning_logs_debug/
+safe_checkpoints/
+*.ckpt
+*.pkl
+result.zip
+errors.json
+predictions.json
+build/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.pytest_cache/
+.cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.pyre/
+.hypothesis/
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.idea/
+
+# Ignore generated datasets, but keep the packaged CROHME zip used by Kaggle.
 data/
+chuyende_tamer_temp/0-cnn-transformer-baseline/data/
+chuyende_tamer_temp/1-cnn-gnn/data/
+chuyende_tamer_temp/data/crohme/
+chuyende_tamer_temp/data/CROHME_extracted/
 !chuyende_tamer_temp/data/
 !chuyende_tamer_temp/data/CROHME.zip
 models/*
 !models/README.md
 dist/
+
+# Generated notebooks/results from local or Kaggle runs.
+chuyende_tamer_temp/ketquachaydemo.ipynb
+
+# Generated files inside the optional UI package.
+chuyende_tamer_temp/GiaoDien/data/
+chuyende_tamer_temp/GiaoDien/models/
+chuyende_tamer_temp/GiaoDien/output-*/
+chuyende_tamer_temp/GiaoDien/outputs-*/
+chuyende_tamer_temp/GiaoDien/outputs/
+chuyende_tamer_temp/GiaoDien/**/*.jpg
+chuyende_tamer_temp/GiaoDien/**/*.jpeg
+chuyende_tamer_temp/GiaoDien/**/*.png
+chuyende_tamer_temp/GiaoDien/docs/feedbacks/
+chuyende_tamer_temp/GiaoDien/docs/_build/
+chuyende_tamer_temp/GiaoDien/site/
