@@ -6,7 +6,7 @@ model:
     max_seq_len: 1536
 
   load_pretrained: True
-  pretrained: './models/unimernet_base/unimernet_base.pth'
+  pretrained: './models/unimernet_base/pytorch_model.pth'
   tokenizer_config:
     path: ./models/unimernet_base
 
