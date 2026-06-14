@@ -1,0 +1,61 @@
+{
+  "os": "Linux-6.6.122+-x86_64-with-debian-bookworm-sid",
+  "python": "3.7.12",
+  "startedAt": "2026-06-13T18:13:56.033737Z",
+  "args": [
+    "--config",
+    "config/crohme.yaml",
+    "--trainer.gpus=2",
+    "--trainer.accelerator=ddp",
+    "--trainer.precision=32",
+    "--trainer.gradient_clip_val=1.0",
+    "--trainer.limit_train_batches=250",
+    "--trainer.limit_val_batches=20",
+    "--trainer.num_sanity_val_steps=0",
+    "--trainer.log_every_n_steps=10"
+  ],
+  "program": "train.py",
+  "codePath": "chuyende_tamer_temp/1-cnn-gnn/train.py",
+  "git": {
+    "remote": "https://github.com/KhaiHASO/CNN-GNN-HMER.git",
+    "commit": "26318be4c71f06cac196c125e90ecbb76483cadc"
+  },
+  "email": "khaikhai331@gmail.com",
+  "root": "lightning_logs",
+  "host": "c8064bb1b0d4",
+  "username": "root",
+  "executable": "/kaggle/working/miniconda/envs/tamer/bin/python",
+  "codePathLocal": "train.py",
+  "cpu_count": 2,
+  "cpu_count_logical": 4,
+  "gpu": "Tesla T4",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "8656922775552",
+      "used": "7475457949696"
+    }
+  },
+  "memory": {
+    "total": "33662468096"
+  },
+  "cpu": {
+    "count": 2,
+    "countLogical": 4
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    },
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "13.0"
+}

@@ -1,0 +1,56 @@
+{
+  "os": "Linux-6.6.122+-x86_64-with-debian-bookworm-sid",
+  "python": "3.7.12",
+  "startedAt": "2026-06-13T17:58:43.337040Z",
+  "args": [
+    "artifact",
+    "put",
+    "lightning_logs",
+    "--name",
+    "cnn-gnn-checkpoints",
+    "--type",
+    "model"
+  ],
+  "program": "/kaggle/working/miniconda/envs/tamer/bin/wandb",
+  "git": {
+    "remote": "https://github.com/KhaiHASO/CNN-GNN-HMER.git",
+    "commit": "26318be4c71f06cac196c125e90ecbb76483cadc"
+  },
+  "email": "khaikhai331@gmail.com",
+  "root": "/kaggle/working/wandb",
+  "host": "c8064bb1b0d4",
+  "username": "root",
+  "executable": "/kaggle/working/miniconda/envs/tamer/bin/python",
+  "cpu_count": 2,
+  "cpu_count_logical": 4,
+  "gpu": "Tesla T4",
+  "gpu_count": 2,
+  "disk": {
+    "/": {
+      "total": "8656922775552",
+      "used": "7475456700416"
+    }
+  },
+  "memory": {
+    "total": "33662468096"
+  },
+  "cpu": {
+    "count": 2,
+    "countLogical": 4
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    },
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "13.0"
+}

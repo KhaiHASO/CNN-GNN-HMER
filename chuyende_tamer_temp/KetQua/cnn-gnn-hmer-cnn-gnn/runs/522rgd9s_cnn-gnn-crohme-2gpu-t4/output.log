@@ -1,0 +1,214 @@
+
+  | Name             | Type            | Params
+-----------------------------------------------------
+0 | tamer_model      | TAMER           | 8.4 M
+1 | exprate_recorder | ExpRateRecorder | 0
+-----------------------------------------------------
+8.4 M     Trainable params
+0         Non-trainable params
+8.4 M     Total params
+33.454    Total estimated model params size (MB)
+/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 5 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  cpuset_checked))
+Epoch 0:   0%|                                | 0/250 [00:00<00:00, 2914.74it/s]
+Traceback (most recent call last):
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 1049, in _run_train
+    self.fit_loop.run()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/fit_loop.py", line 200, in advance
+    epoch_output = self.epoch_loop.run(train_dataloader)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/epoch/training_epoch_loop.py", line 130, in advance
+    batch_output = self.batch_loop.run(batch, self.iteration_count, self._dataloader_idx)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 100, in run
+    super().run(batch, batch_idx, dataloader_idx)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 147, in advance
+    result = self._run_optimization(batch_idx, split_batch, opt_idx, optimizer)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 201, in _run_optimization
+    self._optimizer_step(optimizer, opt_idx, batch_idx, closure)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 403, in _optimizer_step
+    using_lbfgs=is_lbfgs,
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/lightning.py", line 1616, in optimizer_step
+    optimizer.step(closure=optimizer_closure)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py", line 206, in step
+    self.__optimizer_step(closure=closure, profiler_name=profiler_name, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py", line 128, in __optimizer_step
+    trainer.accelerator.optimizer_step(self._optimizer, self._optimizer_idx, lambda_closure=closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 296, in optimizer_step
+    self.run_optimizer_step(optimizer, opt_idx, lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 303, in run_optimizer_step
+    self.training_type_plugin.optimizer_step(optimizer, lambda_closure=lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py", line 226, in optimizer_step
+    optimizer.step(closure=lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/lr_scheduler.py", line 68, in wrapper
+    return wrapped(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/optimizer.py", line 140, in wrapper
+    out = func(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/adadelta.py", line 88, in step
+    loss = closure()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 235, in _training_step_and_backward_closure
+    result = self.training_step_and_backward(split_batch, batch_idx, opt_idx, optimizer, hiddens)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 536, in training_step_and_backward
+    result = self._training_step(split_batch, batch_idx, opt_idx, hiddens)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 306, in _training_step
+    training_step_output = self.trainer.accelerator.training_step(step_kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 193, in training_step
+    return self.training_type_plugin.training_step(*step_kwargs.values())
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py", line 389, in training_step
+    return self.model(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py", line 1000, in _run_ddp_forward
+    return module_to_run(*inputs[0], **kwargs[0])
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/overrides/base.py", line 82, in forward
+    output = self.module.training_step(*inputs, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py", line 98, in training_step
+    out_hat, sim = self(batch.imgs, batch.mask, tgt)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py", line 93, in forward
+    return self.tamer_model(img, img_mask, tgt)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/tamer.py", line 77, in forward
+    feature, mask = self.encoder(img, img_mask)  # [b, t, d]
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/encoder.py", line 268, in forward
+    feature_flat = self.gat(feature_flat, adj)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 162, in forward
+    h = layer(h, adj_mask)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 68, in forward
+    e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 96, in _compute_attention_scores
+    Wh2_expanded.repeat(1, 1, n, 1, 1)], dim=-1)  # [b, num_heads, n, n, 2*head_dim]
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.82 GiB (GPU 0; 14.56 GiB total capacity; 11.65 GiB already allocated; 141.81 MiB free; 14.21 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train.py", line 41, in <module>
+    cli_main()
+  File "train.py", line 37, in cli_main
+    trainer_defaults={"plugins": DDPPlugin(find_unused_parameters=True)},
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/utilities/cli.py", line 289, in __init__
+    self.fit()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/utilities/cli.py", line 432, in fit
+    self.trainer.fit(**self.fit_kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 552, in fit
+    self._run(model)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 922, in _run
+    self._dispatch()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 990, in _dispatch
+    self.accelerator.start_training(self)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 92, in start_training
+    self.training_type_plugin.start_training(trainer)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py", line 161, in start_training
+    self._results = trainer.run_stage()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 1000, in run_stage
+    return self._run_train()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 1062, in _run_train
+    self.training_type_plugin.reconciliate_processes(traceback.format_exc())
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py", line 478, in reconciliate_processes
+    raise DeadlockDetectedException(f"DeadLock detected from rank: {self.global_rank} \n {trace}")
+pytorch_lightning.utilities.exceptions.DeadlockDetectedException: DeadLock detected from rank: 0
+ Traceback (most recent call last):
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py", line 1049, in _run_train
+    self.fit_loop.run()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/fit_loop.py", line 200, in advance
+    epoch_output = self.epoch_loop.run(train_dataloader)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/epoch/training_epoch_loop.py", line 130, in advance
+    batch_output = self.batch_loop.run(batch, self.iteration_count, self._dataloader_idx)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 100, in run
+    super().run(batch, batch_idx, dataloader_idx)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py", line 111, in run
+    self.advance(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 147, in advance
+    result = self._run_optimization(batch_idx, split_batch, opt_idx, optimizer)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 201, in _run_optimization
+    self._optimizer_step(optimizer, opt_idx, batch_idx, closure)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 403, in _optimizer_step
+    using_lbfgs=is_lbfgs,
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/lightning.py", line 1616, in optimizer_step
+    optimizer.step(closure=optimizer_closure)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py", line 206, in step
+    self.__optimizer_step(closure=closure, profiler_name=profiler_name, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py", line 128, in __optimizer_step
+    trainer.accelerator.optimizer_step(self._optimizer, self._optimizer_idx, lambda_closure=closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 296, in optimizer_step
+    self.run_optimizer_step(optimizer, opt_idx, lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 303, in run_optimizer_step
+    self.training_type_plugin.optimizer_step(optimizer, lambda_closure=lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py", line 226, in optimizer_step
+    optimizer.step(closure=lambda_closure, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/lr_scheduler.py", line 68, in wrapper
+    return wrapped(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/optimizer.py", line 140, in wrapper
+    out = func(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/adadelta.py", line 88, in step
+    loss = closure()
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 235, in _training_step_and_backward_closure
+    result = self.training_step_and_backward(split_batch, batch_idx, opt_idx, optimizer, hiddens)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 536, in training_step_and_backward
+    result = self._training_step(split_batch, batch_idx, opt_idx, hiddens)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py", line 306, in _training_step
+    training_step_output = self.trainer.accelerator.training_step(step_kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py", line 193, in training_step
+    return self.training_type_plugin.training_step(*step_kwargs.values())
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py", line 389, in training_step
+    return self.model(*args, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py", line 1040, in forward
+    output = self._run_ddp_forward(*inputs, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py", line 1000, in _run_ddp_forward
+    return module_to_run(*inputs[0], **kwargs[0])
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/overrides/base.py", line 82, in forward
+    output = self.module.training_step(*inputs, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py", line 98, in training_step
+    out_hat, sim = self(batch.imgs, batch.mask, tgt)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py", line 93, in forward
+    return self.tamer_model(img, img_mask, tgt)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/tamer.py", line 77, in forward
+    feature, mask = self.encoder(img, img_mask)  # [b, t, d]
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/encoder.py", line 268, in forward
+    feature_flat = self.gat(feature_flat, adj)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 162, in forward
+    h = layer(h, adj_mask)
+  File "/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 68, in forward
+    e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]
+  File "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py", line 96, in _compute_attention_scores
+    Wh2_expanded.repeat(1, 1, n, 1, 1)], dim=-1)  # [b, num_heads, n, n, 2*head_dim]
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.82 GiB (GPU 0; 14.56 GiB total capacity; 11.65 GiB already allocated; 141.81 MiB free; 14.21 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo & Dashboard: CNN-GNN-HMER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-color: #334155;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-failed { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-running { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Card container */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(15, 23, 42, 0.3);
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        /* Two columns layout */
+        .grid-2 {
+            display: grid;
+            grid-template-cols: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .grid-2 {
+                grid-template-cols: 1fr 1fr;
+            }
+        }
+
+        /* Code & Pre */
+        pre {
+            background-color: #0f172a;
+            color: #38bdf8;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+            max-height: 400px;
+        }
+
+        /* Predictions styles */
+        .pred-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .pred-card {
+            background: #182232;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pred-img-container {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        .pred-img-container img {
+            max-height: 80px;
+            max-width: 100%;
+            object-fit: contain;
+            filter: invert(0);
+        }
+
+        .pred-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .pred-value {
+            font-family: monospace;
+            background: #0f172a;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .pred-status {
+            align-self: flex-start;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .match { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .mismatch { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        /* Config list */
+        .config-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .config-item {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .config-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .config-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            margin-top: 2px;
+        }
+
+        .btn-link {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Báo cáo Kết quả Huấn luyện: CNN-GNN-HMER</h1>
+                <div class="subtitle">Báo cáo phân tích dữ liệu tự động từ dự án Weights & Biases (W&B)</div>
+            </div>
+            <div style="text-align: right;">
+                <span class="badge badge-success">Dự án: <span id="project-name"></span></span>
+                <div class="subtitle" style="margin-top: 5px;">Thành viên: <span id="entity-name"></span></div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Tổng số Runs</div>
+                <div class="stat-value" id="stat-total-runs">0</div>
+                <div class="stat-desc">Bao gồm cả các run bị lỗi/crashed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Thành công / Lỗi</div>
+                <div class="stat-value" id="stat-success-failed">0 / 0</div>
+                <div class="stat-desc">Dựa trên trạng thái lưu trữ trên W&B</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Best Epoch (Run 1nzxiodq)</div>
+                <div class="stat-value" id="stat-best-epoch">-</div>
+                <div class="stat-desc">Số epoch đạt được trước khi crash</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Tỷ lệ Nhận diện Đúng (ExpRate)</div>
+                <div class="stat-value" id="stat-best-exprate">-</div>
+                <div class="stat-desc">Độ chính xác cao nhất (Validation)</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-overview')">Tổng quan & Phân tích</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-runs')">Danh sách Runs</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-charts')">Biểu đồ Huấn luyện</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-predictions')">Kết quả Dự đoán (Validation)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-config')">Cấu hình Mô hình (Best Run)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-artifacts')">Quản lý Artifacts</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-errors')">Nhật ký lỗi (Logs)</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">Tóm tắt Dự án & Đánh giá kết quả</h2>
+                <div style="font-size: 1.05rem; line-height: 1.8;">
+                    <p>Dự án này nghiên cứu và phát triển mô hình <strong>CNN-GNN-HMER (Handwritten Mathematical Expression Recognition)</strong>. 
+                    Mô hình kết hợp thế mạnh của mạng CNN (trích xuất đặc trưng hình ảnh công thức) và GNN (cụ thể là Graph Attention Network - GAT, dùng để mô hình hóa cấu trúc hai chiều và mối quan hệ giữa các ký tự) 
+                    để dịch ảnh công thức viết tay sang mã LaTeX.</p>
+                    
+                    <h3 style="margin-top: 20px; color: #fff;">Các phát hiện chính:</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px; list-style-type: square;">
+                        <li><strong>Mô hình huấn luyện tốt nhất:</strong> Run <code>1nzxiodq_cnn-gnn-crohme-2gpu-t4</code> đã chạy thành công qua 19 epoch trước khi bị dừng/crashed.</li>
+                        <li><strong>Độ chính xác:</strong> Ở epoch 19, mô hình đạt tỷ lệ nhận diện biểu thức chính xác hoàn toàn (Validation Expression Rate - <code>val_ExpRate</code>) là <strong>24.09%</strong>, với Loss tập validation là <strong>0.8601</strong>.</li>
+                        <li><strong>Chi tiết lỗi OOM (Out of Memory):</strong> Một số run (như <code>522rgd9s</code>) đã thất bại ngay lập tức ở epoch 0. Phân tích file log cho thấy lỗi xảy ra do <strong>CUDA out of memory</strong> trong module GAT (Graph Attention Network) khi cố gắng tính toán ma trận Attention <code>Wh2_expanded.repeat(...)</code> (yêu cầu cấp phát thêm 2.82 GiB trong khi bộ nhớ GPU 16GB đã đầy).</li>
+                        <li><strong>Cách khắc phục đề xuất:</strong> Giảm <code>batch_size</code>, giảm kích thước mô hình (<code>d_model</code> từ 256 xuống 128 hoặc giảm số layers/heads của GAT), hoặc kích hoạt Gradient Accumulation để tránh tràn bộ nhớ GPU.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">Thông tin Repository & Commit</h2>
+                    <table>
+                        <tr><th>Repository</th><td><a href="https://github.com/KhaiHASO/CNN-GNN-HMER" target="_blank" class="btn-link">github.com/KhaiHASO/CNN-GNN-HMER</a></td></tr>
+                        <tr><th>Commit Hash</th><td><code>26318be4c71f06cac196c125e90ecbb76483cadc</code></td></tr>
+                        <tr><th>File chạy chính (Entrypoint)</th><td><code>chuyende_tamer_temp/1-cnn-gnn/train.py</code></td></tr>
+                        <tr><th>Môi trường Python</th><td>Conda: <code>unimernet</code> (Python 3.10.20)</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Kết quả tốt nhất đạt được</h2>
+                    <table>
+                        <tr><th>Tham số</th><th>Giá trị</th></tr>
+                        <tr><td>Epoch cao nhất</td><td>19 (Run 1nzxiodq)</td></tr>
+                        <tr><td>Training Loss (Struct)</td><td>0.0425</td></tr>
+                        <tr><td>Validation Loss (Total)</td><td>0.8601</td></tr>
+                        <tr><td>Validation Loss (Struct)</td><td>0.0475</td></tr>
+                        <tr style="background-color: rgba(16, 185, 129, 0.1);"><td><b>Validation Expression Rate (Accuracy)</b></td><td style="color: #34d399; font-weight: bold;">24.09%</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RUNS -->
+        <div id="tab-runs" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Danh sách các lượt chạy (Runs)</h2>
+                <div style="overflow-x: auto;">
+                    <table id="runs-table">
+                        <thead>
+                            <tr>
+                                <th>ID / Name</th>
+                                <th>Trạng thái</th>
+                                <th>Thời gian chạy (s)</th>
+                                <th>Ngày tạo</th>
+                                <th>Epoch</th>
+                                <th>Train Loss</th>
+                                <th>Val Loss</th>
+                                <th>Val ExpRate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CHARTS -->
+        <div id="tab-charts" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">Biểu đồ Loss (Theo Epoch)</h2>
+                    <div class="chart-container">
+                        <canvas id="lossChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-title">Độ chính xác (Validation Expression Rate)</h2>
+                    <div class="chart-container">
+                        <canvas id="accChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <h2 class="card-title">Tốc độ học (Learning Rate - Adadelta)</h2>
+                <div class="chart-container" style="height: 250px;">
+                    <canvas id="lrChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: PREDICTIONS -->
+        <div id="tab-predictions" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Mẫu kết quả dự đoán trên tập Validation</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Dưới đây là một số hình ảnh công thức toán học từ tập dữ liệu validation, hiển thị chuỗi ký tự gốc (Ground Truth) và chuỗi ký tự do mô hình dự đoán (Prediction).
+                </p>
+                <div class="pred-grid" id="predictions-container">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CONFIG -->
+        <div id="tab-config" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Cấu hình Siêu tham số (Hyperparameters) - Run 1nzxiodq</h2>
+                <div class="config-grid" id="config-container">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ARTIFACTS -->
+        <div id="tab-artifacts" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Danh sách File & Artifacts đã tải về</h2>
+                <div style="overflow-x: auto;">
+                    <table id="artifacts-table">
+                        <thead>
+                            <tr>
+                                <th>Loại</th>
+                                <th>Tên Collection</th>
+                                <th>Version</th>
+                                <th>Dung lượng</th>
+                                <th>Tệp tin đi kèm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ERRORS -->
+        <div id="tab-errors" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Chi tiết lỗi Lượt chạy Thất bại (Run: 522rgd9s)</h2>
+                <p style="margin-bottom: 10px;">Lỗi xảy ra trong quá trình tính toán phân cấp của <strong>GAT (Graph Attention Network)</strong> dẫn đến <strong>Out of Memory (OOM)</strong> trên GPU:</p>
+                <pre><code id="oom-error-code"></code></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Data injected from python script
+        const data = {"project_name": "cnn-gnn-hmer-cnn-gnn", "entity": "khaihaso", "runs": [{"id": "uf9wwd1n", "name": "cnn-gnn-crohme-2gpu-t4", "state": "crashed", "notes": null, "tags": [], "created_at": "2026-06-13T17:57:33Z", "heartbeat_at": "2026-06-13T17:58:19Z", "runtime": 12.972074183, "config": {"dc": 32, "alpha": 1, "nhead": 8, "d_model": 256, "dropout": 0.3, "max_len": 150, "use_gat": true, "patience": 20, "beam_size": 10, "milestones": [300, 350], "num_layers": 16, "vocab_size": 113, "gat_dropout": 0.1, "growth_rate": 24, "temperature": 1, "gat_num_heads": 8, "learning_rate": 1, "self_coverage": true, "cross_coverage": true, "early_stopping": false, "gat_hidden_dim": "None", "gat_num_layers": 2, "dim_feedforward": 1024, "num_decoder_layers": 3}, "summary": {"_runtime": 12.972074183, "_step": 1, "_timestamp": 1781373466.7574751, "_wandb": {"runtime": 12}, "lr-Adadelta": 1, "trainer/global_step": 0, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://qed9lzt9z8jjt0a5vp6nigmh979tunfh7jsyfq1yjf1h5wbnm8avk7l37dyb5u2tr9w6fqqeezx4jtq8m2egcdkap0y55s5gs12docjrko5qv5xk0ewy6z5dfu4fq5lo:latest/val_predictions.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://mgudz3nm2slgfqjkg5feo7k7ax7kfg91wnl0kuytv45nxn7otxf7ey3h6mow5wqyvrdnstlc57wayhbfolrzpsxhek2nnkv9l5pudkn82sz7tpdmb2jisrujsskrshx1/val_predictions.table.json", "ncols": 3, "nrows": 2, "path": "media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "sha256": "123c68308f2bb5db057c66cd5b4dc51a34d3c8bef923b0184adcef80b6201449", "size": 832}}, "history": [{"val_predictions": {"artifact_path": "wandb-client-artifact://mgudz3nm2slgfqjkg5feo7k7ax7kfg91wnl0kuytv45nxn7otxf7ey3h6mow5wqyvrdnstlc57wayhbfolrzpsxhek2nnkv9l5pudkn82sz7tpdmb2jisrujsskrshx1/val_predictions.table.json", "size": 832, "_type": "table-file", "nrows": 2, "path": "media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "_latest_artifact_path": "wandb-client-artifact://qed9lzt9z8jjt0a5vp6nigmh979tunfh7jsyfq1yjf1h5wbnm8avk7l37dyb5u2tr9w6fqqeezx4jtq8m2egcdkap0y55s5gs12docjrko5qv5xk0ewy6z5dfu4fq5lo:latest/val_predictions.table.json", "sha256": "123c68308f2bb5db057c66cd5b4dc51a34d3c8bef923b0184adcef80b6201449", "ncols": 3}, "trainer/global_step": 0, "_step": 0, "_runtime": 5.939083168, "_timestamp": 1781373459.724079, "lr-Adadelta": null}, {"val_predictions": null, "trainer/global_step": 0, "_step": 1, "_runtime": 12.972074183, "_timestamp": 1781373466.7574751, "lr-Adadelta": 1.0}], "log": ""}, {"id": "20h2tun4", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T17:58:38Z", "heartbeat_at": "2026-06-13T17:58:40Z", "runtime": 0, "config": {"path": "lightning_logs"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "7qqqa390", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T17:58:43Z", "heartbeat_at": "2026-06-13T17:58:44Z", "runtime": 0, "config": {"path": "lightning_logs"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "86olsd2p", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T17:58:48Z", "heartbeat_at": "2026-06-13T17:58:50Z", "runtime": 0, "config": {"path": "eval"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "jwbl6zuc", "name": "cnn-gnn-crohme-2gpu-t4", "state": "crashed", "notes": null, "tags": [], "created_at": "2026-06-13T18:07:58Z", "heartbeat_at": "2026-06-13T18:08:44Z", "runtime": 12.936119397, "config": {"dc": 32, "alpha": 1, "nhead": 8, "d_model": 256, "dropout": 0.3, "max_len": 150, "use_gat": true, "patience": 20, "beam_size": 10, "milestones": [300, 350], "num_layers": 16, "vocab_size": 113, "gat_dropout": 0.1, "growth_rate": 24, "temperature": 1, "gat_num_heads": 8, "learning_rate": 1, "self_coverage": true, "cross_coverage": true, "early_stopping": false, "gat_hidden_dim": "None", "gat_num_layers": 2, "dim_feedforward": 1024, "num_decoder_layers": 3}, "summary": {"_runtime": 12.936119397, "_step": 1, "_timestamp": 1781374091.412312, "_wandb": {"runtime": 12}, "lr-Adadelta": 1, "trainer/global_step": 0, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://mmq3r1kig2hm4ru0w92vtk83vw8ij75z6yr552wn5l0qrviw7k6kwbg4ve3ix9d8ofnoujtmu0faw267x43hkdde0yr0zg65py07gm1cd43p0d45s5g3w8g2ep6kplwq:latest/val_predictions.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://ejflmf8vpm44aajclvhf79wzia6j4k1iml5zb4jpr0osvktjbufuvh41hvmmxzvo95pr74cr9qqn0dbt3ye9phukqulj7o4fhv3uxv7mc07ihnim0ak8ky8ygkz39ho3/val_predictions.table.json", "ncols": 3, "nrows": 2, "path": "media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "sha256": "123c68308f2bb5db057c66cd5b4dc51a34d3c8bef923b0184adcef80b6201449", "size": 832}}, "history": [{"_timestamp": 1781374084.2347739, "lr-Adadelta": null, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://mmq3r1kig2hm4ru0w92vtk83vw8ij75z6yr552wn5l0qrviw7k6kwbg4ve3ix9d8ofnoujtmu0faw267x43hkdde0yr0zg65py07gm1cd43p0d45s5g3w8g2ep6kplwq:latest/val_predictions.table.json", "_type": "table-file", "ncols": 3, "sha256": "123c68308f2bb5db057c66cd5b4dc51a34d3c8bef923b0184adcef80b6201449", "size": 832, "nrows": 2, "path": "media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "artifact_path": "wandb-client-artifact://ejflmf8vpm44aajclvhf79wzia6j4k1iml5zb4jpr0osvktjbufuvh41hvmmxzvo95pr74cr9qqn0dbt3ye9phukqulj7o4fhv3uxv7mc07ihnim0ak8ky8ygkz39ho3/val_predictions.table.json"}, "trainer/global_step": 0, "_step": 0, "_runtime": 5.759033631}, {"_timestamp": 1781374091.412312, "lr-Adadelta": 1.0, "val_predictions": null, "trainer/global_step": 0, "_step": 1, "_runtime": 12.936119397}], "log": ""}, {"id": "qdov0k7t", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T18:09:11Z", "heartbeat_at": "2026-06-13T18:09:13Z", "runtime": 0, "config": {"path": "lightning_logs"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "r63isncm", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T18:09:16Z", "heartbeat_at": "2026-06-13T18:09:18Z", "runtime": 0, "config": {"path": "lightning_logs"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "13j2wxey", "name": "cnn-gnn-crohme-2gpu-t4", "state": "finished", "notes": null, "tags": [], "created_at": "2026-06-13T18:09:22Z", "heartbeat_at": "2026-06-13T18:09:22Z", "runtime": 0, "config": {"path": "eval"}, "summary": {"_wandb": {"runtime": 0}}, "history": [], "log": ""}, {"id": "522rgd9s", "name": "cnn-gnn-crohme-2gpu-t4", "state": "failed", "notes": null, "tags": [], "created_at": "2026-06-13T18:13:56Z", "heartbeat_at": "2026-06-13T18:14:02Z", "runtime": 0.588112524, "config": {"dc": 32, "alpha": 1, "nhead": 8, "d_model": 256, "dropout": 0.3, "max_len": 150, "use_gat": true, "patience": 20, "beam_size": 10, "milestones": [300, 350], "num_layers": 16, "vocab_size": 113, "gat_dropout": 0.1, "growth_rate": 24, "temperature": 1, "gat_num_heads": 8, "learning_rate": 1, "self_coverage": true, "cross_coverage": true, "early_stopping": false, "gat_hidden_dim": "None", "gat_num_layers": 2, "dim_feedforward": 1024, "num_decoder_layers": 3}, "summary": {"_runtime": 0.588112524, "_step": 0, "_timestamp": 1781374436.6150784, "_wandb": {"runtime": 5}, "lr-Adadelta": 1, "trainer/global_step": 0}, "history": [{"_step": 0, "_runtime": 0.588112524, "_timestamp": 1781374436.6150784, "lr-Adadelta": 1, "trainer/global_step": 0}], "log": "\n  | Name             | Type            | Params\n-----------------------------------------------------\n0 | tamer_model      | TAMER           | 8.4 M\n1 | exprate_recorder | ExpRateRecorder | 0\n-----------------------------------------------------\n8.4 M     Trainable params\n0         Non-trainable params\n8.4 M     Total params\n33.454    Total estimated model params size (MB)\n/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/utils/data/dataloader.py:557: UserWarning: This DataLoader will create 5 worker processes in total. Our suggested max number of worker in current system is 4, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.\n  cpuset_checked))\nEpoch 0:   0%|                                | 0/250 [00:00<00:00, 2914.74it/s]\nTraceback (most recent call last):\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1049, in _run_train\n    self.fit_loop.run()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/fit_loop.py\", line 200, in advance\n    epoch_output = self.epoch_loop.run(train_dataloader)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/epoch/training_epoch_loop.py\", line 130, in advance\n    batch_output = self.batch_loop.run(batch, self.iteration_count, self._dataloader_idx)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 100, in run\n    super().run(batch, batch_idx, dataloader_idx)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 147, in advance\n    result = self._run_optimization(batch_idx, split_batch, opt_idx, optimizer)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 201, in _run_optimization\n    self._optimizer_step(optimizer, opt_idx, batch_idx, closure)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 403, in _optimizer_step\n    using_lbfgs=is_lbfgs,\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/lightning.py\", line 1616, in optimizer_step\n    optimizer.step(closure=optimizer_closure)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py\", line 206, in step\n    self.__optimizer_step(closure=closure, profiler_name=profiler_name, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py\", line 128, in __optimizer_step\n    trainer.accelerator.optimizer_step(self._optimizer, self._optimizer_idx, lambda_closure=closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 296, in optimizer_step\n    self.run_optimizer_step(optimizer, opt_idx, lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 303, in run_optimizer_step\n    self.training_type_plugin.optimizer_step(optimizer, lambda_closure=lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py\", line 226, in optimizer_step\n    optimizer.step(closure=lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/lr_scheduler.py\", line 68, in wrapper\n    return wrapped(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/optimizer.py\", line 140, in wrapper\n    out = func(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/autograd/grad_mode.py\", line 27, in decorate_context\n    return func(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/adadelta.py\", line 88, in step\n    loss = closure()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 235, in _training_step_and_backward_closure\n    result = self.training_step_and_backward(split_batch, batch_idx, opt_idx, optimizer, hiddens)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 536, in training_step_and_backward\n    result = self._training_step(split_batch, batch_idx, opt_idx, hiddens)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 306, in _training_step\n    training_step_output = self.trainer.accelerator.training_step(step_kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 193, in training_step\n    return self.training_type_plugin.training_step(*step_kwargs.values())\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py\", line 389, in training_step\n    return self.model(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py\", line 1040, in forward\n    output = self._run_ddp_forward(*inputs, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py\", line 1000, in _run_ddp_forward\n    return module_to_run(*inputs[0], **kwargs[0])\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/overrides/base.py\", line 82, in forward\n    output = self.module.training_step(*inputs, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py\", line 98, in training_step\n    out_hat, sim = self(batch.imgs, batch.mask, tgt)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py\", line 93, in forward\n    return self.tamer_model(img, img_mask, tgt)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/tamer.py\", line 77, in forward\n    feature, mask = self.encoder(img, img_mask)  # [b, t, d]\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/encoder.py\", line 268, in forward\n    feature_flat = self.gat(feature_flat, adj)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 162, in forward\n    h = layer(h, adj_mask)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 68, in forward\n    e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 96, in _compute_attention_scores\n    Wh2_expanded.repeat(1, 1, n, 1, 1)], dim=-1)  # [b, num_heads, n, n, 2*head_dim]\ntorch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.82 GiB (GPU 0; 14.56 GiB total capacity; 11.65 GiB already allocated; 141.81 MiB free; 14.21 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"train.py\", line 41, in <module>\n    cli_main()\n  File \"train.py\", line 37, in cli_main\n    trainer_defaults={\"plugins\": DDPPlugin(find_unused_parameters=True)},\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/utilities/cli.py\", line 289, in __init__\n    self.fit()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/utilities/cli.py\", line 432, in fit\n    self.trainer.fit(**self.fit_kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 552, in fit\n    self._run(model)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 922, in _run\n    self._dispatch()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 990, in _dispatch\n    self.accelerator.start_training(self)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 92, in start_training\n    self.training_type_plugin.start_training(trainer)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py\", line 161, in start_training\n    self._results = trainer.run_stage()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1000, in run_stage\n    return self._run_train()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1062, in _run_train\n    self.training_type_plugin.reconciliate_processes(traceback.format_exc())\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py\", line 478, in reconciliate_processes\n    raise DeadlockDetectedException(f\"DeadLock detected from rank: {self.global_rank} \\n {trace}\")\npytorch_lightning.utilities.exceptions.DeadlockDetectedException: DeadLock detected from rank: 0\n Traceback (most recent call last):\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/trainer/trainer.py\", line 1049, in _run_train\n    self.fit_loop.run()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/fit_loop.py\", line 200, in advance\n    epoch_output = self.epoch_loop.run(train_dataloader)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/epoch/training_epoch_loop.py\", line 130, in advance\n    batch_output = self.batch_loop.run(batch, self.iteration_count, self._dataloader_idx)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 100, in run\n    super().run(batch, batch_idx, dataloader_idx)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/base.py\", line 111, in run\n    self.advance(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 147, in advance\n    result = self._run_optimization(batch_idx, split_batch, opt_idx, optimizer)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 201, in _run_optimization\n    self._optimizer_step(optimizer, opt_idx, batch_idx, closure)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 403, in _optimizer_step\n    using_lbfgs=is_lbfgs,\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/lightning.py\", line 1616, in optimizer_step\n    optimizer.step(closure=optimizer_closure)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py\", line 206, in step\n    self.__optimizer_step(closure=closure, profiler_name=profiler_name, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/core/optimizer.py\", line 128, in __optimizer_step\n    trainer.accelerator.optimizer_step(self._optimizer, self._optimizer_idx, lambda_closure=closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 296, in optimizer_step\n    self.run_optimizer_step(optimizer, opt_idx, lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 303, in run_optimizer_step\n    self.training_type_plugin.optimizer_step(optimizer, lambda_closure=lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/training_type_plugin.py\", line 226, in optimizer_step\n    optimizer.step(closure=lambda_closure, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/lr_scheduler.py\", line 68, in wrapper\n    return wrapped(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/optimizer.py\", line 140, in wrapper\n    out = func(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/autograd/grad_mode.py\", line 27, in decorate_context\n    return func(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/optim/adadelta.py\", line 88, in step\n    loss = closure()\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 235, in _training_step_and_backward_closure\n    result = self.training_step_and_backward(split_batch, batch_idx, opt_idx, optimizer, hiddens)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 536, in training_step_and_backward\n    result = self._training_step(split_batch, batch_idx, opt_idx, hiddens)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/loops/batch/training_batch_loop.py\", line 306, in _training_step\n    training_step_output = self.trainer.accelerator.training_step(step_kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/accelerators/accelerator.py\", line 193, in training_step\n    return self.training_type_plugin.training_step(*step_kwargs.values())\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/plugins/training_type/ddp.py\", line 389, in training_step\n    return self.model(*args, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py\", line 1040, in forward\n    output = self._run_ddp_forward(*inputs, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/parallel/distributed.py\", line 1000, in _run_ddp_forward\n    return module_to_run(*inputs[0], **kwargs[0])\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/pytorch_lightning/overrides/base.py\", line 82, in forward\n    output = self.module.training_step(*inputs, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py\", line 98, in training_step\n    out_hat, sim = self(batch.imgs, batch.mask, tgt)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/lit_tamer.py\", line 93, in forward\n    return self.tamer_model(img, img_mask, tgt)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/tamer.py\", line 77, in forward\n    feature, mask = self.encoder(img, img_mask)  # [b, t, d]\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/encoder.py\", line 268, in forward\n    feature_flat = self.gat(feature_flat, adj)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 162, in forward\n    h = layer(h, adj_mask)\n  File \"/kaggle/working/miniconda/envs/tamer/lib/python3.7/site-packages/torch/nn/modules/module.py\", line 1194, in _call_impl\n    return forward_call(*input, **kwargs)\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 68, in forward\n    e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]\n  File \"/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py\", line 96, in _compute_attention_scores\n    Wh2_expanded.repeat(1, 1, n, 1, 1)], dim=-1)  # [b, num_heads, n, n, 2*head_dim]\ntorch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.82 GiB (GPU 0; 14.56 GiB total capacity; 11.65 GiB already allocated; 141.81 MiB free; 14.21 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF\n"}, {"id": "1nzxiodq", "name": "cnn-gnn-crohme-2gpu-t4", "state": "crashed", "notes": null, "tags": [], "created_at": "2026-06-13T18:39:14Z", "heartbeat_at": "2026-06-13T20:29:14Z", "runtime": 6460.365774192, "config": {"dc": 32, "alpha": 1, "nhead": 8, "d_model": 256, "dropout": 0.3, "max_len": 150, "use_gat": true, "patience": 20, "beam_size": 10, "milestones": [300, 350], "num_layers": 16, "vocab_size": 113, "gat_dropout": 0.1, "growth_rate": 24, "temperature": 1, "gat_num_heads": 8, "learning_rate": 1, "self_coverage": true, "cross_coverage": true, "early_stopping": false, "gat_hidden_dim": "None", "gat_num_layers": 2, "dim_feedforward": 1024, "num_decoder_layers": 3}, "summary": {"_runtime": 6460.365774192, "_step": 61, "_timestamp": 1781382414.3070362, "_wandb": {"runtime": 6460}, "epoch": 19, "lr-Adadelta": 1, "train/struct_loss": 0.04254842549562454, "train_loss": 0.4605879485607147, "trainer/global_step": 15020, "val/struct_loss": 0.047565825283527374, "val_ExpRate": 0.24089068174362183, "val_loss": 0.860170841217041, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://ytqt43gut4cwebmwur089los1ab4rv12s0md899p8jgzrqkgp4pzp6ky3dwo8kzgqejk9ylq13gmqrtochx4s0bwwxob8fx95bk7wqrypga2dud0fyfh1nnudd9rjzxc:latest/val_predictions.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://5n6yjg5aoauhmo6chy7h5156zharc0j8d9uy9zyjtqz33urs577bq7uvv34bzl62cfuj05th8qktrd7oos0hec5vjyicx42j6ckksiq08ptdwqowzpe3zc120zx5ejae/val_predictions.table.json", "ncols": 3, "nrows": 2, "path": "media/table/val_predictions_58_2014fcc9c7b8bebcab69.table.json", "sha256": "2014fcc9c7b8bebcab69b5f3bfe5a908ded804df2cb63bd263336809a5343692", "size": 112}}, "history": [{"train/struct_loss": null, "trainer/global_step": 0, "_timestamp": 1781375959.8772707, "lr-Adadelta": null, "val_loss": null, "_step": 0, "epoch": null, "_runtime": 5.936310162, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"sha256": "b3f162f24940127e4f673f3d5bc470a9a078e4736be833530653491b4ce5cb57", "size": 844, "ncols": 3, "nrows": 2, "_latest_artifact_path": "wandb-client-artifact://cru909anlvx6n0b1rdmbo4dcyy5u53n3a490tagnnmun4vqbl12u7ryu026ioyo5035hxvpesfhkkjzuwld50uh1wz6xnycxw3ofiq5i3oexascwl9sznz14dx9geqes:latest/val_predictions.table.json", "path": "media/table/val_predictions_0_b3f162f24940127e4f67.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://tdv4j890bwp7wrkbgmz5676m750p9fdtbprqa2ta4j9xfobi82uaoaqtnj0yy2tgsv3yrtjkvxh1hp95ezisgc95x3566r3zbmedf7lmrue60vojrr40mv94xg2tvfcp/val_predictions.table.json"}}, {"train/struct_loss": null, "trainer/global_step": 0, "_timestamp": 1781375967.032586, "lr-Adadelta": 1.0, "val_loss": null, "_step": 1, "epoch": null, "_runtime": 13.091392349, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 1.266300082206726, "trainer/global_step": 750, "_timestamp": 1781376166.0582936, "lr-Adadelta": null, "val_loss": null, "_step": 2, "epoch": 0.0, "_runtime": 212.11717605, "val_ExpRate": null, "train_loss": 2.593242883682251, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 751, "_timestamp": 1781376166.0597842, "lr-Adadelta": 1.0, "val_loss": null, "_step": 3, "epoch": null, "_runtime": 212.118493947, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 751, "_timestamp": 1781376367.518936, "lr-Adadelta": null, "val_loss": null, "_step": 4, "epoch": null, "_runtime": 413.577716724, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"_type": "table-file", "ncols": 3, "nrows": 2, "artifact_path": "wandb-client-artifact://tlenkxdy2gykfq6dvgc4eu73c66zqf544bno6yticiloqoxpifac0y45taaoxquxr39pbb2nzwkmk77vl0br7eu2t25qp8n8vgp0hpuzpzcbkz0aylomctp3z3eu5kau/val_predictions.table.json", "_latest_artifact_path": "wandb-client-artifact://tmzvsrmai4uslmg0cado8f5fuy3sgkxce35wzkirnzf46yj6vhep06fz2cbzjmurnrtbnpclzvitlu0jk1k6dyqrncerg84c04u5nh06lkkdzwghnuyuc9ormjxe1xoq:latest/val_predictions.table.json", "path": "media/table/val_predictions_4_12bf32550846698ab2a8.table.json", "sha256": "12bf32550846698ab2a85d2cd6edb88a13981a9ff479d59e29a53983bc1a9992", "size": 149}}, {"train/struct_loss": null, "trainer/global_step": 1501, "_timestamp": 1781376679.4120715, "lr-Adadelta": null, "val_loss": 2.521049737930298, "_step": 5, "epoch": 1.0, "_runtime": 725.470909599, "val_ExpRate": 0.0, "train_loss": null, "val/struct_loss": 0.3204711675643921, "val_predictions": null}, {"train/struct_loss": 0.4841662645339966, "trainer/global_step": 1501, "_timestamp": 1781376679.8625917, "lr-Adadelta": null, "val_loss": null, "_step": 6, "epoch": 1.0, "_runtime": 725.92141857, "val_ExpRate": null, "train_loss": 2.0713438987731934, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 1502, "_timestamp": 1781376679.8643672, "lr-Adadelta": 1.0, "val_loss": null, "_step": 7, "epoch": null, "_runtime": 725.923151207, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.30920735001564026, "trainer/global_step": 2252, "_timestamp": 1781376881.1915588, "lr-Adadelta": null, "val_loss": null, "_step": 8, "epoch": 2.0, "_runtime": 927.250328146, "val_ExpRate": null, "train_loss": 1.8819553852081299, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 2253, "_timestamp": 1781376881.1932733, "lr-Adadelta": 1.0, "val_loss": null, "_step": 9, "epoch": null, "_runtime": 927.252020692, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 2253, "_timestamp": 1781377080.4116242, "lr-Adadelta": null, "val_loss": null, "_step": 10, "epoch": null, "_runtime": 1126.470515951, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://1n5c38jfah8e99gqtbr5dqtd03bxjflpvr48aymgkzk7zuofpd0gs2ko7j32bk4yz0g60cimsrqbhcntnj2ikbv5yer693prl4fpwpcxla8ppjyc5kk7b2ukygvb50pf:latest/val_predictions.table.json", "sha256": "445f2603925e6078ff13d49575d82f63df304b78e0b40d74cfae457b827387dd", "size": 116, "ncols": 3, "nrows": 2, "path": "media/table/val_predictions_10_445f2603925e6078ff13.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://322oahm778bpt1qwz5xt1dyjjh3pubr53c8f9bnucvq46s207aip0gdg52da2h0t333rszoeepdhhdzetn9xckgfxf35jk0sxgttpycwyuxf5egdm1jb9mcysdwfz1ic/val_predictions.table.json"}}, {"train/struct_loss": null, "trainer/global_step": 3003, "_timestamp": 1781377274.2963994, "lr-Adadelta": null, "val_loss": 2.2632646560668945, "_step": 11, "epoch": 3.0, "_runtime": 1320.355264275, "val_ExpRate": 0.0, "train_loss": null, "val/struct_loss": 0.16902413964271545, "val_predictions": null}, {"train/struct_loss": 0.23718111217021942, "trainer/global_step": 3003, "_timestamp": 1781377274.3085296, "lr-Adadelta": null, "val_loss": null, "_step": 12, "epoch": 3.0, "_runtime": 1320.367466807, "val_ExpRate": null, "train_loss": 1.7470768690109253, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 3004, "_timestamp": 1781377274.310258, "lr-Adadelta": 1.0, "val_loss": null, "_step": 13, "epoch": null, "_runtime": 1320.369019299, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.19788601994514465, "trainer/global_step": 3754, "_timestamp": 1781377474.3987262, "lr-Adadelta": null, "val_loss": null, "_step": 14, "epoch": 4.0, "_runtime": 1520.457647988, "val_ExpRate": null, "train_loss": 1.642459750175476, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 3755, "_timestamp": 1781377474.4009283, "lr-Adadelta": 1.0, "val_loss": null, "_step": 15, "epoch": null, "_runtime": 1520.4597053, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 3755, "_timestamp": 1781377675.2015877, "lr-Adadelta": null, "val_loss": null, "_step": 16, "epoch": null, "_runtime": 1721.260506466, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"artifact_path": "wandb-client-artifact://5rnhx48uldtmshqs27v4l77bvtbo4s6kqu6d9jkq2o9mih2s3gu6xsoacudbjfas4p9h0b2qff06tm9lrracydr6u1yozbtlsfj7540outjm888w2v6f4so3bu52y0k1/val_predictions.table.json", "_latest_artifact_path": "wandb-client-artifact://uk475rr2ewezj9flencwmerojel8f6xdm1gzu8cyaj27vt7ydggspm7bq8w33cw0otq3sstfgumb7kjhpcdmcupuz0y8ociljzjnmc45t6rnqp50s44yrenlxp9824nw:latest/val_predictions.table.json", "sha256": "8248add1d88b69ae71112b104e33f41dacb0ab20f915a10c94723a1b089d2039", "size": 118, "ncols": 3, "path": "media/table/val_predictions_16_8248add1d88b69ae7111.table.json", "_type": "table-file", "nrows": 2}}, {"train/struct_loss": null, "trainer/global_step": 4505, "_timestamp": 1781377871.3980427, "lr-Adadelta": null, "val_loss": 2.149221181869507, "_step": 17, "epoch": 5.0, "_runtime": 1917.456867938, "val_ExpRate": 0.0, "train_loss": null, "val/struct_loss": 0.1921941190958023, "val_predictions": null}, {"train/struct_loss": 0.17475713789463043, "trainer/global_step": 4505, "_timestamp": 1781377871.4091733, "lr-Adadelta": null, "val_loss": null, "_step": 18, "epoch": 5.0, "_runtime": 1917.46800106, "val_ExpRate": null, "train_loss": 1.5395652055740356, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 4506, "_timestamp": 1781377871.41124, "lr-Adadelta": 1.0, "val_loss": null, "_step": 19, "epoch": null, "_runtime": 1917.470025959, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.1551463007926941, "trainer/global_step": 5256, "_timestamp": 1781378071.899584, "lr-Adadelta": null, "val_loss": null, "_step": 20, "epoch": 6.0, "_runtime": 2117.958454556, "val_ExpRate": null, "train_loss": 1.4317233562469482, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 5257, "_timestamp": 1781378071.9016216, "lr-Adadelta": 1.0, "val_loss": null, "_step": 21, "epoch": null, "_runtime": 2117.960382603, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 5257, "_timestamp": 1781378271.1502867, "lr-Adadelta": null, "val_loss": null, "_step": 22, "epoch": null, "_runtime": 2317.209201052, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"path": "media/table/val_predictions_22_6b81d3369099f4229d2b.table.json", "sha256": "6b81d3369099f4229d2b6b3c0b8b7f6c86f6386280530d5fb44383a9691a2f44", "size": 124, "ncols": 3, "artifact_path": "wandb-client-artifact://i8j09at6ma2u5g1ka4i27k34quaupywcetn3ulr5odv5b1cdti56xtp94mmrdxpmlv596p6xb6is1mu7zzhv3higyt8ucfwvz3j47xi6uqbb4ubt5q9j322uv19wrbpc/val_predictions.table.json", "_latest_artifact_path": "wandb-client-artifact://pwmmmawj2j23s6l0j420fbm0q03i6zl7aosu9t45gc5419wbq0j4yg38up2elz27wvh6ycd31upcasbdqda4mnxtmrryrd9wx61e5sn24i45vs50g3ftuct8vm7kul4j:latest/val_predictions.table.json", "_type": "table-file", "nrows": 2}}, {"train/struct_loss": null, "trainer/global_step": 6007, "_timestamp": 1781378732.985142, "lr-Adadelta": null, "val_loss": 1.9478724002838135, "_step": 23, "epoch": 7.0, "_runtime": 2779.043980053, "val_ExpRate": 0.0050607286393642426, "train_loss": null, "val/struct_loss": 0.1499541699886322, "val_predictions": null}, {"train/struct_loss": 0.1366201639175415, "trainer/global_step": 6007, "_timestamp": 1781378733.348187, "lr-Adadelta": null, "val_loss": null, "_step": 24, "epoch": 7.0, "_runtime": 2779.406999229, "val_ExpRate": null, "train_loss": 1.3266175985336304, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 6008, "_timestamp": 1781378733.3496602, "lr-Adadelta": 1.0, "val_loss": null, "_step": 25, "epoch": null, "_runtime": 2779.408435617, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.12706544995307922, "trainer/global_step": 6758, "_timestamp": 1781378940.3127968, "lr-Adadelta": null, "val_loss": null, "_step": 26, "epoch": 8.0, "_runtime": 2986.371732447, "val_ExpRate": null, "train_loss": 1.2280728816986084, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 6759, "_timestamp": 1781378940.3143408, "lr-Adadelta": 1.0, "val_loss": null, "_step": 27, "epoch": null, "_runtime": 2986.373069442, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 6759, "_timestamp": 1781379150.0561156, "lr-Adadelta": null, "val_loss": null, "_step": 28, "epoch": null, "_runtime": 3196.114972152, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"artifact_path": "wandb-client-artifact://iiqwajhet40tefhkjml3xzccgyqewf9rxtfj6bdilkl6tr43y1u6rocxa60ox547b65nf5oy7b20o9ttrexvxtvxrzceks8aii79rqpe8giax5pxpgoozvjh5xs5d41c/val_predictions.table.json", "size": 112, "ncols": 3, "_latest_artifact_path": "wandb-client-artifact://s3ikrkznaqmz7faosh536592oaevja7n4dyej25zv9yagkcn2tvaxzffi56qfsf50934x1a98svaw3ozxt3h4vveks4qa5vvqymoiyq1nr8ixdm3tiptlsce1j872cm7:latest/val_predictions.table.json", "path": "media/table/val_predictions_28_d1068d5b656a920b473c.table.json", "sha256": "d1068d5b656a920b473c02710620c0e9cedd283f8bd98755b01540016d534d9f", "_type": "table-file", "nrows": 2}}, {"train/struct_loss": null, "trainer/global_step": 7509, "_timestamp": 1781379399.4063973, "lr-Adadelta": null, "val_loss": 1.6568719148635864, "_step": 29, "epoch": 9.0, "_runtime": 3445.465580956, "val_ExpRate": 0.025303643196821213, "train_loss": null, "val/struct_loss": 0.1301177591085434, "val_predictions": null}, {"train/struct_loss": 0.11508678644895554, "trainer/global_step": 7509, "_timestamp": 1781379399.787143, "lr-Adadelta": null, "val_loss": null, "_step": 30, "epoch": 9.0, "_runtime": 3445.846024047, "val_ExpRate": null, "train_loss": 1.1180833578109741, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 7510, "_timestamp": 1781379399.7892647, "lr-Adadelta": 1.0, "val_loss": null, "_step": 31, "epoch": null, "_runtime": 3445.847991611, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.10671287775039673, "trainer/global_step": 8260, "_timestamp": 1781379603.634696, "lr-Adadelta": null, "val_loss": null, "_step": 32, "epoch": 10.0, "_runtime": 3649.693591383, "val_ExpRate": null, "train_loss": 1.0115954875946045, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 8261, "_timestamp": 1781379603.6367636, "lr-Adadelta": 1.0, "val_loss": null, "_step": 33, "epoch": null, "_runtime": 3649.695490877, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 8261, "_timestamp": 1781379805.1407886, "lr-Adadelta": null, "val_loss": null, "_step": 34, "epoch": null, "_runtime": 3851.199599387, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"_latest_artifact_path": "wandb-client-artifact://ybp488h3y92q6lozx1wwo81ptbbewo5xtwmrx9wursg4m35dukq9mtrp8zjyt8ic16xd4wj1kbbzn629fnd82jntbd5krrc271y0ez6jtda3nbpry5t8902hf80775e5:latest/val_predictions.table.json", "sha256": "9763ac344a072c81644cb4b11635f9fe9f436cbcc22eb1a8a753c1710691bbfa", "artifact_path": "wandb-client-artifact://n1oczwovv8t1ib4waob2ybh4p9ck5xxmapnj4630mrncbfuz4gn949m101c2em16shcbsf72sw8l1q28wby5qau9juvweafzz1ge114bcailc8ck1d4u18td8542bb96/val_predictions.table.json", "path": "media/table/val_predictions_34_9763ac344a072c81644c.table.json", "size": 118, "_type": "table-file", "ncols": 3, "nrows": 2}}, {"train/struct_loss": null, "trainer/global_step": 9011, "_timestamp": 1781380015.9033563, "lr-Adadelta": null, "val_loss": 1.4103058576583862, "_step": 35, "epoch": 11.0, "_runtime": 4061.96226184, "val_ExpRate": 0.04959513992071152, "train_loss": null, "val/struct_loss": 0.07964232563972473, "val_predictions": null}, {"train/struct_loss": 0.09155381470918655, "trainer/global_step": 9011, "_timestamp": 1781380016.267629, "lr-Adadelta": null, "val_loss": null, "_step": 36, "epoch": 11.0, "_runtime": 4062.326465091, "val_ExpRate": null, "train_loss": 0.910688579082489, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 9012, "_timestamp": 1781380016.269607, "lr-Adadelta": 1.0, "val_loss": null, "_step": 37, "epoch": null, "_runtime": 4062.32837502, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.078827403485775, "trainer/global_step": 9762, "_timestamp": 1781380216.6593778, "lr-Adadelta": null, "val_loss": null, "_step": 38, "epoch": 12.0, "_runtime": 4262.718269516, "val_ExpRate": null, "train_loss": 0.8211806416511536, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 9763, "_timestamp": 1781380216.661293, "lr-Adadelta": 1.0, "val_loss": null, "_step": 39, "epoch": null, "_runtime": 4262.720033242, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 9763, "_timestamp": 1781380417.696769, "lr-Adadelta": null, "val_loss": null, "_step": 40, "epoch": null, "_runtime": 4463.755547787, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"artifact_path": "wandb-client-artifact://faqmthpoth3lh6thtnbaj68lnwcvzsw8wgwmpmwjwmkqjl870edm50jaor5basf18gtb1k7xlpp09ihjsubkliibrx1cnpotlav2sizelefkejfmvahows4fkahujb28/val_predictions.table.json", "_latest_artifact_path": "wandb-client-artifact://us9qrtdm2nqwl34mc1bwgdflnyj9r1frqn6hnhu528n8t9bewkw2halefcpsmdk8gff1ltif6xub79ipkbfbhtrxwncs7cm8q6b82obp89w0jdukcafelqoz4hj2ugku:latest/val_predictions.table.json", "sha256": "d7f8dc8b14dd2ebb35bea50fb7392eb6ceabba40f135733c4593c7a879c8993c", "ncols": 3, "path": "media/table/val_predictions_40_d7f8dc8b14dd2ebb35be.table.json", "size": 118, "_type": "table-file", "nrows": 2}}, {"train/struct_loss": null, "trainer/global_step": 10513, "_timestamp": 1781380601.7808194, "lr-Adadelta": null, "val_loss": 1.216838002204895, "_step": 41, "epoch": 13.0, "_runtime": 4647.83960844, "val_ExpRate": 0.1072874516248703, "train_loss": null, "val/struct_loss": 0.059638846665620804, "val_predictions": null}, {"train/struct_loss": 0.07072800397872925, "trainer/global_step": 10513, "_timestamp": 1781380602.1515398, "lr-Adadelta": null, "val_loss": null, "_step": 42, "epoch": 13.0, "_runtime": 4648.210334884, "val_ExpRate": null, "train_loss": 0.7483924627304077, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 10514, "_timestamp": 1781380602.1536608, "lr-Adadelta": 1.0, "val_loss": null, "_step": 43, "epoch": null, "_runtime": 4648.212406455, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.06254325807094574, "trainer/global_step": 11264, "_timestamp": 1781380802.113474, "lr-Adadelta": null, "val_loss": null, "_step": 44, "epoch": 14.0, "_runtime": 4848.172282552, "val_ExpRate": null, "train_loss": 0.6819326877593994, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 11265, "_timestamp": 1781380802.1149442, "lr-Adadelta": 1.0, "val_loss": null, "_step": 45, "epoch": null, "_runtime": 4848.173636976, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 11265, "_timestamp": 1781381003.2086804, "lr-Adadelta": null, "val_loss": null, "_step": 46, "epoch": null, "_runtime": 5049.267523055, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"ncols": 3, "nrows": 2, "_latest_artifact_path": "wandb-client-artifact://kcubpwtl3qvm3e01l5dhge0m0yd1pao0lkqh7x311ska2t4jsyupoom8ib8fs4eh8oc2c1pb7ywp1ykkqfr3q3uzzlz0qdysscn4dlnutk12mkp9y5jcx530av45vwwj:latest/val_predictions.table.json", "artifact_path": "wandb-client-artifact://b9ualmcx5brxilb53p2t4a5t6fj0d12nurx4zaw2zc3ftxanx5jd2eg500h02a1u99zw7ldj5nqev4tqt5m88rhsbd86leu3x1fzh2ima4ppwo103vxpniuxuoduwkij/val_predictions.table.json", "path": "media/table/val_predictions_46_eb570aacc4c8d2836ee1.table.json", "sha256": "eb570aacc4c8d2836ee11697fd756f3a6d54701ccfbeaa56b8c7826363a305fa", "size": 116, "_type": "table-file"}}, {"train/struct_loss": null, "trainer/global_step": 12015, "_timestamp": 1781381194.9519844, "lr-Adadelta": null, "val_loss": 1.0214163064956665, "_step": 47, "epoch": 15.0, "_runtime": 5241.011981075, "val_ExpRate": 0.1659919023513794, "train_loss": null, "val/struct_loss": 0.058537520468235016, "val_predictions": null}, {"train/struct_loss": 0.05983000621199608, "trainer/global_step": 12015, "_timestamp": 1781381195.3245828, "lr-Adadelta": null, "val_loss": null, "_step": 48, "epoch": 15.0, "_runtime": 5241.383353602, "val_ExpRate": null, "train_loss": 0.6300774216651917, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 12016, "_timestamp": 1781381195.3259993, "lr-Adadelta": 1.0, "val_loss": null, "_step": 49, "epoch": null, "_runtime": 5241.384659135, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.05553307384252548, "trainer/global_step": 12766, "_timestamp": 1781381396.9535124, "lr-Adadelta": null, "val_loss": null, "_step": 50, "epoch": 16.0, "_runtime": 5443.012285618, "val_ExpRate": null, "train_loss": 0.5753041505813599, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 12767, "_timestamp": 1781381396.9550648, "lr-Adadelta": 1.0, "val_loss": null, "_step": 51, "epoch": null, "_runtime": 5443.013754328, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 12767, "_timestamp": 1781381598.1746523, "lr-Adadelta": null, "val_loss": null, "_step": 52, "epoch": null, "_runtime": 5644.23350054, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"sha256": "dddb6d6c01e11572874bb0f976f4ccdf2526826b192997a31b41b0aab9b492fa", "_type": "table-file", "nrows": 2, "size": 112, "ncols": 3, "artifact_path": "wandb-client-artifact://vr0jv93bf2fdah9mdyr25bgug5dkn75bhxalyo7dogm1eu2vzrub2wm6p3pkm9f2da3ootmibra9v6m3x9tslo3hliu02ew4qpqe3l3dsxs8rw0fbfxbcl6buea3mgwb/val_predictions.table.json", "_latest_artifact_path": "wandb-client-artifact://w4pp4ndknlqlz7rl578e5qke64t2twf5wtbhhj1kh08z790i0pggnszznctbniwetzaibfb61k7ex5htkgxa1djplv2d5j9ixlm9ayf0lj23981htooy5bifex19bswg:latest/val_predictions.table.json", "path": "media/table/val_predictions_52_dddb6d6c01e11572874b.table.json"}}, {"train/struct_loss": null, "trainer/global_step": 13517, "_timestamp": 1781381810.2738202, "lr-Adadelta": null, "val_loss": 0.9084956049919128, "_step": 53, "epoch": 17.0, "_runtime": 5856.332667839, "val_ExpRate": 0.21255061030387878, "train_loss": null, "val/struct_loss": 0.050796858966350555, "val_predictions": null}, {"train/struct_loss": 0.04954922944307327, "trainer/global_step": 13517, "_timestamp": 1781381810.6508915, "lr-Adadelta": null, "val_loss": null, "_step": 54, "epoch": 17.0, "_runtime": 5856.709670642, "val_ExpRate": null, "train_loss": 0.5319883227348328, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 13518, "_timestamp": 1781381810.6522777, "lr-Adadelta": 1.0, "val_loss": null, "_step": 55, "epoch": null, "_runtime": 5856.711031648, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": 0.046330954879522324, "trainer/global_step": 14268, "_timestamp": 1781382011.1605117, "lr-Adadelta": null, "val_loss": null, "_step": 56, "epoch": 18.0, "_runtime": 6057.219283284, "val_ExpRate": null, "train_loss": 0.49461808800697327, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 14269, "_timestamp": 1781382011.1621892, "lr-Adadelta": 1.0, "val_loss": null, "_step": 57, "epoch": null, "_runtime": 6057.220922751, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 14269, "_timestamp": 1781382215.5468566, "lr-Adadelta": null, "val_loss": null, "_step": 58, "epoch": null, "_runtime": 6261.605646666, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": {"size": 112, "ncols": 3, "nrows": 2, "_latest_artifact_path": "wandb-client-artifact://ytqt43gut4cwebmwur089los1ab4rv12s0md899p8jgzrqkgp4pzp6ky3dwo8kzgqejk9ylq13gmqrtochx4s0bwwxob8fx95bk7wqrypga2dud0fyfh1nnudd9rjzxc:latest/val_predictions.table.json", "path": "media/table/val_predictions_58_2014fcc9c7b8bebcab69.table.json", "_type": "table-file", "artifact_path": "wandb-client-artifact://5n6yjg5aoauhmo6chy7h5156zharc0j8d9uy9zyjtqz33urs577bq7uvv34bzl62cfuj05th8qktrd7oos0hec5vjyicx42j6ckksiq08ptdwqowzpe3zc120zx5ejae/val_predictions.table.json", "sha256": "2014fcc9c7b8bebcab69b5f3bfe5a908ded804df2cb63bd263336809a5343692"}}, {"train/struct_loss": null, "trainer/global_step": 15019, "_timestamp": 1781382413.843685, "lr-Adadelta": null, "val_loss": 0.860170841217041, "_step": 59, "epoch": 19.0, "_runtime": 6459.902566896, "val_ExpRate": 0.24089068174362183, "train_loss": null, "val/struct_loss": 0.047565825283527374, "val_predictions": null}, {"train/struct_loss": 0.04254842549562454, "trainer/global_step": 15019, "_timestamp": 1781382414.305313, "lr-Adadelta": null, "val_loss": null, "_step": 60, "epoch": 19.0, "_runtime": 6460.364160841, "val_ExpRate": null, "train_loss": 0.4605879485607147, "val/struct_loss": null, "val_predictions": null}, {"train/struct_loss": null, "trainer/global_step": 15020, "_timestamp": 1781382414.3070362, "lr-Adadelta": 1.0, "val_loss": null, "_step": 61, "epoch": null, "_runtime": 6460.365774192, "val_ExpRate": null, "train_loss": null, "val/struct_loss": null, "val_predictions": null}], "log": ""}], "artifacts": [{"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v10", "state": "COMMITTED", "size": 1664, "aliases": ["latest"], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1249}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v9", "state": "COMMITTED", "size": 1664, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1249}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v8", "state": "COMMITTED", "size": 1668, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1253}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v7", "state": "COMMITTED", "size": 1670, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1255}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v6", "state": "COMMITTED", "size": 1670, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1255}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v5", "state": "COMMITTED", "size": 1664, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1249}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v4", "state": "COMMITTED", "size": 1676, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1261}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v3", "state": "COMMITTED", "size": 1670, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1255}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v2", "state": "COMMITTED", "size": 1668, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1253}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v1", "state": "COMMITTED", "size": 1701, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1286}]}, {"type": "run_table", "collection": "run-1nzxiodq-val_predictions", "version": "v0", "state": "COMMITTED", "size": 2396, "aliases": [], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1981}]}, {"type": "run_table", "collection": "run-jwbl6zuc-val_predictions", "version": "v0", "state": "COMMITTED", "size": 2384, "aliases": ["latest"], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1969}]}, {"type": "run_table", "collection": "run-uf9wwd1n-val_predictions", "version": "v0", "state": "COMMITTED", "size": 2384, "aliases": ["latest"], "description": null, "files": [{"name": "media/images/674060a1e01213fd329f.png", "size": 190}, {"name": "media/images/a04be2890abfbc0763dd.png", "size": 225}, {"name": "val_predictions.table.json", "size": 1969}]}, {"type": "logs", "collection": "cnn-gnn-lightning-logs", "version": "v1", "state": "COMMITTED", "size": 142907, "aliases": ["latest"], "description": null, "files": [{"name": "config.yaml", "size": 2862}, {"name": "wandb/debug-internal.log", "size": 866}, {"name": "wandb/debug.log", "size": 4024}, {"name": "wandb/latest-run/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/latest-run/files/output.log", "size": 1362}, {"name": "wandb/latest-run/files/requirements.txt", "size": 2894}, {"name": "wandb/latest-run/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/latest-run/logs/debug-core.log", "size": 1092}, {"name": "wandb/latest-run/logs/debug-internal.log", "size": 866}, {"name": "wandb/latest-run/logs/debug.log", "size": 4024}, {"name": "wandb/latest-run/run-jwbl6zuc.wandb", "size": 32768}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-core.log", "size": 1089}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug.log", "size": 3996}, {"name": "wandb/run-20260613_175733-uf9wwd1n/run-uf9wwd1n.wandb", "size": 32768}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug-core.log", "size": 1092}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug.log", "size": 4024}, {"name": "wandb/run-20260613_180758-jwbl6zuc/run-jwbl6zuc.wandb", "size": 32768}]}, {"type": "logs", "collection": "cnn-gnn-lightning-logs", "version": "v0", "state": "COMMITTED", "size": 97786, "aliases": [], "description": null, "files": [{"name": "config.yaml", "size": 2862}, {"name": "wandb/debug-internal.log", "size": 866}, {"name": "wandb/debug.log", "size": 3996}, {"name": "wandb/latest-run/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/latest-run/files/output.log", "size": 1362}, {"name": "wandb/latest-run/files/requirements.txt", "size": 2894}, {"name": "wandb/latest-run/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/latest-run/logs/debug-core.log", "size": 1089}, {"name": "wandb/latest-run/logs/debug-internal.log", "size": 866}, {"name": "wandb/latest-run/logs/debug.log", "size": 3996}, {"name": "wandb/latest-run/run-uf9wwd1n.wandb", "size": 32768}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-core.log", "size": 1089}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug.log", "size": 3996}, {"name": "wandb/run-20260613_175733-uf9wwd1n/run-uf9wwd1n.wandb", "size": 32768}]}, {"type": "model", "collection": "cnn-gnn-checkpoints", "version": "v1", "state": "COMMITTED", "size": 142907, "aliases": ["latest"], "description": null, "files": [{"name": "config.yaml", "size": 2862}, {"name": "wandb/debug-internal.log", "size": 866}, {"name": "wandb/debug.log", "size": 4024}, {"name": "wandb/latest-run/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/latest-run/files/output.log", "size": 1362}, {"name": "wandb/latest-run/files/requirements.txt", "size": 2894}, {"name": "wandb/latest-run/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/latest-run/logs/debug-core.log", "size": 1092}, {"name": "wandb/latest-run/logs/debug-internal.log", "size": 866}, {"name": "wandb/latest-run/logs/debug.log", "size": 4024}, {"name": "wandb/latest-run/run-jwbl6zuc.wandb", "size": 32768}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-core.log", "size": 1089}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug.log", "size": 3996}, {"name": "wandb/run-20260613_175733-uf9wwd1n/run-uf9wwd1n.wandb", "size": 32768}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_180758-jwbl6zuc/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug-core.log", "size": 1092}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_180758-jwbl6zuc/logs/debug.log", "size": 4024}, {"name": "wandb/run-20260613_180758-jwbl6zuc/run-jwbl6zuc.wandb", "size": 32768}]}, {"type": "model", "collection": "cnn-gnn-checkpoints", "version": "v0", "state": "COMMITTED", "size": 97786, "aliases": [], "description": null, "files": [{"name": "config.yaml", "size": 2862}, {"name": "wandb/debug-internal.log", "size": 866}, {"name": "wandb/debug.log", "size": 3996}, {"name": "wandb/latest-run/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/latest-run/files/output.log", "size": 1362}, {"name": "wandb/latest-run/files/requirements.txt", "size": 2894}, {"name": "wandb/latest-run/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/latest-run/logs/debug-core.log", "size": 1089}, {"name": "wandb/latest-run/logs/debug-internal.log", "size": 866}, {"name": "wandb/latest-run/logs/debug.log", "size": 3996}, {"name": "wandb/latest-run/run-uf9wwd1n.wandb", "size": 32768}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/media/table/val_predictions_0_123c68308f2bb5db057c.table.json", "size": 832}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/output.log", "size": 1362}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/requirements.txt", "size": 2894}, {"name": "wandb/run-20260613_175733-uf9wwd1n/files/wandb-metadata.json", "size": 1224}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-core.log", "size": 1089}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug-internal.log", "size": 866}, {"name": "wandb/run-20260613_175733-uf9wwd1n/logs/debug.log", "size": 3996}, {"name": "wandb/run-20260613_175733-uf9wwd1n/run-uf9wwd1n.wandb", "size": 32768}]}, {"type": "eval", "collection": "cnn-gnn-eval-files", "version": "v0", "state": "COMMITTED", "size": 2863, "aliases": ["latest"], "description": null, "files": [{"name": "eval_crohme.sh", "size": 210}, {"name": "eval_hme100k.sh", "size": 87}, {"name": "test.py", "size": 2566}]}, {"type": "job", "collection": "job-https___github.com_KhaiHASO_CNN-GNN-HMER.git_chuyende_tamer_temp_1-cnn-gnn_train.py", "version": "v0", "state": "COMMITTED", "size": 4345, "aliases": ["latest"], "description": null, "files": [{"name": "requirements.frozen.txt", "size": 2894}, {"name": "wandb-job.json", "size": 1451}]}, {"type": "wandb-history", "collection": "run-1nzxiodq-history", "version": "v0", "state": "COMMITTED", "size": 9535, "aliases": ["latest"], "description": "Weights & Biases Run History Data for 1nzxiodq", "files": [{"name": "0000.parquet", "size": 9535}]}, {"type": "wandb-history", "collection": "run-uf9wwd1n-history", "version": "v0", "state": "COMMITTED", "size": 2717, "aliases": ["latest"], "description": "Weights & Biases Run History Data for uf9wwd1n", "files": [{"name": "0000.parquet", "size": 2717}]}, {"type": "wandb-history", "collection": "run-jwbl6zuc-history", "version": "v0", "state": "COMMITTED", "size": 2718, "aliases": ["latest"], "description": "Weights & Biases Run History Data for jwbl6zuc", "files": [{"name": "0000.parquet", "size": 2718}]}, {"type": "wandb-history", "collection": "run-522rgd9s-history", "version": "v0", "state": "COMMITTED", "size": 1005, "aliases": ["latest"], "description": "Weights & Biases Run History Data for 522rgd9s", "files": [{"name": "0000.parquet", "size": 1005}]}], "extracted_predictions": [{"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "3 3 3 3 3 3 q 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "3 3 3 3 3 3 q 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "y ^ { 2 }", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "\\int \\limits _ { c } ^ { d } d x", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- 7", "match": true}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "k V", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "3 . 3", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "( t )", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- f", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "f _ { f }", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "1 . 1", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "( y _ { y } )", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- 3", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "4 4", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- I", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "k _ { h }", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- 7", "match": true}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "h _ { h }", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- 1", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "h ( h )", "match": false}, {"run": "run-1nzxiodq-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "- 7", "match": true}, {"run": "run-1nzxiodq-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "h N", "match": false}, {"run": "run-jwbl6zuc-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3", "match": false}, {"run": "run-jwbl6zuc-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "3 3 3 3 3 3 q 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3", "match": false}, {"run": "run-uf9wwd1n-val_predictions", "image": "images/674060a1e01213fd329f.png", "ground_truth": "- 7", "prediction": "3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3", "match": false}, {"run": "run-uf9wwd1n-val_predictions", "image": "images/a04be2890abfbc0763dd.png", "ground_truth": "k N", "prediction": "3 3 3 3 3 3 q 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 \\div 3 \\div 3 3 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3 3 3 3 3 3 3 3 3 3 3 3 \\div 3 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 3 3 3 3 \\div 3 \\div 3 3 3 3 3 \\div 3 \\div 3 \\div 3 3", "match": false}]};
+
+        // Populate header & basic info
+        document.getElementById('project-name').textContent = data.project_name;
+        document.getElementById('entity-name').textContent = data.entity;
+        document.getElementById('stat-total-runs').textContent = data.runs.length;
+        
+        let successCount = 0;
+        let failedCount = 0;
+        data.runs.forEach(r => {
+            if (r.state === 'finished') successCount++;
+            else failedCount++;
+        });
+        document.getElementById('stat-success-failed').textContent = `${successCount} / ${failedCount}`;
+
+        // Find the best run (1nzxiodq)
+        const bestRun = data.runs.find(r => r.id === '1nzxiodq') || {};
+        if (bestRun.summary) {
+            document.getElementById('stat-best-epoch').textContent = bestRun.summary.epoch !== undefined ? Math.round(bestRun.summary.epoch) : '-';
+            if (bestRun.summary.val_ExpRate !== undefined && bestRun.summary.val_ExpRate !== null) {
+                document.getElementById('stat-best-exprate').textContent = (bestRun.summary.val_ExpRate * 100).toFixed(2) + '%';
+            }
+        }
+
+        // 1. Populate Runs Table
+        const tbodyRuns = document.querySelector('#runs-table tbody');
+        data.runs.forEach(run => {
+            const tr = document.createElement('tr');
+            
+            let statusBadge = '';
+            if (run.state === 'finished') {
+                statusBadge = '<span class="badge badge-success">finished</span>';
+            } else if (run.state === 'crashed') {
+                statusBadge = '<span class="badge badge-failed">crashed</span>';
+            } else if (run.state === 'failed') {
+                statusBadge = '<span class="badge badge-failed">failed</span>';
+            } else {
+                statusBadge = `<span class="badge badge-warning">${run.state}</span>`;
+            }
+
+            const epoch = run.summary && run.summary.epoch !== undefined ? Math.round(run.summary.epoch) : '-';
+            const trainLoss = run.summary && run.summary.train_loss !== undefined && run.summary.train_loss !== null ? run.summary.train_loss.toFixed(4) : '-';
+            const valLoss = run.summary && run.summary.val_loss !== undefined && run.summary.val_loss !== null ? run.summary.val_loss.toFixed(4) : '-';
+            const valExpRate = run.summary && run.summary.val_ExpRate !== undefined && run.summary.val_ExpRate !== null ? (run.summary.val_ExpRate * 100).toFixed(2) + '%' : '-';
+            
+            const date = new Date(run.created_at * 1000).toLocaleString('vi-VN');
+
+            tr.innerHTML = `
+                <td><strong>${run.name}</strong><br><small style="color: #64748b;">${run.id}</small></td>
+                <td>${statusBadge}</td>
+                <td>${Math.round(run.runtime)}s</td>
+                <td>${date}</td>
+                <td>${epoch}</td>
+                <td>${trainLoss}</td>
+                <td>${valLoss}</td>
+                <td>${valExpRate}</td>
+            `;
+            tbodyRuns.appendChild(tr);
+        });
+
+        // 2. Populate Config
+        const configContainer = document.getElementById('config-container');
+        if (bestRun.config) {
+            Object.keys(bestRun.config).sort().forEach(key => {
+                if (key === '_wandb' || key === 'path') return;
+                const val = bestRun.config[key];
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <div class="config-name">${key}</div>
+                    <div class="config-value">${typeof val === 'object' ? JSON.stringify(val) : val}</div>
+                `;
+                configContainer.appendChild(item);
+            });
+        }
+
+        // 3. Populate Predictions
+        const predContainer = document.getElementById('predictions-container');
+        if (data.extracted_predictions && data.extracted_predictions.length > 0) {
+            data.extracted_predictions.forEach(pred => {
+                const card = document.createElement('div');
+                card.className = 'pred-card';
+                
+                const statusClass = pred.match ? 'match' : 'mismatch';
+                const statusText = pred.match ? 'Đúng (Match)' : 'Sai (Mismatch)';
+
+                card.innerHTML = `
+                    <div class="pred-img-container">
+                        <img src="${pred.image}" alt="Formula Image" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'30\'><text y=\'15\' fill=\'%23666\'>Image missing</text></svg>';">
+                    </div>
+                    <div>
+                        <div class="pred-label">Ground Truth</div>
+                        <div class="pred-value">${pred.ground_truth}</div>
+                    </div>
+                    <div>
+                        <div class="pred-label">Prediction</div>
+                        <div class="pred-value">${pred.prediction}</div>
+                    </div>
+                    <span class="pred-status ${statusClass}">${statusText}</span>
+                `;
+                predContainer.appendChild(card);
+            });
+        } else {
+            predContainer.innerHTML = '<p style="grid-column: 1/-1;">Không tìm thấy dữ liệu dự đoán validation nào.</p>';
+        }
+
+        // 4. Populate Artifacts Table
+        const tbodyArtifacts = document.querySelector('#artifacts-table tbody');
+        data.artifacts.forEach(art => {
+            const tr = document.createElement('tr');
+            
+            // Format size
+            let sizeStr = (art.size / 1024).toFixed(2) + " KB";
+            if (art.size > 1024 * 1024) {
+                sizeStr = (art.size / (1024 * 1024)).toFixed(2) + " MB";
+            }
+            
+            // List files
+            const filesList = art.files.map(f => `<code>${f.name}</code> (${(f.size/1024).toFixed(1)} KB)`).join('<br>');
+
+            tr.innerHTML = `
+                <td><span class="badge" style="background-color: #4f46e5; color: #fff;">${art.type}</span></td>
+                <td><strong>${art.collection}</strong></td>
+                <td><code>${art.version}</code></td>
+                <td>${sizeStr}</td>
+                <td>${filesList}</td>
+            `;
+            tbodyArtifacts.appendChild(tr);
+        });
+
+        // 5. Populate Error Logs
+        const oomRun = data.runs.find(r => r.id === '522rgd9s');
+        if (oomRun && oomRun.log) {
+            document.getElementById('oom-error-code').textContent = oomRun.log;
+        } else {
+            document.getElementById('oom-error-code').textContent = "Không tìm thấy file log lỗi.";
+        }
+
+        // 6. Draw Charts
+        // Filter history for the main run (1nzxiodq)
+        if (bestRun.history && bestRun.history.length > 0) {
+            // Sort history by step/epoch
+            const sortedHistory = [...bestRun.history].sort((a, b) => a._step - b._step);
+            
+            // Filter out points where epoch or loss is null
+            const epochs = sortedHistory.map(h => h.epoch).filter(e => e !== null);
+            const trainLosses = sortedHistory.filter(h => h.epoch !== null && h.train_loss !== null).map(h => ({x: h.epoch, y: h.train_loss}));
+            const valLosses = sortedHistory.filter(h => h.epoch !== null && h.val_loss !== null).map(h => ({x: h.epoch, y: h.val_loss}));
+            const expRates = sortedHistory.filter(h => h.epoch !== null && h.val_ExpRate !== null).map(h => ({x: h.epoch, y: h.val_ExpRate * 100})); // converted to %
+            const lrRates = sortedHistory.filter(h => h.epoch !== null && h['lr-Adadelta'] !== null).map(h => ({x: h.epoch, y: h['lr-Adadelta']}));
+
+            // Loss Chart
+            new Chart(document.getElementById('lossChart'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Train Loss',
+                            data: trainLosses,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Val Loss',
+                            data: valLosses,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', title: { display: true, text: 'Epoch', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { title: { display: true, text: 'Loss Value', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } }
+                    }
+                }
+            });
+
+            // Accuracy Chart
+            new Chart(document.getElementById('accChart'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Validation ExpRate (%)',
+                            data: expRates,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', title: { display: true, text: 'Epoch', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { min: 0, max: 100, title: { display: true, text: 'ExpRate (%)', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } }
+                    }
+                }
+            });
+
+            // LR Chart
+            new Chart(document.getElementById('lrChart'), {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Learning Rate (Adadelta)',
+                            data: lrRates,
+                            borderColor: '#fbbf24',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', title: { display: true, text: 'Epoch', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { title: { display: true, text: 'Learning Rate', color: '#94a3b8' }, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } }
+                    }
+                }
+            });
+        }
+
+        // Tab selection logic
+        function openTab(evt, tabId) {
+            const tabcontents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontents.length; i++) {
+                tabcontents[i].className = tabcontents[i].className.replace(" active", "");
+            }
+            const tablinks = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabId).className += " active";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"epoch":99,"train_loss":0.14954976737499237,"_step":249,"lr-Adadelta":1,"_timestamp":1.7814002724366236e+09,"val/struct_loss":0.029600078240036964,"val_ExpRate":0.5030364394187927,"_runtime":27095.899343232,"train/struct_loss":0.012909172102808952,"val_loss":0.437805712223053,"trainer/global_step":75099,"_wandb":{"runtime":27096}}

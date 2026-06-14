@@ -1,0 +1,16 @@
+{
+    "_runtime": 27095.899343232,
+    "_step": 249,
+    "_timestamp": 1781400272.4366236,
+    "_wandb": {
+        "runtime": 27096
+    },
+    "epoch": 99,
+    "lr-Adadelta": 1,
+    "train/struct_loss": 0.012909172102808952,
+    "train_loss": 0.14954976737499237,
+    "trainer/global_step": 75099,
+    "val/struct_loss": 0.029600078240036964,
+    "val_ExpRate": 0.5030364394187927,
+    "val_loss": 0.437805712223053
+}
