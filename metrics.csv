@@ -1,4 +1,7 @@
-lr-Adadelta,step,val_loss,val/struct_loss,val_ExpRate,epoch,train_loss,train/struct_loss
-1.0,0,,,,,,
-,1,5.7820634841918945,1.17205810546875,0.0,0,,
-,1,,,,0,4.47022008895874,3.32352352142334
+Name,Value,Timestamp,Step
+"lr-Adadelta",1.0,1781435906079,0
+"val_loss",5.7820634841918945,1781435906079,1
+"val/struct_loss",1.17205810546875,1781435906079,1
+"val_ExpRate",0.0,1781435906079,1
+"train_loss",4.47022008895874,1781435906079,1
+"train/struct_loss",3.32352352142334,1781435906079,1
