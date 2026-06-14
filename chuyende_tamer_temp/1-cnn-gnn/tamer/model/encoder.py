@@ -196,34 +196,55 @@ class Encoder(pl.LightningModule):
         b, h, w = mask.shape
         n_nodes = h * w
         
-        # Create grid adjacency (4-connected: up, down, left, right)
-        adj = torch.zeros(b, n_nodes, n_nodes, dtype=torch.long, device=mask.device)
+        # Create grid adjacency (8-connected: up, down, left, right, diagonals)
+        indices = torch.arange(n_nodes, device=mask.device)
         
-        for i in range(h):
-            for j in range(w):
-                node_idx = i * w + j
-                
-                # Right neighbor
-                if j < w - 1:
-                    right_idx = i * w + (j + 1)
-                    adj[:, node_idx, right_idx] = 1
-                    adj[:, right_idx, node_idx] = 1
-                
-                # Down neighbor
-                if i < h - 1:
-                    down_idx = (i + 1) * w + j
-                    adj[:, node_idx, down_idx] = 1
-                    adj[:, down_idx, node_idx] = 1
+        # Right neighbor
+        has_right = (indices % w) < (w - 1)
+        right_src = indices[has_right]
+        right_dst = right_src + 1
+        
+        # Down neighbor
+        has_down = indices < (h - 1) * w
+        down_src = indices[has_down]
+        down_dst = down_src + w
+        
+        # Diagonal Down-Right neighbor
+        has_down_right = has_down & has_right
+        dr_src = indices[has_down_right]
+        dr_dst = dr_src + w + 1
+        
+        # Diagonal Down-Left neighbor
+        has_down_left = has_down & ((indices % w) > 0)
+        dl_src = indices[has_down_left]
+        dl_dst = dl_src + w - 1
+        
+        # Build base adjacency matrix for a single graph
+        adj_single = torch.zeros(n_nodes, n_nodes, dtype=torch.long, device=mask.device)
+        adj_single[right_src, right_dst] = 1
+        adj_single[right_dst, right_src] = 1
+        adj_single[down_src, down_dst] = 1
+        adj_single[down_dst, down_src] = 1
+        adj_single[dr_src, dr_dst] = 1
+        adj_single[dr_dst, dr_src] = 1
+        adj_single[dl_src, dl_dst] = 1
+        adj_single[dl_dst, dl_src] = 1
+        
+        # Self-connections (prevents NaN in softmax)
+        adj_single[indices, indices] = 1
+        
+        # Expand to batch size
+        adj = adj_single.unsqueeze(0).expand(b, -1, -1).clone()
         
         # Mask out padding nodes (set their connections to 0)
         mask_flat = mask.reshape(b, n_nodes)  # [b, n_nodes]
         padding_mask = (mask_flat == 1)  # True for padding
-        adj = adj.masked_fill(padding_mask.unsqueeze(1), 0)
-        adj = adj.masked_fill(padding_mask.unsqueeze(2), 0)
+        adj.masked_fill_(padding_mask.unsqueeze(1), 0)
+        adj.masked_fill_(padding_mask.unsqueeze(2), 0)
         
-        # Self-connections for all nodes (prevents NaN in softmax for padding nodes)
-        for b_idx in range(b):
-            adj[b_idx, torch.arange(n_nodes, device=mask.device), torch.arange(n_nodes, device=mask.device)] = 1
+        # Re-apply self-connections for all nodes (including padding nodes)
+        batch_indices = torch.arange(b, device=mask.device).unsqueeze(1)
+        adj[batch_indices, indices, indices] = 1
         
         return adj
 
@@ -262,8 +283,8 @@ class Encoder(pl.LightningModule):
             feature_flat = feature.view(b, h * w, d)
             # Build adjacency matrix
             adj = self._build_grid_adjacency(mask)
-            # Apply GAT
-            feature_flat = self.gat(feature_flat, adj)
+            # Apply GAT with a residual skip connection
+            feature_flat = feature_flat + self.gat(feature_flat, adj)
             # Reshape back to [b, h, w, d]
             feature = feature_flat.view(b, h, w, d)
             feature = self.norm(feature)

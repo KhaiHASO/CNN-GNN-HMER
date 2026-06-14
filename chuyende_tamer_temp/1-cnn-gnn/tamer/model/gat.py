@@ -67,10 +67,10 @@ class GATLayer(nn.Module):
         # Compute attention coefficients
         e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]
         
-        # Apply mask and LeakyReLU
+        # Apply LeakyReLU then mask connected nodes
+        e = self.leaky_relu(e)
         adj_mask_expanded = adj_mask.unsqueeze(1)  # [b, 1, n, n]
         e = e.masked_fill(adj_mask_expanded == 0, float('-inf'))
-        e = self.leaky_relu(e)
         
         # Softmax
         attention = F.softmax(e, dim=-1)  # [b, num_heads, n, n]

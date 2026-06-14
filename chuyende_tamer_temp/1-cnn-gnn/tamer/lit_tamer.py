@@ -135,13 +135,12 @@ class LitTAMER(pl.LightningModule):
             sync_dist=True,
         )
 
-        # Log images with predictions to WandB
+        # Perform beam search once
+        hyps = self.approximate_joint_search(batch.imgs, batch.mask)
         if batch_idx == 0:
             columns = ["image", "ground_truth", "prediction"]
             data = []
             
-            # Use beam search for higher quality predictions to visualize
-            hyps = self.approximate_joint_search(batch.imgs, batch.mask)
             preds = [vocab.indices2words(h.seq) for h in hyps]
             gts = [vocab.indices2words(ind) for ind in batch.indices]
             
@@ -171,8 +170,6 @@ class LitTAMER(pl.LightningModule):
         #         on_epoch=True,
         #     )
         #     return
-
-        hyps = self.approximate_joint_search(batch.imgs, batch.mask)
 
         self.exprate_recorder([h.seq for h in hyps], batch.indices)
         self.log(
