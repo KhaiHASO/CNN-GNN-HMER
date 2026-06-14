@@ -17,6 +17,16 @@ class DagsHubCallback(Callback):
         self.token = os.environ.get("DAGSHUB_USER_TOKEN") or os.environ.get("DAGSHUB_TOKEN")
         self.branch = os.environ.get("DAGSHUB_BRANCH", "main")
 
+    def get_loggers(self, trainer):
+        if not hasattr(trainer, "logger") or trainer.logger is None:
+            return []
+        if hasattr(trainer.logger, "__iter__"):
+            try:
+                return list(trainer.logger)
+            except Exception:
+                return [trainer.logger]
+        return [trainer.logger]
+
     def on_validation_end(self, trainer, pl_module):
         if trainer.global_rank != 0:
             return
@@ -51,7 +61,7 @@ class DagsHubCallback(Callback):
                     print(f"[DagsHub] Failed to upload checkpoint: {e}")
 
         # 2. Upload metrics.csv to DagsHub Storage Bucket (bucket=True)
-        for logger in trainer.loggers:
+        for logger in self.get_loggers(trainer):
             if hasattr(logger, "log_dir") and logger.log_dir:
                 metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
                 if os.path.exists(metrics_csv):
@@ -78,7 +88,7 @@ class DagsHubCallback(Callback):
 
         # Upload final metrics.csv to the Git repository (bucket=False)
         # This will register the metrics in the DagsHub Experiments tab!
-        for logger in trainer.loggers:
+        for logger in self.get_loggers(trainer):
             if hasattr(logger, "log_dir") and logger.log_dir:
                 metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
                 if os.path.exists(metrics_csv):
