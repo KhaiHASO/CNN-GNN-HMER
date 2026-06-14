@@ -36,6 +36,7 @@ def main(
         test_folder=test_year,
         max_size=max_size,
         scale_to_limit=scale_to_limit,
+        eval_batch_size=1,
     )
 
     model = LitTAMER.load_from_checkpoint(ckp_path)

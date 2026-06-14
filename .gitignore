@@ -54,7 +54,7 @@ venv.bak/
 
 # Ignore generated datasets, but keep the packaged CROHME zip used by Kaggle.
 data/
-chuyende_tamer_temp/0-cnn-transformer-baseline/data/
+chuyende_tamer_temp/0-cnn-transformer-baseline/data
 chuyende_tamer_temp/1-cnn-gnn/data/
 chuyende_tamer_temp/data/crohme/
 chuyende_tamer_temp/data/CROHME_extracted/
@@ -79,3 +79,6 @@ chuyende_tamer_temp/GiaoDien/**/*.png
 chuyende_tamer_temp/GiaoDien/docs/feedbacks/
 chuyende_tamer_temp/GiaoDien/docs/_build/
 chuyende_tamer_temp/GiaoDien/site/
+
+# Allow checkpoint files in chuyende_tamer_temp/KetQua/
+!chuyende_tamer_temp/KetQua/**/*.ckpt
