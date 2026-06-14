@@ -1,5 +1,26 @@
 import sys
 import os
+import functools
+import typing
+
+# Monkeypatch for Python 3.7 compatibility with dagshub client
+if not hasattr(functools, "cached_property"):
+    class cached_property:
+        def __init__(self, func):
+            self.func = func
+            self.__doc__ = func.__doc__
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self
+            value = self.func(instance)
+            instance.__dict__[self.func.__name__] = value
+            return value
+    functools.cached_property = cached_property
+
+if not hasattr(typing, "Literal"):
+    from typing_extensions import Literal
+    typing.Literal = Literal
+
 import wandb
 from pytorch_lightning.plugins.training_type.ddp import DDPPlugin
 from pytorch_lightning.utilities.cli import LightningCLI
@@ -27,11 +48,23 @@ class DagsHubCallback(Callback):
                 return [trainer.logger]
         return [trainer.logger]
 
+    def _get_repo_client(self):
+        if not self.repo or not self.token:
+            return None
+        try:
+            from dagshub.upload import Repo
+            owner, repo_name = self.repo.split("/", 1)
+            return Repo(owner, repo_name, token=self.token, branch=self.branch)
+        except Exception as e:
+            print(f"[DagsHub] Failed to initialize Repo client: {e}")
+            return None
+
     def on_validation_end(self, trainer, pl_module):
         if trainer.global_rank != 0:
             return
             
-        if not self.repo or not self.token:
+        repo_client = self._get_repo_client()
+        if not repo_client:
             return
 
         # 1. Upload best checkpoint to DagsHub Storage Bucket (bucket=True)
@@ -45,14 +78,11 @@ class DagsHubCallback(Callback):
             current_best = checkpoint_callback.best_model_path
             if current_best != self.last_uploaded_ckpt and os.path.exists(current_best):
                 try:
-                    import dagshub
                     print(f"[DagsHub] Uploading best checkpoint: {current_best}...")
-                    dagshub.upload_files(
-                        repo=self.repo,
+                    repo_client.upload(
                         local_path=current_best,
                         remote_path="checkpoints/best_model.ckpt",
                         commit_message=f"Upload best checkpoint (val_ExpRate={trainer.callback_metrics.get('val_ExpRate', 0.0):.4f})",
-                        token=self.token,
                         bucket=True
                     )
                     self.last_uploaded_ckpt = current_best
@@ -66,13 +96,10 @@ class DagsHubCallback(Callback):
                 metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
                 if os.path.exists(metrics_csv):
                     try:
-                        import dagshub
-                        dagshub.upload_files(
-                            repo=self.repo,
+                        repo_client.upload(
                             local_path=metrics_csv,
                             remote_path="metrics.csv",
                             commit_message="Upload metrics.csv",
-                            token=self.token,
                             bucket=True
                         )
                         print(f"[DagsHub] Successfully uploaded metrics.csv to DagsHub Storage.")
@@ -83,7 +110,8 @@ class DagsHubCallback(Callback):
         if trainer.global_rank != 0:
             return
             
-        if not self.repo or not self.token:
+        repo_client = self._get_repo_client()
+        if not repo_client:
             return
 
         # Upload final metrics.csv to the Git repository (bucket=False)
@@ -93,15 +121,11 @@ class DagsHubCallback(Callback):
                 metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
                 if os.path.exists(metrics_csv):
                     try:
-                        import dagshub
                         print(f"[DagsHub] Uploading final metrics.csv to Git repository (branch: {self.branch})...")
-                        dagshub.upload_files(
-                            repo=self.repo,
+                        repo_client.upload(
                             local_path=metrics_csv,
                             remote_path="metrics.csv",
                             commit_message="Log final training metrics from training run",
-                            token=self.token,
-                            branch=self.branch,
                             bucket=False
                         )
                         print(f"[DagsHub] Successfully logged final metrics to DagsHub Experiments.")
