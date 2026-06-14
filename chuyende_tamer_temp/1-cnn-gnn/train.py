@@ -14,6 +14,41 @@ class MLflowCheckpointCallback(Callback):
         super().__init__()
         self.last_uploaded_ckpt = None
 
+    def on_fit_start(self, trainer, pl_module):
+        if trainer.global_rank != 0:
+            return
+            
+        config_path = None
+        for i, arg in enumerate(sys.argv):
+            if arg == "--config" and i + 1 < len(sys.argv):
+                config_path = sys.argv[i + 1]
+                break
+            elif arg.startswith("--config="):
+                config_path = arg.split("=", 1)[1]
+                break
+                
+        if not config_path:
+            config_path = "config/crohme.yaml"
+            
+        if os.path.exists(config_path):
+            loggers = trainer.loggers if hasattr(trainer, "loggers") else [trainer.logger]
+            for logger in loggers:
+                if isinstance(logger, MLFlowLogger):
+                    try:
+                        run_id = logger.run_id
+                        if run_id:
+                            print(f"[MLflow] Logging config file as artifact: {config_path}...")
+                            logger.experiment.log_artifact(
+                                run_id=run_id,
+                                local_path=config_path,
+                                artifact_path="config"
+                            )
+                            print("[MLflow] Successfully logged config file.")
+                        else:
+                            print("[MLflow] Warning: run_id is empty, cannot log config file.")
+                    except Exception as e:
+                        print(f"[MLflow] Failed to log config file: {e}")
+
     def on_validation_end(self, trainer, pl_module):
         if trainer.global_rank != 0:
             return
