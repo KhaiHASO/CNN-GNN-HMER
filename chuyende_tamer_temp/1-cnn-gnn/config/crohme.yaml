@@ -7,6 +7,7 @@ trainer:
       project: CNN-GNN-HMER-cnn-gnn
       name: cnn-gnn-crohme-2gpu-t4
       save_dir: lightning_logs
+      log_model: true
   callbacks:
     - class_path: pytorch_lightning.callbacks.LearningRateMonitor
       init_args:
