@@ -83,3 +83,6 @@ chuyende_tamer_temp/GiaoDien/site/
 # Allow lightning_logs and checkpoints under chuyende_tamer_temp/KetQua/
 !chuyende_tamer_temp/KetQua/**/lightning_logs/
 !chuyende_tamer_temp/KetQua/**/*.ckpt
+
+# Ignore MLflow local runs
+mlruns/
