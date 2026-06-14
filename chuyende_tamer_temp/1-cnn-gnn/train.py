@@ -71,7 +71,7 @@ def cli_main():
     cli = LightningCLI(
         LitTAMER,
         HMEDatamodule,
-        save_config_overwrite=True,
+        save_config_callback=None,
         trainer_defaults={
             "plugins": DDPPlugin(find_unused_parameters=True),
             "callbacks": [MLflowCheckpointCallback()]
