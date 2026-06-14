@@ -80,5 +80,6 @@ chuyende_tamer_temp/GiaoDien/docs/feedbacks/
 chuyende_tamer_temp/GiaoDien/docs/_build/
 chuyende_tamer_temp/GiaoDien/site/
 
-# Allow checkpoint files in chuyende_tamer_temp/KetQua/
+# Allow lightning_logs and checkpoints under chuyende_tamer_temp/KetQua/
+!chuyende_tamer_temp/KetQua/**/lightning_logs/
 !chuyende_tamer_temp/KetQua/**/*.ckpt
