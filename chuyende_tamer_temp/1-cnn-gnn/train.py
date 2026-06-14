@@ -59,6 +59,99 @@ class DagsHubCallback(Callback):
             print(f"[DagsHub] Failed to initialize Repo client: {e}")
             return None
 
+    def _convert_metrics(self, trainer, pl_metrics_csv, target_csv):
+        import csv
+        import time
+        if not os.path.exists(pl_metrics_csv):
+            return False
+        try:
+            rows = []
+            with open(pl_metrics_csv, "r") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    rows.append(row)
+            
+            timestamp = int(time.time() * 1000)
+            with open(target_csv, "w", newline="") as f:
+                writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+                f.write("Name,Value,Timestamp,Step\n")
+                for row in rows:
+                    step = row.get("step")
+                    epoch = row.get("epoch")
+                    step_num = 1
+                    if step is not None and step != "":
+                        step_num = int(step)
+                    elif epoch is not None and epoch != "":
+                        step_num = int(epoch)
+                    
+                    for k, v in row.items():
+                        if k in ["step", "epoch"] or v is None or v == "":
+                            continue
+                        try:
+                            val = float(v)
+                            writer.writerow([k, val, timestamp, step_num])
+                        except ValueError:
+                            continue
+            return True
+        except Exception as e:
+            print(f"[DagsHub] Failed to convert metrics: {e}")
+            return False
+
+    def _write_params(self, trainer, target_yml):
+        try:
+            import yaml
+            hparams = {}
+            if hasattr(trainer, "lightning_module") and hasattr(trainer.lightning_module, "hparams"):
+                hparams.update(trainer.lightning_module.hparams)
+            
+            serializable_hparams = {}
+            for k, v in hparams.items():
+                if type(v) in [int, float, bool, str, list, dict]:
+                    serializable_hparams[k] = v
+                else:
+                    serializable_hparams[k] = str(v)
+            
+            with open(target_yml, "w") as f:
+                yaml.safe_dump(serializable_hparams, f)
+            return True
+        except Exception as e:
+            print(f"[DagsHub] Failed to write params.yml: {e}")
+            return False
+
+    def _upload_logs(self, repo_client, trainer, pl_metrics_csv, bucket=False):
+        import shutil
+        import tempfile
+        
+        # Create temp directory
+        temp_dir = tempfile.mkdtemp()
+        try:
+            # 1. Convert metrics
+            root_metrics_csv = os.path.join(temp_dir, "metrics.csv")
+            has_metrics = self._convert_metrics(trainer, pl_metrics_csv, root_metrics_csv)
+            
+            # 2. Write parameters
+            root_params_yml = os.path.join(temp_dir, "params.yml")
+            has_params = self._write_params(trainer, root_params_yml)
+            
+            # 3. Upload directory if we have files
+            if has_metrics or has_params:
+                print(f"[DagsHub] Uploading metrics.csv and params.yml to {'Storage' if bucket else 'Git (branch: ' + self.branch + ')'}...")
+                upload_kwargs = {
+                    "local_path": temp_dir,
+                    "remote_path": "",  # Upload at the root level of the repo/bucket
+                    "commit_message": "Log training metrics and hyperparameters",
+                    "bucket": bucket
+                }
+                if not bucket:
+                    upload_kwargs["versioning"] = "git"
+                    upload_kwargs["force"] = True
+                repo_client.upload(**upload_kwargs)
+                print(f"[DagsHub] Successfully uploaded training logs.")
+        except Exception as e:
+            print(f"[DagsHub] Failed to upload training logs: {e}")
+        finally:
+            shutil.rmtree(temp_dir)
+
     def on_validation_end(self, trainer, pl_module):
         if trainer.global_rank != 0:
             return
@@ -90,21 +183,12 @@ class DagsHubCallback(Callback):
                 except Exception as e:
                     print(f"[DagsHub] Failed to upload checkpoint: {e}")
 
-        # 2. Upload metrics.csv to DagsHub Storage Bucket (bucket=True)
+        # 2. Convert and Upload metrics.csv and params.yml to DagsHub Storage Bucket (bucket=True)
         for logger in self.get_loggers(trainer):
             if hasattr(logger, "log_dir") and logger.log_dir:
-                metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
-                if os.path.exists(metrics_csv):
-                    try:
-                        repo_client.upload(
-                            local_path=metrics_csv,
-                            remote_path="metrics.csv",
-                            commit_message="Upload metrics.csv",
-                            bucket=True
-                        )
-                        print(f"[DagsHub] Successfully uploaded metrics.csv to DagsHub Storage.")
-                    except Exception as e:
-                        print(f"[DagsHub] Failed to upload metrics: {e}")
+                pl_metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
+                if os.path.exists(pl_metrics_csv):
+                    self._upload_logs(repo_client, trainer, pl_metrics_csv, bucket=True)
 
     def on_fit_end(self, trainer, pl_module):
         if trainer.global_rank != 0:
@@ -114,23 +198,13 @@ class DagsHubCallback(Callback):
         if not repo_client:
             return
 
-        # Upload final metrics.csv to the Git repository (bucket=False)
-        # This will register the metrics in the DagsHub Experiments tab!
+        # Upload final metrics.csv and params.yml to the Git repository (bucket=False)
+        # This will register the metrics and params in the DagsHub Experiments tab!
         for logger in self.get_loggers(trainer):
             if hasattr(logger, "log_dir") and logger.log_dir:
-                metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
-                if os.path.exists(metrics_csv):
-                    try:
-                        print(f"[DagsHub] Uploading final metrics.csv to Git repository (branch: {self.branch})...")
-                        repo_client.upload(
-                            local_path=metrics_csv,
-                            remote_path="metrics.csv",
-                            commit_message="Log final training metrics from training run",
-                            bucket=False
-                        )
-                        print(f"[DagsHub] Successfully logged final metrics to DagsHub Experiments.")
-                    except Exception as e:
-                        print(f"[DagsHub] Failed to upload final metrics to Git: {e}")
+                pl_metrics_csv = os.path.join(logger.log_dir, "metrics.csv")
+                if os.path.exists(pl_metrics_csv):
+                    self._upload_logs(repo_client, trainer, pl_metrics_csv, bucket=False)
 
 def cli_main():
     # Handle WandB API Key from CLI (e.g., --wandb_api_key=XYZ or --wandb_api_key XYZ)
