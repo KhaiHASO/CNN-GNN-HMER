@@ -272,11 +272,7 @@ class Encoder(pl.LightningModule):
         # proj
         feature = rearrange(feature, "b d h w -> b h w d")
 
-        # positional encoding
-        feature = self.pos_enc_2d(feature, mask)
-        feature = self.norm(feature)
-
-        # Apply GAT if enabled
+        # Apply GAT if enabled (on pure visual features, before adding positional encoding)
         if self.use_gat:
             b, h, w, d = feature.shape
             # Flatten to [b, n_nodes, d]
@@ -288,6 +284,10 @@ class Encoder(pl.LightningModule):
             # Reshape back to [b, h, w, d]
             feature = feature_flat.view(b, h, w, d)
             feature = self.norm(feature)
+
+        # positional encoding (added after GAT to keep coordinates sharp and unblurred)
+        feature = self.pos_enc_2d(feature, mask)
+        feature = self.norm(feature)
 
         # flat to 1-D
         return feature, mask
