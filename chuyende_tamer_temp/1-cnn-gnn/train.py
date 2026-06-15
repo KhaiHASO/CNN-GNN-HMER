@@ -13,6 +13,7 @@ class MLflowCheckpointCallback(Callback):
     def __init__(self):
         super().__init__()
         self.last_uploaded_ckpt = None
+        self.last_uploaded_mtime = None
 
     def on_fit_start(self, trainer, pl_module):
         if trainer.global_rank != 0:
@@ -61,25 +62,29 @@ class MLflowCheckpointCallback(Callback):
         
         if checkpoint_callback and checkpoint_callback.best_model_path:
             current_best = checkpoint_callback.best_model_path
-            if current_best != self.last_uploaded_ckpt and os.path.exists(current_best):
-                loggers = trainer.loggers if hasattr(trainer, "loggers") else [trainer.logger]
-                for logger in loggers:
-                    if isinstance(logger, MLFlowLogger):
-                        try:
-                            run_id = logger.run_id
-                            if run_id:
-                                print(f"[MLflow] Uploading best checkpoint to DagsHub MLflow: {current_best}...")
-                                logger.experiment.log_artifact(
-                                    run_id=run_id,
-                                    local_path=current_best,
-                                    artifact_path="checkpoints"
-                                )
-                                self.last_uploaded_ckpt = current_best
-                                print("[MLflow] Successfully uploaded checkpoint.")
-                            else:
-                                print("[MLflow] Warning: run_id is empty, cannot upload checkpoint.")
-                        except Exception as e:
-                            print(f"[MLflow] Failed to upload checkpoint: {e}")
+            if os.path.exists(current_best):
+                current_mtime = os.path.getmtime(current_best)
+                # Upload if path changed (dynamic naming) OR if file content changed (static naming)
+                if current_best != self.last_uploaded_ckpt or current_mtime != self.last_uploaded_mtime:
+                    loggers = trainer.loggers if hasattr(trainer, "loggers") else [trainer.logger]
+                    for logger in loggers:
+                        if isinstance(logger, MLFlowLogger):
+                            try:
+                                run_id = logger.run_id
+                                if run_id:
+                                    print(f"[MLflow] Uploading best checkpoint to DagsHub MLflow: {current_best}...")
+                                    logger.experiment.log_artifact(
+                                        run_id=run_id,
+                                        local_path=current_best,
+                                        artifact_path="checkpoints"
+                                    )
+                                    self.last_uploaded_ckpt = current_best
+                                    self.last_uploaded_mtime = current_mtime
+                                    print("[MLflow] Successfully uploaded checkpoint.")
+                                else:
+                                    print("[MLflow] Warning: run_id is empty, cannot upload checkpoint.")
+                            except Exception as e:
+                                print(f"[MLflow] Failed to upload checkpoint: {e}")
 
 def cli_main():
     # Handle WandB API Key from CLI (e.g., --wandb_api_key=XYZ or --wandb_api_key XYZ)
