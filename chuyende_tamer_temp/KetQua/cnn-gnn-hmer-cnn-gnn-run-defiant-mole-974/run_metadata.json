@@ -1,0 +1,53 @@
+{
+  "run_info": {
+    "run_id": "2e2611189af24ca5955fd73ceaa57d9c",
+    "run_name": "defiant-mole-974",
+    "experiment_id": "0",
+    "status": "RUNNING",
+    "start_time": 1781516136979,
+    "end_time": null,
+    "lifecycle_stage": "active"
+  },
+  "params": {
+    "alpha": "1.0",
+    "d_model": "256",
+    "vocab_size": "113",
+    "patience": "20",
+    "gat_num_layers": "2",
+    "nhead": "8",
+    "gat_num_heads": "8",
+    "max_len": "150",
+    "num_decoder_layers": "3",
+    "milestones": "[300, 350]",
+    "dim_feedforward": "1024",
+    "cross_coverage": "True",
+    "gat_dropout": "0.1",
+    "dropout": "0.3",
+    "self_coverage": "True",
+    "num_layers": "16",
+    "learning_rate": "1.0",
+    "dc": "32",
+    "gat_hidden_dim": "None",
+    "temperature": "1.0",
+    "early_stopping": "False",
+    "use_gat": "True",
+    "growth_rate": "24",
+    "beam_size": "10"
+  },
+  "metrics": {
+    "val_ExpRate": [],
+    "val/struct_loss": [],
+    "val_loss": [],
+    "train_loss": [],
+    "epoch": [],
+    "lr-Adadelta": [],
+    "train/struct_loss": []
+  },
+  "tags": {
+    "mlflow.user": "khaihaso",
+    "mlflow.source.name": "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/train.py",
+    "mlflow.source.type": "LOCAL",
+    "mlflow.source.git.commit": "fd40fe70af70ff1feb7ad38fd8a1fd8891eae8b6",
+    "mlflow.runName": "defiant-mole-974"
+  }
+}

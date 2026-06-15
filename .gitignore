@@ -86,3 +86,6 @@ chuyende_tamer_temp/GiaoDien/site/
 
 # Ignore MLflow local runs
 mlruns/
+
+# Ignore checkpoints in downloaded DagsHub run folders to avoid Git bloat
+chuyende_tamer_temp/KetQua/**/*run*/**/*.ckpt
