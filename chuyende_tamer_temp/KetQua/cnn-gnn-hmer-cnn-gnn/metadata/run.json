@@ -1,0 +1,181 @@
+{
+  "inputs": {},
+  "info": {
+    "start_time": 1781437670343,
+    "run_uuid": "8b964c54a2d94b8ca0e667db6ceba820",
+    "run_name": "colorful-moose-173",
+    "status": "FINISHED",
+    "end_time": 1781467087676,
+    "run_id": "8b964c54a2d94b8ca0e667db6ceba820",
+    "artifact_uri": "mlflow-artifacts:/0fad7ceceed4469bbbdafa27397817f4/8b964c54a2d94b8ca0e667db6ceba820/artifacts",
+    "lifecycle_stage": "active",
+    "experiment_id": "0",
+    "user_id": "root"
+  },
+  "data": {
+    "params": [
+      {
+        "value": "True",
+        "key": "self_coverage"
+      },
+      {
+        "key": "growth_rate",
+        "value": "24"
+      },
+      {
+        "key": "num_decoder_layers",
+        "value": "3"
+      },
+      {
+        "key": "alpha",
+        "value": "1.0"
+      },
+      {
+        "key": "beam_size",
+        "value": "10"
+      },
+      {
+        "value": "256",
+        "key": "d_model"
+      },
+      {
+        "key": "gat_num_heads",
+        "value": "8"
+      },
+      {
+        "key": "gat_dropout",
+        "value": "0.1"
+      },
+      {
+        "key": "patience",
+        "value": "20"
+      },
+      {
+        "key": "learning_rate",
+        "value": "1.0"
+      },
+      {
+        "key": "max_len",
+        "value": "150"
+      },
+      {
+        "key": "use_gat",
+        "value": "True"
+      },
+      {
+        "key": "gat_num_layers",
+        "value": "2"
+      },
+      {
+        "key": "milestones",
+        "value": "[300, 350]"
+      },
+      {
+        "key": "dim_feedforward",
+        "value": "1024"
+      },
+      {
+        "key": "vocab_size",
+        "value": "113"
+      },
+      {
+        "key": "dc",
+        "value": "32"
+      },
+      {
+        "key": "temperature",
+        "value": "1.0"
+      },
+      {
+        "key": "gat_hidden_dim",
+        "value": "None"
+      },
+      {
+        "key": "num_layers",
+        "value": "16"
+      },
+      {
+        "key": "early_stopping",
+        "value": "False"
+      },
+      {
+        "key": "cross_coverage",
+        "value": "True"
+      },
+      {
+        "key": "dropout",
+        "value": "0.3"
+      },
+      {
+        "key": "nhead",
+        "value": "8"
+      }
+    ],
+    "tags": [
+      {
+        "key": "mlflow.user",
+        "value": "khaihaso"
+      },
+      {
+        "value": "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/train.py",
+        "key": "mlflow.source.name"
+      },
+      {
+        "key": "mlflow.source.type",
+        "value": "LOCAL"
+      },
+      {
+        "key": "mlflow.source.git.commit",
+        "value": "c367169c3b5f6e7bbde717481ff4868c64361e35"
+      },
+      {
+        "key": "mlflow.runName",
+        "value": "colorful-moose-173"
+      }
+    ],
+    "metrics": [
+      {
+        "key": "val_loss",
+        "value": 0.5058882832527161,
+        "timestamp": 1781467079088,
+        "step": 75099
+      },
+      {
+        "key": "epoch",
+        "value": 99,
+        "timestamp": 1781467086200,
+        "step": 75099
+      },
+      {
+        "step": 75099,
+        "key": "train_loss",
+        "value": 0.16003254055976868,
+        "timestamp": 1781467086200
+      },
+      {
+        "key": "lr-Adadelta",
+        "value": 1,
+        "timestamp": 1781466717079,
+        "step": 74349
+      },
+      {
+        "key": "val_ExpRate",
+        "value": 0.4615384638309479,
+        "timestamp": 1781467079088,
+        "step": 75099
+      },
+      {
+        "key": "val/struct_loss",
+        "value": 0.02735760621726513,
+        "timestamp": 1781467079088,
+        "step": 75099
+      },
+      {
+        "timestamp": 1781467086200,
+        "step": 75099,
+        "key": "train/struct_loss",
+        "value": 0.015356971882283688
+      }
+    ]
+  }
+}

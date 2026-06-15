@@ -1,0 +1,87 @@
+[
+  {
+    "path": "checkpoints/epoch=1-step=1501-val_ExpRate=0.0000.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=11-step=9011-val_ExpRate=0.1123.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "is_dir": false,
+    "file_size": 101428253,
+    "path": "checkpoints/epoch=13-step=10513-val_ExpRate=0.1174.ckpt"
+  },
+  {
+    "path": "checkpoints/epoch=15-step=12015-val_ExpRate=0.1964.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "file_size": 101428253,
+    "path": "checkpoints/epoch=17-step=13517-val_ExpRate=0.2318.ckpt",
+    "is_dir": false
+  },
+  {
+    "path": "checkpoints/epoch=19-step=15019-val_ExpRate=0.2854.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=23-step=18023-val_ExpRate=0.3310.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=27-step=21027-val_ExpRate=0.3623.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=31-step=24031-val_ExpRate=0.3694.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=37-step=28537-val_ExpRate=0.4008.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "is_dir": false,
+    "file_size": 101428253,
+    "path": "checkpoints/epoch=41-step=31541-val_ExpRate=0.4018.ckpt"
+  },
+  {
+    "path": "checkpoints/epoch=47-step=36047-val_ExpRate=0.4261.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=53-step=40553-val_ExpRate=0.4514.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=63-step=48063-val_ExpRate=0.4717.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "path": "checkpoints/epoch=7-step=6007-val_ExpRate=0.0081.ckpt",
+    "is_dir": false,
+    "file_size": 101428253
+  },
+  {
+    "file_size": 101428253,
+    "path": "checkpoints/epoch=77-step=58577-val_ExpRate=0.4939.ckpt",
+    "is_dir": false
+  },
+  {
+    "file_size": 101428253,
+    "path": "checkpoints/epoch=9-step=7509-val_ExpRate=0.0709.ckpt",
+    "is_dir": false
+  }
+]

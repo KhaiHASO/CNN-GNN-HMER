@@ -1,78 +1,126 @@
-# Báo cáo Phân tích Dự án CNN-GNN-HMER
+# Báo cáo phân tích CNN-GNN HMER
 
-## 1. Giới thiệu dự án
-Dự án **CNN-GNN-HMER** (Handwritten Mathematical Expression Recognition) nhằm nhận diện các biểu thức toán học viết tay từ hình ảnh và chuyển đổi chúng thành mã nguồn LaTeX tương ứng. Mô hình sử dụng sự kết hợp giữa **CNN** (dùng để trích xuất đặc trưng hình ảnh) và **GNN** (cụ thể là Graph Attention Network - GAT, dùng để mô hình hóa cấu trúc hai chiều và mối quan hệ giữa các ký tự).
+## 1. Tổng quan
 
----
+Dashboard này tổng hợp kết quả chạy mô hình **CNN-GNN HMER** tại thư mục `chuyende_tamer_temp/1-cnn-gnn`. Đây là phiên bản cải tiến so với CNN-Transformer baseline bằng cách bật nhánh Graph Attention Network qua tham số `use_gat=True`.
 
-## 2. Thông tin mã nguồn (Metadata)
-*   **Repository nguồn:** [KhaiHASO/CNN-GNN-HMER](https://github.com/KhaiHASO/CNN-GNN-HMER) (Private Repository)
-*   **Commit Hash:** `26318be4c71f06cac196c125e90ecbb76483cadc`
-*   **Tệp chạy chính (Entrypoint):** `chuyende_tamer_temp/1-cnn-gnn/train.py`
-*   **Môi trường chạy:** Conda environment `unimernet` (Python 3.10.20)
+Nguồn dữ liệu được lấy từ bộ metadata MLflow/Dagshub trong thư mục:
 
----
+- `metadata/run.json`
+- `metadata/artifacts.json`
+- `README_DAGSHUB_DOWNLOAD.json`
+- `artifacts/checkpoints/epoch=77-step=58577-val_ExpRate=0.4939.ckpt`
 
-## 3. Tổng quan về các Lượt chạy (Runs) trên W&B
-Dự án chứa tổng cộng **10 runs** được lưu trên hệ thống Weights & Biases (W&B) của người dùng `khaihaso`.
+## 2. Metadata run
 
-| Tên Run | ID Run | Trạng thái | Thời gian chạy | Kết quả / Ghi chú |
-| :--- | :--- | :--- | :--- | :--- |
-| `cnn-gnn-crohme-2gpu-t4` | `1nzxiodq` | Crashed | 2,827 giây (~47 phút) | Run chính chạy được 19 epochs, đạt `val_ExpRate` = 24.09% |
-| `cnn-gnn-crohme-2gpu-t4` | `522rgd9s` | Failed | 33 giây | Bị crash ngay ở epoch 0 do lỗi **CUDA Out of Memory** |
-| `cnn-gnn-crohme-2gpu-t4` | `jwbl6zuc` | Crashed | 17 giây | Crash ngay ở epoch 0 |
-| `cnn-gnn-crohme-2gpu-t4` | `uf9wwd1n` | Crashed | 17 giây | Crash ngay ở epoch 0 |
-| *Các run phụ khác (13j2wxey, 20h2tun4, 7qqqa390, 86olsd2p, qdov0k7t, r63isncm)* | - | Finished | ~10-15 giây | Các run phụ được tạo tự động khi upload/đồng bộ các Artifacts |
+| Trường | Giá trị |
+| :--- | :--- |
+| Run name | `colorful-moose-173` |
+| Run ID | `8b964c54a2d94b8ca0e667db6ceba820` |
+| Trạng thái | `FINISHED` |
+| User | `root` |
+| MLflow user tag | `khaihaso` |
+| Source | `/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/train.py` |
+| Commit | `c367169c3b5f6e7bbde717481ff4868c64361e35` |
+| Artifact URI | `mlflow-artifacts:/0fad7ceceed4469bbbdafa27397817f4/8b964c54a2d94b8ca0e667db6ceba820/artifacts` |
 
----
+Thời lượng chạy theo metadata:
 
-## 4. Phân tích Chi tiết Lỗi Crash tại Epoch 19 (Run `1nzxiodq`)
-Tại sao run `1nzxiodq` đang chạy tốt đến epoch 19 (mất khoảng 1 giờ 47 phút) thì đột ngột bị crash mà không lưu lại log lỗi (`exitcode: null`)?
+- Start time: `1781437670343`
+- End time: `1781467087676`
+- Runtime xấp xỉ: **29,417 giây**, tương đương **8.17 giờ**
 
-### Phân tích kỹ thuật:
-1. **Sự khác biệt về Kích thước Dữ liệu Đầu vào (Dynamic Resolution):**
-   Trong bài toán HMER, các hình ảnh chứa biểu thức viết tay có kích thước không cố định. Ảnh chứa biểu thức dài hoặc phức tạp sẽ lớn hơn nhiều so với ảnh chứa biểu thức ngắn (ví dụ: một hệ phương trình dài so với chỉ một ký tự hoặc chữ số đơn lẻ).
-   
-2. **Độ phức tạp Bộ nhớ của GAT (Graph Attention Network):**
-   Mô hình này sử dụng cơ chế Attention trong GAT (`tamer/model/gat.py`). Tại dòng 98:
-   `Wh2_expanded.repeat(1, 1, n, 1, 1)`
-   Để tính toán điểm số Attention cho tất cả các cặp đỉnh (nodes) trong đồ thị, tensor được nhân bản $n$ lần (với $n$ là số lượng node/pixels của đặc trưng).
-   Độ phức tạp bộ nhớ của thao tác này tăng theo hàm **bình phương** số lượng node ($O(n^2)$).
-   
-3. **Hiện tượng OOM Đột ngột (Out Of Memory Spike):**
-   Trong suốt 18 epoch đầu, mô hình có thể chỉ gặp các mẫu dữ liệu có kích thước trung bình và nhỏ, giúp lượng VRAM tiêu thụ luôn nằm dưới ngưỡng giới hạn 16GB của card Tesla T4.
-   Tuy nhiên, ở epoch 19, khi hệ thống nạp vào một **batch chứa ảnh có kích thước lớn hoặc độ dài biểu thức vượt trội**, lượng VRAM yêu cầu tăng đột biến (vượt quá dung lượng còn lại của GPU).
-   Khi GPU bị tràn bộ nhớ đột ngột ở cấp độ driver/CUDA (phân bổ vượt mức quá lớn), hệ điều hành hoặc driver sẽ lập tức gửi tín hiệu kết thúc tiến trình (`SIGKILL`), khiến chương trình python dừng ngay lập tức. W&B agent không kịp thực hiện các thủ tục đóng kết nối và upload file log `output.log`, dẫn đến trạng thái ghi nhận trên W&B là **Crashed** và `exitcode` là **None**.
+## 3. Cấu hình mô hình
 
----
+| Nhóm | Tham số | Giá trị |
+| :--- | :--- | :--- |
+| Backbone | `growth_rate` | `24` |
+| Backbone | `num_layers` | `16` |
+| Decoder | `num_decoder_layers` | `3` |
+| Decoder | `d_model` | `256` |
+| Decoder | `nhead` | `8` |
+| Decoder | `dim_feedforward` | `1024` |
+| GNN | `use_gat` | `True` |
+| GNN | `gat_num_layers` | `2` |
+| GNN | `gat_num_heads` | `8` |
+| GNN | `gat_dropout` | `0.1` |
+| Training | `learning_rate` | `1.0` |
+| Training | `dropout` | `0.3` |
+| Training | `early_stopping` | `False` |
+| Inference | `beam_size` | `10` |
+| Inference | `max_len` | `150` |
+| Objective | `self_coverage` | `True` |
+| Objective | `cross_coverage` | `True` |
 
-## 5. Đề xuất Khắc phục triệt để
-Để tránh việc mô hình bị dừng đột ngột ở các epoch sau, bạn nên áp dụng các giải pháp sau:
-*   **Tránh sử dụng `.repeat` trong GAT:** Thay thế việc dùng `.repeat` bằng cơ chế tự động **Broadcasting** của PyTorch (chỉ tốn bộ nhớ khi tính toán, không nhân bản dữ liệu trên bộ nhớ thực tế).
-*   **Lọc/Giới hạn kích thước ảnh đầu vào:** Loại bỏ các ảnh quá dài/quá lớn trong quá trình tiền xử lý, hoặc resize chúng về một kích thước tối đa cố định.
-*   **Giảm Batch Size và sử dụng Gradient Accumulation:** Giảm `batch_size` xuống một nửa (ví dụ từ 32 xuống 16 hoặc 8) để tạo không gian trống (headroom) cho VRAM phòng trường hợp gặp mẫu lớn, đồng thời đặt `accumulate_grad_batches` trong PyTorch Lightning để giữ nguyên kích thước batch cập nhật trọng số.
-*   **Sử dụng Gradient Checkpointing:** Giúp tiết kiệm đáng kể bộ nhớ GPU bằng cách tính toán lại các activation trong quá trình lan truyền ngược thay vì lưu tất cả trong bộ nhớ.
+## 4. Kết quả chính
 
----
+| Chỉ số | Giá trị |
+| :--- | ---: |
+| Epoch cuối | `99` |
+| Global step cuối | `75099` |
+| Train loss cuối | `0.1600` |
+| Train struct loss cuối | `0.0154` |
+| Validation loss cuối | `0.5059` |
+| Validation struct loss cuối | `0.0274` |
+| Validation ExpRate cuối | **46.15%** |
+| Checkpoint tốt nhất ghi nhận | **49.39%** tại epoch `77` |
 
-## 6. Kết quả huấn luyện (Best Run: 1nzxiodq)
-*   **Train Loss (Struct):** 0.0425
-*   **Val Loss (Total):** 0.8601
-*   **Val Loss (Struct):** 0.0475
-*   **Validation Expression Rate (Accuracy):** 24.09%
+Điểm quan trọng là kết quả cuối của run thấp hơn checkpoint tốt nhất. Điều này cho thấy mô hình đã đạt đỉnh trước khi kết thúc huấn luyện, sau đó có dấu hiệu dao động hoặc suy giảm nhẹ trên validation.
 
-> [!NOTE]
-> Mô hình đang học tốt, biểu hiện qua việc **loss giảm dần** và **độ chính xác tăng dần** qua các epoch. Tuy nhiên, tỷ lệ 24.09% vẫn còn thấp đối với bài toán HMER thực tế, cần được huấn luyện thêm nhiều epoch hơn hoặc cải tiến mô hình.
+## 5. Diễn biến checkpoint
 
----
+Các checkpoint được lưu khi `val_ExpRate` cải thiện hoặc đạt mốc quan trọng:
 
-## 7. Dữ liệu Validation đã lưu (Bảng dự đoán)
-Hệ thống W&B đã lưu trữ bảng dự đoán của tập validation (`val_predictions`). Hai mẫu dự đoán tiêu biểu được ghi nhận trong bảng này:
-1.  **Hình ảnh 1:** Biểu thức `- 7`.
-    *   **Ground Truth:** `- 7`
-    *   **Prediction:** `- 7`
-    *   **Kết quả:** :white_check_mark: Chính xác (Match)
-2.  **Hình ảnh 2:** Biểu thức `k N`.
-    *   **Ground Truth:** `k N`
-    *   **Prediction:** `k V`
-    *   **Kết quả:** :x: Sai (Mismatch - Nhận diện nhầm N thành V)
+| Epoch | Step | Val ExpRate |
+| ---: | ---: | ---: |
+| 1 | 1501 | 0.00% |
+| 7 | 6007 | 0.81% |
+| 9 | 7509 | 7.09% |
+| 11 | 9011 | 11.23% |
+| 13 | 10513 | 11.74% |
+| 15 | 12015 | 19.64% |
+| 17 | 13517 | 23.18% |
+| 19 | 15019 | 28.54% |
+| 23 | 18023 | 33.10% |
+| 27 | 21027 | 36.23% |
+| 31 | 24031 | 36.94% |
+| 37 | 28537 | 40.08% |
+| 41 | 31541 | 40.18% |
+| 47 | 36047 | 42.61% |
+| 53 | 40553 | 45.14% |
+| 63 | 48063 | 47.17% |
+| 77 | 58577 | **49.39%** |
+
+Quỹ đạo học tăng ổn định từ epoch 1 đến 77. Sau epoch 77, metadata cuối epoch 99 chỉ còn `val_ExpRate=46.15%`, tức giảm **3.24 điểm phần trăm** so với checkpoint tốt nhất.
+
+## 6. So sánh với baseline
+
+| Mô hình | Run | Epoch cuối | Val ExpRate cuối | Checkpoint tốt nhất |
+| :--- | :--- | ---: | ---: | ---: |
+| CNN-Transformer baseline | `8ivyzmlm` | 99 | 50.30% | 50.91% |
+| CNN-GNN | `8b964c54...` | 99 | 46.15% | 49.39% |
+
+Chênh lệch chính:
+
+- Theo checkpoint tốt nhất, CNN-GNN thấp hơn baseline **1.52 điểm phần trăm**.
+- Theo metric cuối run, CNN-GNN thấp hơn baseline **4.15 điểm phần trăm**.
+- CNN-GNN đã chạy đủ 100 epoch và ổn định hơn so với lần ghi nhận cũ bị crash ở epoch 19, nhưng vẫn chưa vượt baseline.
+
+## 7. Nhận xét kỹ thuật
+
+CNN-GNN cho thấy tác dụng tích cực của nhánh GAT khi nhìn vào tốc độ cải thiện checkpoint: từ 28.54% tại epoch 19 lên 49.39% tại epoch 77. Điều này cho thấy mô hình không còn bị chặn sớm và có khả năng học biểu diễn không gian tốt hơn khi được huấn luyện đủ lâu.
+
+Tuy nhiên, khoảng cách với baseline chưa được đóng hoàn toàn. Có ba dấu hiệu cần chú ý:
+
+- Validation loss cuối `0.5059` cao hơn baseline cuối `0.4378`.
+- Checkpoint tốt nhất xuất hiện ở epoch 77, không phải epoch cuối.
+- ExpRate cuối giảm xuống 46.15%, cho thấy cần dùng checkpoint tốt nhất để đánh giá, không nên lấy epoch cuối làm mô hình đại diện.
+
+## 8. Khuyến nghị
+
+1. Dùng checkpoint `epoch=77-step=58577-val_ExpRate=0.4939.ckpt` cho đánh giá chính thức thay vì epoch cuối.
+2. Chạy lại evaluation chi tiết trên CROHME 2014/2016/2019 để có bảng lỗi giống baseline.
+3. Bật early stopping hoặc lưu best checkpoint theo `val_ExpRate` để tránh chọn mô hình sau khi hiệu năng giảm.
+4. So sánh lỗi theo nhóm biểu thức dài, ký hiệu chồng/lồng và cấu trúc phân số để xác định nhánh GAT giúp hoặc làm hại ở loại mẫu nào.
+5. Thử ablation `use_gat=False`, `gat_num_layers=1`, `gat_num_heads=4/8` để tách ảnh hưởng của GAT khỏi decoder Transformer.
+
