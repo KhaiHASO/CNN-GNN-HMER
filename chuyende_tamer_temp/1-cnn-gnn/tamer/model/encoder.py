@@ -279,8 +279,8 @@ class Encoder(pl.LightningModule):
             feature_flat = feature.view(b, h * w, d)
             # Build adjacency matrix
             adj = self._build_grid_adjacency(mask)
-            # Apply GAT with a residual skip connection
-            feature_flat = feature_flat + self.gat(feature_flat, adj)
+            # Apply GAT with a residual skip connection (passing grid height and width)
+            feature_flat = feature_flat + self.gat(feature_flat, adj, h, w)
             # Reshape back to [b, h, w, d]
             feature = feature_flat.view(b, h, w, d)
             feature = self.norm(feature)

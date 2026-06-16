@@ -3,9 +3,9 @@
     "run_id": "2e2611189af24ca5955fd73ceaa57d9c",
     "run_name": "defiant-mole-974",
     "experiment_id": "0",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "start_time": 1781516136979,
-    "end_time": null,
+    "end_time": 1781544305665,
     "lifecycle_stage": "active"
   },
   "params": {
@@ -35,13 +35,27 @@
     "beam_size": "10"
   },
   "metrics": {
-    "val_ExpRate": [],
-    "val/struct_loss": [],
-    "val_loss": [],
-    "train_loss": [],
-    "epoch": [],
-    "lr-Adadelta": [],
-    "train/struct_loss": []
+    "val_ExpRate": [
+      0.4746963679790497
+    ],
+    "val/struct_loss": [
+      0.036668259650468826
+    ],
+    "val_loss": [
+      0.47585663199424744
+    ],
+    "train_loss": [
+      0.1484314203262329
+    ],
+    "epoch": [
+      99.0
+    ],
+    "lr-Adadelta": [
+      1.0
+    ],
+    "train/struct_loss": [
+      0.011443549767136574
+    ]
   },
   "tags": {
     "mlflow.user": "khaihaso",

@@ -32,10 +32,10 @@ model:
   self_coverage: true
   # GAT (Graph Attention Network) - optional
   use_gat: true  # CNN-GNN variant: enable GAT layers
-  gat_num_layers: 2
-  gat_num_heads: 8
+  gat_num_layers: 1
+  gat_num_heads: 4
   gat_hidden_dim: null  # null means use d_model
-  gat_dropout: 0.1
+  gat_dropout: 0.2
   beam_size: 3
   max_len: 80
   alpha: 1.0
