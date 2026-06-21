@@ -80,12 +80,8 @@ chuyende_tamer_temp/GiaoDien/docs/feedbacks/
 chuyende_tamer_temp/GiaoDien/docs/_build/
 chuyende_tamer_temp/GiaoDien/site/
 
-# Allow lightning_logs and checkpoints under chuyende_tamer_temp/KetQua/
+# Allow lightning_logs under chuyende_tamer_temp/KetQua/
 !chuyende_tamer_temp/KetQua/**/lightning_logs/
-!chuyende_tamer_temp/KetQua/**/*.ckpt
 
 # Ignore MLflow local runs
 mlruns/
-
-# Ignore checkpoints in downloaded DagsHub run folders to avoid Git bloat
-chuyende_tamer_temp/KetQua/**/*run*/**/*.ckpt
