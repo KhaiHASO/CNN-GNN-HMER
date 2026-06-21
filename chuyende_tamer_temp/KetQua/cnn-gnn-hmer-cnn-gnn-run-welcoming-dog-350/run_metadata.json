@@ -1,0 +1,102 @@
+{
+  "run_info": {
+    "run_id": "e44ee12972f8447482b89d0a5f1acbf2",
+    "run_name": "welcoming-dog-350",
+    "experiment_id": "0",
+    "status": "FINISHED",
+    "start_time": 1781693756328,
+    "end_time": 1781725588745,
+    "lifecycle_stage": "active"
+  },
+  "params": {
+    "early_stopping": "False",
+    "milestones": "[300, 350]",
+    "gat_num_heads": "8",
+    "gat_dropout": "0.2",
+    "vocab_size": "113",
+    "growth_rate": "24",
+    "gat_num_layers": "2",
+    "dropout": "0.3",
+    "self_coverage": "True",
+    "dim_feedforward": "1024",
+    "use_gat": "True",
+    "learning_rate": "1.0",
+    "beam_size": "10",
+    "alpha": "1.0",
+    "gat_hidden_dim": "None",
+    "num_layers": "16",
+    "num_decoder_layers": "3",
+    "d_model": "256",
+    "cross_coverage": "True",
+    "patience": "20",
+    "dc": "32",
+    "nhead": "8",
+    "temperature": "1.0",
+    "max_len": "150"
+  },
+  "metrics": {
+    "val_ExpRate": [
+      {
+        "key": "val_ExpRate",
+        "value": 0.4554655849933624,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "val_loss": [
+      {
+        "key": "val_loss",
+        "value": 0.5104912519454956,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "val/struct_loss": [
+      {
+        "key": "val/struct_loss",
+        "value": 0.030482910573482513,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "lr-Adadelta": [
+      {
+        "key": "lr-Adadelta",
+        "value": 1.0,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "train/struct_loss": [
+      {
+        "key": "train/struct_loss",
+        "value": 0.013186478987336159,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "train_loss": [
+      {
+        "key": "train_loss",
+        "value": 0.1560712456703186,
+        "timestamp": 0,
+        "step": 0
+      }
+    ],
+    "epoch": [
+      {
+        "key": "epoch",
+        "value": 99.0,
+        "timestamp": 0,
+        "step": 0
+      }
+    ]
+  },
+  "tags": {
+    "mlflow.user": "khaihaso",
+    "mlflow.source.name": "/kaggle/working/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/train.py",
+    "mlflow.source.type": "LOCAL",
+    "mlflow.source.git.commit": "29aa18b75192d05ee7ef47bec931db7afae39835",
+    "mlflow.runName": "welcoming-dog-350"
+  }
+}

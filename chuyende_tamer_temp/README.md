@@ -144,59 +144,70 @@ Dưới đây là bảng đối chiếu chi tiết kết quả đánh giá (Eval
 * **Baseline:** Checkpoint `epoch=95-step=72095` (Run ID: `8ivyzmlm`)
 * **CNN-GNN (Old):** Checkpoint `epoch=77-step=58577` (Run ID: `colorful-moose-173`) - *Tích hợp Positional Encoding TRƯỚC lớp GAT*
 * **CNN-GNN (New):** Checkpoint `best_model.ckpt` (Run ID: `defiant-mole-974`) - *Tích hợp Positional Encoding SAU lớp GAT (2 layers, 8 heads, 0.1 dropout)*
-* **CNN-GNN + Coordinate-Aware GAT:** Checkpoint `best_model.ckpt` (Run ID: `skittish-worm-90`) - *GAT 1 layer, 4 heads, 0.2 dropout, kèm Relative Position Bias (Coordinate-Aware kề 8-hướng)*
+* **CNN-GNN + Coordinate-Aware GAT (1L, 4H):** Checkpoint `best_model.ckpt` (Run ID: `skittish-worm-90`) - *GAT 1 layer, 4 heads, 0.2 dropout, kèm Relative Position Bias (Coordinate-Aware kề 8-hướng)*
+* **CNN-GNN + Coordinate-Aware GAT (2L, 8H):** Checkpoint `best_model.ckpt` (Run ID: `welcoming-dog-350`) - *GAT 2 layers, 8 heads, 0.2 dropout, kèm Relative Position Bias (Coordinate-Aware kề 8-hướng - Thử nghiệm Scale-up)*
 
 | Tập dữ liệu (Dataset) | Mô hình | ExpRate (Khớp 100%) | ExpRate $\le$ 1 (Sai $\le$ 1 ký tự) | ExpRate $\le$ 2 (Sai $\le$ 2 ký tự) | Mean Edit Distance (K/c chỉnh sửa TB) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **CROHME 2014** | Baseline | **51.12%** | **69.98%** | **77.69%** | 1.99 |
 | | CNN-GNN (Old) | 49.39% | 66.53% | 75.25% | 2.22 |
 | | CNN-GNN (New) | 48.88% | 66.73% | 75.35% | 2.19 |
-| | **Coordinate-Aware GAT** | 49.90% | 67.44% | 77.18% | **1.98** *(Tốt nhất)* |
+| | **Coordinate-Aware GAT (1L, 4H)** | 49.90% | 67.44% | 77.18% | **1.98** *(Tốt nhất)* |
+| | Coordinate-Aware GAT (2L, 8H) | 46.65% | 63.99% | 73.43% | 2.48 |
 | **CROHME 2016** | Baseline | 50.65% | **67.92%** | **76.02%** | 2.21 |
 | | CNN-GNN (Old) | 47.43% | 64.95% | 74.72% | 2.45 |
 | | CNN-GNN (New) | **50.74%** | 66.96% | 75.85% | 2.19 |
-| | **Coordinate-Aware GAT** | 49.17% | 67.13% | 75.76% | **2.13** *(Tốt nhất)* |
+| | **Coordinate-Aware GAT (1L, 4H)** | 49.17% | 67.13% | 75.76% | **2.13** *(Tốt nhất)* |
+| | Coordinate-Aware GAT (2L, 8H) | 45.68% | 63.03% | 73.23% | 2.53 |
 | **CROHME 2019** | Baseline | **48.54%** | **68.14%** | 77.23% | 2.40 |
 | | CNN-GNN (Old) | 46.71% | 66.89% | 75.90% | 2.62 |
 | | CNN-GNN (New) | 47.87% | 67.81% | **77.98%** | **2.02** *(Tốt nhất)* |
-| | **Coordinate-Aware GAT** | 47.87% | 67.72% | 76.90% | 2.08 |
+| | **Coordinate-Aware GAT (1L, 4H)** | 47.87% | 67.72% | 76.90% | 2.08 |
+| | Coordinate-Aware GAT (2L, 8H) | 37.70% | 58.97% | 70.14% | 2.93 |
 | **Trung bình (Average)**| Baseline | **50.10%** | **68.68%** | **76.98%** | 2.20 |
 | | CNN-GNN (Old) | 47.84% | 66.12% | 75.29% | 2.43 |
 | | CNN-GNN (New) | 49.17% | 67.17% | 76.40% | 2.14 |
-| | **Coordinate-Aware GAT** | 48.98% | 67.43% | 76.61% | **2.06** *(Tốt nhất)* |
+| | **Coordinate-Aware GAT (1L, 4H)** | **48.98%** | **67.43%** | **76.61%** | **2.06** *(Tốt nhất)* |
+| | Coordinate-Aware GAT (2L, 8H) | 43.35% | 62.00% | 72.27% | 2.65 |
 
 ---
 
 ### 2. Phân tích Sâu & Nhận xét Kỹ thuật (In-depth Analysis)
 
-> [!IMPORTANT]
-> **Điểm sáng lớn nhất: Khoảng cách chỉnh sửa (Mean Edit Distance) đạt kỷ lục mới**
-> Mô hình sử dụng **Coordinate-Aware GAT (`skittish-worm-90`)** đạt khoảng cách chỉnh sửa trung bình thấp nhất: **2.06** (giảm 6.3% so với Baseline và 3.7% so với GNN mới phiên bản thường).
-> Điều này minh chứng rằng cơ chế nhúng hướng tương đối trong ma trận kề (8 hướng kề) giúp bộ giải mã Transformer giữ vững cấu trúc 2D của công thức toán (không bị lệch dòng, đảo lộn số mũ/chỉ số dưới hoặc phân số) tốt hơn hẳn. Khi dự đoán sai, mô hình chỉ bị sai lệch rất nhỏ về ký tự chứ không phá vỡ cấu trúc biểu thức.
+#### 2.1. Đánh giá về sự tối ưu của GAT 1 lớp và Bias Tọa độ tương đối (`skittish-worm-90`)
+* Cơ chế nhúng hướng tương đối trong ma trận kề kề 8-hướng giúp giữ vững cấu trúc không gian cực kỳ hiệu quả, đạt **Mean Edit Distance kỷ lục là 2.06** (so với 2.20 của Baseline). Khi dự đoán sai, cấu trúc phân số, số mũ, chỉ số dưới của mô hình ít bị xáo trộn nhất.
 
-1. **Trade-off giữa Capacity (Dung lượng mô hình) và Mối quan hệ Không gian:**
-   * **CNN-GNN (New - `defiant-mole-974`)** dùng 2 lớp GAT và 8 heads đạt ExpRate trung bình **49.17%** (nhờ dung lượng tham số lớn hơn).
-   * **Coordinate-Aware GAT (`skittish-worm-90`)** chỉ dùng 1 lớp GAT và 4 heads đạt ExpRate trung bình **48.98%** (thấp hơn 0.19% so với bản New, nhưng Mean Edit Distance lại tối ưu hơn nhiều: **2.06** so với **2.14**).
-   * **Kết luận:** Việc tinh giản mô hình giúp giảm overfitting rõ rệt (Validation Loss ổn định ở mức `0.512`), đồng thời việc nhúng Relative Position Bias bù đắp cực tốt cho việc thiếu hụt số lớp GAT bằng cách cung cấp thông tin không gian trực quan hơn.
-
-2. **Dung sai lỗi (ExpRate $\le$ 1 và $\le$ 2):**
-   * Tỷ lệ sai lệch dưới 1 ký tự (ExpRate $\le$ 1) của mô hình Coordinate-Aware đạt **67.43%**, cải thiện so với bản New thường (67.17%). Điều này chứng tỏ mô hình có xu hướng đoán "gần đúng hoàn toàn" cao hơn.
-
----
-
-### 🚀 3. Đề xuất Phương án Kế tiếp (Roadmap)
-
-Để vượt qua baseline **50.10% ExpRate** trung bình một cách toàn diện (cả về tỷ lệ khớp 100% lẫn Edit Distance), chúng tôi đề xuất các phương án tối ưu hóa như sau:
-
-#### 3.1. Phục hồi dung lượng GAT (Scale-up Coordinate-Aware GAT)
-* **Phương án:** Giữ nguyên cơ chế **Coordinate-Aware Relative Position Bias** nhưng nâng cấp GAT từ **1 layer / 4 heads** lên **2 layers / 8 heads** (hoặc tăng kích thước `gat_hidden_dim` / `d_model`).
-* **Mục tiêu:** Tận dụng tối đa khả năng biểu diễn cấu trúc không gian của Coordinate-Aware GAT đồng thời khôi phục lại sức mạnh học biểu diễn sâu (deep representation capacity) của mô hình 2 lớp, giúp đẩy ExpRate trung bình vượt qua mốc 50.10%.
-
-#### 3.2. Huấn luyện chính thức (Kaggle Production Run)
-* **Phương án:** Chạy huấn luyện chính thức với cấu hình lai tối ưu này trên Kaggle trong **100-120 epochs** kèm theo **Learning Rate Cosine Annealing scheduler**. Chạy thử nghiệm RTX 3070 hiện tại đã cho thấy xu hướng hội tụ rất tốt và ổn định.
-
-#### 3.3. Tăng cường dữ liệu hình ảnh (Data Augmentation)
-* **Phương án:** Bổ sung các kỹ thuật tăng cường như **Elastic Deformation** (biến dạng đàn hồi để mô phỏng nét viết tay tự nhiên), **Random Scaling**, và **Perspective Transform** để mô hình GNN học được các quan hệ không gian bền vững hơn trước các biến thể viết tay khác nhau.
+#### 2.2. Hiện tượng sụt giảm hiệu năng nghiêm trọng ở bản Scale-up (`welcoming-dog-350`)
+Khi tăng quy mô Coordinate-Aware GAT lên **2 layers và 8 heads** (Run `welcoming-dog-350`), tỷ lệ nhận diện trung bình sụt giảm mạnh về **43.35%** (giảm **-5.63%** so với phiên bản 1 lớp). Đây là một kết quả bất ngờ nhưng có lý do kỹ thuật rõ ràng:
+1. **Hiện tượng nghẽn thông tin do Dropout cộng dồn trên đồ thị thưa:**
+   Đồ thị của chúng ta là đồ thị mạng lưới kề 8-hướng (mỗi nút chỉ kết nối với tối đa 8 nút lân cận và chính nó). Việc thiết lập `gat_dropout = 0.2` sẽ ngẫu nhiên loại bỏ 20% cạnh kết nối trong Attention. Khi chồng chéo **2 layers GAT** liên tiếp, hiện tượng ngắt kết nối này bị cộng dồn, cộng với lớp Dropout trung gian giữa 2 layer (`0.2`), dẫn đến việc **luồng thông tin đồ thị bị đứt gãy nghiêm trọng**. 
+2. **Sự méo mó phi tuyến của Bias Tọa độ tương đối:**
+   Trong file [gat.py](file:///home/khai/Desktop/github/CNN-GNN-HMER/chuyende_tamer_temp/1-cnn-gnn/tamer/model/gat.py#L98-L99), relative position bias được cộng trực tiếp vào logits:
+   $$e = e + bias$$
+   sau đó đi qua hàm kích hoạt phi tuyến `LeakyReLU(0.2)`. 
+   * Ở mô hình 1 lớp, sự méo mó xảy ra một lần trước khi đưa vào Softmax.
+   * Ở mô hình 2 lớp, các đặc trưng tọa độ tương đối sau khi méo mó ở lớp 1 sẽ đi qua hàm kích hoạt phi tuyến phụ (`ELU`), cộng thêm nhiễu dropout, rồi tiếp tục bị biến dạng bởi một lớp `LeakyReLU` và bias mới ở lớp 2. Điều này phá vỡ tính tuyến tính hình học của tọa độ tương đối, khiến mô hình bị nhiễu thông tin không gian trầm trọng.
+3. **Độ nhạy Attention khi số Head quá lớn:**
+   Khi chia 256 kênh đặc trưng thành 8 heads, mỗi head chỉ xử lý `32` kênh. Với dung lượng kênh quá nhỏ, attention score rất dễ bị ảnh hưởng bởi nhiễu và độ lệch của learnable bias, dẫn đến việc lan truyền đặc trưng đồ thị bị mất cân bằng.
 
 ---
-© 2025 Phan Hoàng Khải - Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE).
+
+### 🚀 3. Đề xuất Phương án Kế tiếp (Roadmap cải tiến mới)
+
+Dựa trên các bài học từ hai run `skittish-worm-90` (Thành công lớn với 1L/4H) và `welcoming-dog-350` (Thất bại khi Scale-up 2L/8H), chúng tôi đề xuất chiến lược tiếp theo để tối ưu hóa CNN-GNN:
+
+#### 3.1. Tối ưu cấu hình 1 Layer với nhiều Head hơn (1 Layer, 8 Heads)
+* **Phương án:** Thay vì tăng số lớp GAT (gây nghẽn truyền tin và méo bias), chúng ta nên duy trì **1 layer GAT** nhưng nâng cấp số head từ **4 heads lên 8 heads**.
+* **Lý do:** Giữ nguyên được đường truyền tin trực tiếp (không bị méo phi tuyến liên lớp), đồng thời tăng khả năng biểu diễn đa chiều (multi-view attention) để nắm bắt các quan hệ hình học tốt hơn.
+
+#### 3.2. Điều chỉnh vị trí cộng Bias Tọa độ (Post-Activation Bias)
+* **Phương án:** Di chuyển phép cộng `bias` ra **sau** hàm `LeakyReLU` hoặc cộng trực tiếp vào ma trận attention đã chuẩn hóa (nhưng trước Softmax) để đảm bảo không bị méo mó phi tuyến bởi LeakyReLU:
+  $$e = \text{LeakyReLU}(e) + bias$$
+  (Cách này giữ nguyên tính chất hình học độc lập của tọa độ).
+
+#### 3.3. Giảm tỷ lệ Dropout trên Graph
+* **Phương án:** Giảm `gat_dropout` xuống mức **0.05 hoặc 0.1** (thay vì 0.2).
+* **Lý do:** Đồ thị lưới pixel cực kỳ nhạy cảm với việc mất kết nối cục bộ. Giảm dropout giúp bảo toàn tính toàn vẹn của cấu trúc nét vẽ công thức trong suốt quá trình lan truyền thông tin đồ thị.
+
+---
+© 2026 Phan Hoàng Khải - Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE).
