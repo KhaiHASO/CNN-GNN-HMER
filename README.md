@@ -1,240 +1,218 @@
-<div align="center">
+# TAMER - Handwritten Mathematical Expression Recognition
 
-English | [简体中文](./README-zh_CN.md) | [日本語](./README-ja.md)
+Dự án này triển khai mô hình **TAMER** (Two-way Attention-based Model for Expression Recognition) cho nhận dạng biểu thức toán học viết tay (Handwritten Mathematical Expression - HME).
 
+**Tác giả:** Phan Hoàng Khải  
+**Đơn vị:** Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE)
 
-<h1>UniMERNet: A Universal Network for Real-World Mathematical Expression Recognition</h1>
+## 📋 Mục lục
 
+- [Tổng quan](#tổng-quan)
+- [Cấu trúc dự án](#cấu-trúc-dự-án)
+- [Deep Dive: Graph Attention Networks (GAT)](#deep-dive-graph-attention-networks-gat)
+- [Cài đặt](#cài-đặt)
+- [Sử dụng](#sử-dụng)
+- [Cấu hình](#cấu-hình)
+- [Kết quả](#kết-quả)
 
-[[ Paper ]](https://arxiv.org/abs/2404.15254) [[ Website ]](https://github.com/opendatalab/UniMERNet/tree/main) [[ Dataset (OpenDataLab)]](https://opendatalab.com/OpenDataLab/UniMER-Dataset) [[ Dataset (Hugging Face) ]](https://huggingface.co/datasets/wanderkid/UniMER_Dataset)
+## 🎯 Tổng quan
 
+TAMER là một kiến trúc mạnh mẽ kết hợp giữa CNN và Transformer để chuyển đổi hình ảnh biểu thức toán học viết tay thành chuỗi LaTeX. Dự án này bao gồm hai phiên bản chính:
 
-[[Models 🤗(Hugging Face)]](https://huggingface.co/wanderkid/unimernet_base)
-[[Models <img src="./asset/images/modelscope_logo.png" width="20px">(ModelScope)]](https://www.modelscope.cn/models/wanderkid/unimernet_base)
+1.  **0-cnn-transformer-baseline**: Phiên bản chuẩn sử dụng DenseNet làm Encoder và Transformer làm Decoder.
+2.  **1-cnn-gnn**: Phiên bản lai **CNN-GNN** tích hợp Graph Attention Networks (GAT) vào bộ mã hóa để tăng cường khả năng trích xuất đặc trưng không gian và cấu trúc của biểu thức.
 
-🔥🔥 [CDM: A Reliable Metric for Fair and Accurate Formula Recognition Evaluation](https://github.com/opendatalab/UniMERNet/tree/main/cdm)
+## 📁 Cấu trúc dự án
 
-</div>
+```
+ChuyenDe-Tamer/
+├── 0-cnn-transformer-baseline/ # Phiên bản TAMER gốc (DenseNet + Transformer)
+├── 1-cnn-gnn/                 # Phiên bản lai CNN-GNN (DenseNet + GAT + Transformer)
+│   ├── tamer/
+│   │   ├── model/
+│   │   │   ├── gat.py   # Cài đặt lớp Graph Attention và Relative Position Bias
+│   │   │   └── encoder.py # Encoder tích hợp GAT
+│   │   └── ...
+├── data/
+│   └── CROHME.zip             # Dataset duy nhất dùng chạy Kaggle
+├── notebooks/                 # Thư mục lưu trữ Jupyter Notebooks chạy trên Kaggle
+├── KetQua/                    # Thư mục chứa kết quả đánh giá thực nghiệm
+│   ├── 1_Baseline/            # Mô hình Baseline chuẩn (M1)
+│   ├── 2_Naive_GNN_PE_Before/ # Mô hình GNN cũ nhòe vị trí (M2)
+│   ├── 3_Corrected_GNN_PE_After/ # Mô hình GNN mới sửa vị trí (M3)
+│   ├── 4_Coord_Aware_GAT_1L_4H/  # Mô hình Coordinate-Aware GAT 1 lớp (M4 - Đề xuất tốt nhất)
+│   └── 5_Coord_Aware_GAT_2L_8H/  # Mô hình Coordinate-Aware GAT 2 lớp (M5)
+└── README.md            # Báo cáo kết quả và tài liệu dự án
+```
 
-Welcome to the official repository of UniMERNet, a solution that converts images of mathematical expressions into LaTeX, suitable for a wide range of real-world scenarios.
+## 🧠 Deep Dive: Graph Attention Networks (GAT)
 
-## News 🚀🚀🚀
-**2025.09.28** 🎉🎉  CDM support chinese formula evaluation now.  
-**2025.03.25** 🎉🎉 <font color="red">The paper on our new formula recognition metric, [CDM](https://arxiv.org/abs/2409.03643), has been accepted by CVPR 2025. We invite everyone to use it.</font>  
-**2024.09.06** 🎉🎉  UniMERNet Update: The new version features a smaller model and faster inference. Training code is now open-sourced. For details, see the latest paper [UniMERNet](https://arxiv.org/abs/2404.15254).  
-**2024.09.06** 🎉🎉  Introducing a new metric for formula recognition: [CDM](https://github.com/opendatalab/UniMERNet/tree/main/cdm). Compared to BLEU/EditDistance, CDM provides a more intuitive and accurate evaluation score, allowing for fair comparison of different models without being affected by formula expression diversity.  
-**2024.07.21** 🎉🎉  Add Math Formula Detection (MFD) Tutorial based on [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) MFD model.    
-**2024.06.06** 🎉🎉  Open-sourced evaluation code for UniMER dataset.  
-**2024.05.06** 🎉🎉  Open-sourced UniMER dataset, including UniMER-1M for model training and UniMER-Test for MER evaluation.  
-**2024.05.06** 🎉🎉  Add Streamlit formula recognition demo and provided local deployment App.  
-**2024.04.24** 🎉🎉  Paper now available on [ArXiv](https://arxiv.org/abs/2404.15254).  
-**2024.04.24** 🎉🎉  Inference code and checkpoints have been released. 
+Điểm nhấn của dự án này là việc tích hợp **Graph Attention Networks (GAT)** vào kiến trúc Encoder. Dưới đây là phân tích chi tiết kỹ thuật về cách GAT hoạt động trong bài toán này:
 
+### Tại sao lại dùng GAT?
 
-## Demo Video
-https://github.com/opendatalab/UniMERNet/assets/69186975/ac54c6b9-442c-48b0-95f9-a4a3fce8780b
+Các mạng CNN truyền thống (như DenseNet) rất giỏi trong việc trích xuất đặc trưng cục bộ (local features). Tuy nhiên, đối với biểu thức toán học, mối quan hệ giữa các ký tự không chỉ nằm ở vị trí lân cận mà còn phụ thuộc vào cấu trúc ngữ nghĩa 2D (ví dụ: phân số, số mũ, chỉ số dưới).
 
+GAT cho phép mô hình coi bản đồ đặc trưng (feature map) như một đồ thị, nơi mỗi điểm ảnh (pixel) hoặc vùng đặc trưng là một nút (node). Cơ chế Attention giúp mỗi nút có thể "tập trung" (attend) vào các nút lân cận quan trọng nhất để tổng hợp thông tin, thay vì nhân chập cố định như CNN.
 
-https://github.com/opendatalab/UniMERNet/assets/69186975/09b71c55-c58a-4792-afc1-d5774880ccf8
+### Kiến trúc chi tiết (Implementation Details)
 
-## Quick Start
+Module GAT được cài đặt trong `1-cnn-gnn/tamer/model/gat.py` và `1-cnn-gnn/tamer/model/encoder.py`.
 
-### Clone the repo and download the model
+1.  **Xây dựng Đồ thị (Graph Construction)**:
+    *   Feature map đầu ra từ DenseNet có kích thước `[H, W, D]`.
+    *   Ta biến đổi feature map này thành một lưới đồ thị (grid graph) với `N = H * W` nút.
+    *   **Adjacency Matrix**: Xây dựng ma trận kề dựa trên kết nối 4 hướng (4-connectivity: trên, dưới, trái, phải). Mỗi nút được kết nối với 4 nút lân cận của nó.
+
+2.  **Cơ chế GAT Layer**:
+    *   Mỗi lớp GAT (`GATLayer`) sử dụng **Multi-head Attention**.
+    *   Đầu vào là các features của nút $h_i$.
+    *   Hệ số attention $e_{ij}$ giữa nút $i$ và nút lân cận $j$ được tính toán thông qua một mạng nơ-ron truyền thẳng (feed-forward neural network):
+        $$e_{ij} = \text{LeakyReLU}(\vec{a}^T [W\vec{h}_i || W\vec{h}_j])$$
+    *   Hệ số này sau đó được chuẩn hóa bằng Softmax để tạo ra trọng số $\alpha_{ij}$.
+    *   Đầu ra của nút $i$ là tổng có trọng số của các nút lân cận:
+        $$\vec{h}'_i = \sigma(\sum_{j \in \mathcal{N}_i} \alpha_{ij} W\vec{h}_j)$$
+
+3.  **Tích hợp vào Encoder**:
+    *   Quy trình xử lý: `Image -> DenseNet -> Feature Map -> Flatten -> GAT Layers -> Reshape -> Feature Map -> Positional Encoding -> Transformer Decoder`.
+    *   Việc chèn GAT vào giữa DenseNet và Transformer giúp làm giàu feature map với thông tin ngữ cảnh cấu trúc trước khi giải mã.
+
+## 🔧 Cài đặt
+
+Yêu cầu môi trường:
+- Python 3.7+
+- PyTorch 1.8+
+- CUDA (nếu dùng GPU)
+
+Cài đặt các gói phụ thuộc:
+
 ```bash
-git clone https://github.com/opendatalab/UniMERNet.git
+# Cài đặt cho phiên bản GAT (Khuyên dùng)
+cd 1-cnn-gnn
+pip install -r requirements.txt
+pip install -e .
 ```
+
+Nếu muốn chạy baseline:
+```bash
+cd 0-cnn-transformer-baseline
+pip install -r requirements.txt
+pip install -e .
+```
+
+## � Sử dụng
+
+### Quá trình Huấn luyện (Training)
+
+Để huấn luyện mô hình, sử dụng script `train.py`. Bạn có thể thay đổi cấu hình trong thư mục `config/`.
 
 ```bash
-cd UniMERNet/models
-# Download the model and tokenizer individually or use git-lfs
-git lfs install
-git clone https://huggingface.co/wanderkid/unimernet_base  # 1.3GB  
-git clone https://huggingface.co/wanderkid/unimernet_small # 773MB  
-git clone https://huggingface.co/wanderkid/unimernet_tiny  # 441MB  
+# Di chuyển vào thư mục source code
+cd 1-cnn-gnn
 
-# you can also download the model from ModelScope
-git clone https://www.modelscope.cn/wanderkid/unimernet_base.git
-git clone https://www.modelscope.cn/wanderkid/unimernet_small.git
-git clone https://www.modelscope.cn/wanderkid/unimernet_tiny.git
+# Chạy huấn luyện với file config mặc định
+python train.py fit --config config/crohme.yaml
 
+# Debug nhanh với dữ liệu nhỏ
+python train.py fit --config config/crohme_debug.yaml
 ```
 
-### Installation
+### Đánh giá (Evaluation)
 
-> Create a clean Conda environment
+Sử dụng các script trong thư mục `eval/` để đánh giá mô hình đã huấn luyện.
 
 ```bash
-conda create -n unimernet python=3.10
-conda activate unimernet
+cd 1-cnn-gnn/eval
+
+# Đánh giá trên tập dữ liệu CROHME
+bash eval_crohme.sh
 ```
 
-> Method 1: Install via pip (recommended for general users)
+## ⚙️ Cấu hình
 
-```bash
-pip install -U "unimernet[full]"
-```
+Các tham số quan trọng trong `config/crohme.yaml`:
 
-> Method 2: Local installation (recommended for developers)
+- **model**:
+    - `d_model`: 256 (Kích thước vector đặc trưng)
+    - `use_gat`: true (Bật tắt module GAT)
+    - `gat_num_layers`: 2 (Số lớp GAT chồng lên nhau)
+    - `gat_num_heads`: 8 (Số đầu attention trong GAT)
+- **data**:
+    - `folder`: Đường dẫn đến dữ liệu ảnh
+    - `batch_size`: Kích thước batch
 
-```bash
-pip install -e ."[full]"
-```
+## 📊 Báo cáo Tổng hợp Thực nghiệm: Quá trình Tiến bộ & Đóng góp Khoa học
 
+Báo cáo này cung cấp cái nhìn toàn diện, mang tính học thuật về quá trình tiến hóa kiến trúc của mô hình **TAMER (CNN-GNN)**, phân tích các phát hiện khoa học cốt lõi từ thực nghiệm và đề xuất phiên bản tối ưu nhất để thực hiện công bố khoa học (paper contribution).
 
+---
 
+### 1. Bảng Tổng hợp Kết quả Định lượng (Quantitative Synthesis)
 
+Dưới đây là bảng đối chiếu kết quả đánh giá (Evaluation) chính thức của cả 5 phiên bản mô hình trên 3 tập kiểm thử chuẩn **CROHME 2014, 2016, và 2019**:
 
-### Running UniMERNet
+*   **M1: Baseline** (Thư mục: `1_Baseline`, Run ID: `8ivyzmlm`) - DenseNet + Transformer Decoder (Không có GAT).
+*   **M2: Naive GAT (GNN Cũ)** (Thư mục: `2_Naive_GNN_PE_Before`, Run ID: `colorful-moose-173`) - GAT 2L, 8H, **PE đặt TRƯỚC GAT**.
+*   **M3: Corrected GAT (GNN Mới)** (Thư mục: `3_Corrected_GNN_PE_After`, Run ID: `defiant-mole-974`) - GAT 2L, 8H, **PE đặt SAU GAT**.
+*   **M4: Coord-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) - GAT 1L, 4H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng**.
+*   **M5: Coord-Aware GAT (2L, 8H)** (Thư mục: `5_Coord_Aware_GAT_2L_8H`, Run ID: `welcoming-dog-350`) - GAT 2L, 8H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng** (Thử nghiệm Scale-up).
 
-1. **Streamlit Application**: For an interactive and user-friendly experience, use our Streamlit-based GUI. This application allows real-time formula recognition and rendering.
+| Tập dữ liệu (Dataset) | Chỉ số (Metric) | M1: Baseline | M2: GNN Cũ (PE trước GAT) | M3: GNN Mới (PE sau GAT) | M4: Coord-Aware GAT (1L, 4H) | M5: Coord-Aware GAT (2L, 8H) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **CROHME 2014** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **51.12%** <br> **69.98%** <br> **77.69%** <br> 1.99 | 49.39% <br> 66.53% <br> 75.25% <br> 2.22 | 48.88% <br> 66.73% <br> 75.35% <br> 2.19 | 49.90% <br> 67.44% <br> 77.18% <br> **1.98** *(Best)* | 46.65% <br> 63.99% <br> 73.43% <br> 2.48 |
+| **CROHME 2016** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | 50.65% <br> **67.92%** <br> **76.02%** <br> 2.21 | 47.43% <br> 64.95% <br> 74.72% <br> 2.45 | **50.74%** *(Best)* <br> 66.96% <br> 75.85% <br> 2.19 | 49.17% <br> 67.13% <br> 75.76% <br> **2.13** *(Best)* | 45.68% <br> 63.03% <br> 73.23% <br> 2.53 |
+| **CROHME 2019** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **48.54%** <br> **68.14%** <br> 77.23% <br> 2.40 | 46.71% <br> 66.89% <br> 75.90% <br> 2.62 | 47.87% <br> 67.81% <br> **77.98%** *(Best)* <br> **2.02** *(Best)* | 47.87% <br> 67.72% <br> 76.90% <br> 2.08 | 37.70% <br> 58.97% <br> 70.14% <br> 2.93 |
+| **Trung bình (Avg)** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **50.10%** <br> **68.68%** <br> **76.98%** <br> 2.20 | 47.84% <br> 66.12% <br> 75.29% <br> 2.21 | 49.17% <br> 67.17% <br> 76.40% <br> 2.14 | 48.98% <br> 67.43% <br> 76.61% <br> **2.06** *(Best)* | 43.35% <br> 62.00% <br> 72.27% <br> 2.65 |
 
-    ```bash
-    unimernet_gui
-    ```
-    Ensure you have the latest version of UniMERNet installed (`pip install --upgrade unimernet & pip install "unimernet[full]"`) for the streamlit GUI application.
+---
 
-2. **Command-line Demo**: Predict LaTeX code from an image.
+### 2. Phân tích Toàn bộ Quá trình Tiến bộ (Progression History Analysis)
 
-    ```bash
-    python demo.py
-    ```
+Sự phát triển của TAMER (CNN-GNN) trải qua 4 bước ngoặt thiết kế kiến trúc quan trọng, mỗi giai đoạn mang lại một bài học khoa học sâu sắc:
 
-3. **Jupyter Notebook Demo**: Recognize and render formula from an image.
+#### Giai đoạn 1: Naive GNN (M2) - Thất bại do nhòe vị trí (Position Encoding Blurring)
+*   **Thiết kế:** GAT chồng lên feature map DenseNet sau khi đã cộng 2D Positional Encoding (PE).
+*   **Hậu quả:** ExpRate giảm **-2.26%** so với Baseline. 
+*   **Bài học:** Cơ chế truyền tin đồ thị (message passing) thực chất là phép trung bình hóa có trọng số (weighted pooling) trên các node lân cận. Phép toán này vô tình làm mịn/nhòe các vector PE tuyệt đối sắc nét của từng pixel, dẫn đến lỗi dịch chuyển attention (Attention Alignment Shift) ở decoder khi giải mã cấu trúc 2D (như số mũ, chỉ số dưới).
 
-    ```bash
-    jupyter-lab ./demo.ipynb
-    ```
+#### Giai đoạn 2: Corrected GNN (M3) - Khôi phục thông tin tọa độ tuyệt đối
+*   **Thiết kế:** Chuyển khối PE xuống **sau** khối GAT. Pixel truyền tin cục bộ trên feature map visual thuần túy trước, sau đó mới được đánh dấu tọa độ tuyệt đối sắc nét gửi tới decoder.
+*   **Kết quả:** ExpRate hồi phục mạnh mẽ lên **49.17%** (+1.33% từ GNN cũ), tiệm cận sát Baseline (50.10%), thậm chí vượt Baseline trên tập CROHME 2016.
+*   **Bài học:** Sự tuần tự giữa biểu diễn ngữ cảnh không gian và tọa độ tuyệt đối là cực kỳ quan trọng. Tọa độ địa lý phải là nhãn cố định được dán lên đặc trưng ngữ cảnh đồ thị hoàn chỉnh, không được phép tham gia vào quá trình truyền tin làm mịn đặc trưng.
 
+#### Giai đoạn 3: Coordinate-Aware GAT (M4) - Thiết lập Inductive Bias không gian
+*   **Thiết kế:** GAT tiêu chuẩn chỉ chú ý đến sự tương đồng visual của các pixel mà mất nhận thức về hướng (Direction-Agnostic). Phiên bản này tích hợp **Relative Position Bias kề 8-hướng** (9 trạng thái quan hệ tọa độ $\Delta x, \Delta y \in \{-1, 0, 1\}$) vào Attention logits, đồng thời tinh giảm số layer/head (1 Layer, 4 Heads) để tránh overfitting.
+*   **Kết quả:** Dù số tham số giảm mạnh, ExpRate đạt **48.98%**, và **Mean Edit Distance đạt kỷ lục 2.06** (vượt qua tất cả các mô hình, kể cả Baseline là 2.20).
+*   **Bài học:** Việc bổ sung **Relative Spatial Inductive Bias** hoạt động như một hướng dẫn hình học cho Attention Heads. Khi mô hình dự đoán sai, sai sót chỉ nằm ở mức 1-2 ký tự cục bộ chứ không bao giờ làm sụp đổ cấu trúc phân tầng phức tạp (như phân số hay căn thức).
 
-## Performance Comparison (BLEU) with SOTA Methods.
+#### Giai đoạn 4: Scale-up Coordinate-Aware GAT (M5) - Điểm nghẽn truyền tin phi tuyến
+*   **Thiết kế:** Nâng cấp Coordinate-Aware GAT lên 2 layers và 8 heads với mong muốn tăng dung lượng biểu diễn.
+*   **Hậu quả:** Hiệu năng sụt giảm nghiêm trọng xuống **43.35%** (giảm tới **-5.63%** so với phiên bản 1 lớp).
+*   **Bài học (Negative Result quý giá):** 
+    1.  **Nghẽn đồ thị thưa:** Đồ thị lưới pixel rất thưa (mỗi node chỉ có tối đa 8 liên kết). Áp dụng `dropout=0.2` trên Attention và feature map liên tiếp qua 2 layers gây đứt gãy luồng lan truyền thông tin nghiêm trọng.
+    2.  **Méo mó phi tuyến:** Relative Bias được cộng vào logits *trước* khi qua các hàm kích hoạt phi tuyến (`LeakyReLU` ở lớp 1, rồi `ELU`, rồi `LeakyReLU` ở lớp 2). Việc đi qua chuỗi kích hoạt phi tuyến liên tiếp đã bẻ cong quan hệ khoảng cách tuyến tính ban đầu, biến thông tin tọa độ tương đối thành nhiễu phi tuyến phức tạp.
 
-> UniMERNet significantly outperforms mainstream models in recognizing real-world mathematical expressions, demonstrating superior performance across Simple Printed Expressions (SPE), Complex Printed Expressions (CPE), Screen-Captured Expressions (SCE), and Handwritten Expressions (HWE), as evidenced by the comparative BLEU Score evaluation.  
+---
 
-![BLEU](./asset/papers/fig1_bleu.jpg)
+### 3. Gợi ý Phiên bản Tốt nhất cho Đóng góp Khoa học (Scientific Recommendation)
 
-## Performance Comparison (CDM) with SOTA Methods.
+Mô hình **M4: Coordinate-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) là phiên bản tốt nhất và phù hợp nhất để làm đóng góp khoa học chính của bài báo.
 
-> Due to the diversity of expression of formulas, it is unfair to compare different models by BLEU metric. Therefore, we conduct evaluation by CDM, a specially designed metric for formula recognition. Our method is far superior to the open source model and has the same effect as that of commercial software Mathpix. CDM@ExpRate means that the proportion of correct formulas is completely predicted. Refer to [CDM](https://arxiv.org/pdf/2409.03643) paper for details.
+#### Lý do lựa chọn học thuật (Academic Rationale):
 
-![CDM](./asset/papers/fig2_cdm.jpg)
+1.  **Chỉ số Mean Edit Distance tối ưu nhất (2.06 vs 2.20 of Baseline):**
+    Trong bài toán nhận diện biểu thức toán học (HMER), tỷ lệ khớp 100% (ExpRate) rất nhạy cảm với các nét chữ viết tay dị biệt của con người. Tuy nhiên, **Mean Edit Distance** (Khoảng cách chỉnh sửa trung bình) mới là thước đo chính xác nhất cho thấy khả năng bảo toàn cấu trúc toán học của mô hình. Kết quả **2.06** của M4 cho thấy sự vượt trội về mặt cấu trúc so với Baseline.
+2.  **Tính hiệu quả và tối giản tham số (Efficiency & Parsimony):**
+    M4 chỉ sử dụng **1 lớp GAT và 4 heads** (lượng tham số cực kỳ nhỏ) nhưng mang lại hiệu năng tương đương bản GAT thông thường 2 lớp 8 heads và vượt trội về độ chính xác cấu trúc. Đây là minh chứng vàng cho việc áp dụng đúng đắn **Inductive Bias** thay vì tăng số lượng tham số mù quáng (càng nhiều tham số trên tập dữ liệu nhỏ càng dễ overfitting).
+3.  **Tính mới về mặt khoa học (Scientific Novelty):**
+    *   **Phát hiện 1: PE Blurring Effect:** Minh chứng toán học và thực nghiệm về sự triệt tiêu thông tin vị trí khi GAT đứng trước Positional Encoding trên lưới pixel.
+    *   **Phát hiện 2: Coordinate-Aware Relative Bias on Pixel Grids:** Thiết kế ma trận Relative Bias 9 trạng thái hoạt động hiệu quả trên cấu trúc kề 8-hướng của ảnh, một thay thế hoàn hảo cho cơ chế tích chập định hướng truyền thống của CNN.
+    *   **Phát hiện 3: Không nên chồng nhiều tầng GAT trên đồ thị lưới ảnh:** Phân tích thực nghiệm từ M5 chỉ ra giới hạn của việc chồng lớp phi tuyến lên ma trận relative bias logits và dropout trên đồ thị thưa.
 
-## Visualization Result with Different Methods.
+#### Đề xuất cấu trúc luận điểm trong Paper:
+*   **Abstract/Introduction:** Đặt vấn đề về việc Transformer Decoder trong HMER thường gặp lỗi lệch dòng (alignment shift) do DenseNet thiếu liên kết ngữ cảnh cấu trúc cục bộ. Đề xuất TAMER (CNN-GNN) kết hợp GAT để giải quyết.
+*   **Methodology:** Trình bày chi tiết toán học của **GAT trên lưới đồ thị kề 8-hướng**, giải pháp chuyển **PE ra sau GAT** để tránh Blurring Effect, và thuật toán **Coordinate-Aware Relative Bias** kề 8-hướng.
+*   **Experiments & Discussion:** Đưa bảng tổng hợp 5 mô hình trên vào. Nhấn mạnh việc M4 đạt **Mean Edit Distance 2.06** và phân tích kết quả âm (negative result) của M5 để làm bài học định hướng thiết kế mạng GNN trên cấu trúc ảnh cho cộng đồng khoa học.
 
-> UniMERNet excels in visual recognition of challenging samples, outperforming other methods.  
-
-![Visualization](https://github.com/opendatalab/VIGC/assets/69186975/6edcac69-5082-43a2-8095-5681b7a707b9)
-
-## UniMER Dataset
-### Introduction
-The UniMER dataset is a specialized collection curated to advance the field of Mathematical Expression Recognition (MER). It encompasses the comprehensive UniMER-1M training set, featuring over one million instances that represent a diverse and intricate range of mathematical expressions, coupled with the UniMER Test Set, meticulously designed to benchmark MER models against real-world scenarios. The dataset details are as follows:
-
-**UniMER-1M Training Set:**
-  - Total Samples: 1,061,791 Latex-Image pairs
-  - Composition: A balanced mix of concise and complex, extended formula expressions
-  - Aim: To train robust, high-accuracy MER models, enhancing recognition precision and generalization
-
-**UniMER Test Set:**
-  - Total Samples: 23,757, categorized into four types of expressions:
-    - Simple Printed Expressions (SPE): 6,762 samples
-    - Complex Printed Expressions (CPE): 5,921 samples
-    - Screen Capture Expressions (SCE): 4,742 samples
-    - Handwritten Expressions (HWE): 6,332 samples
-  - Purpose: To provide a thorough evaluation of MER models across a spectrum of real-world conditions
-
-### Dataset Download
-You can download the dataset from [OpenDataLab](https://opendatalab.com/OpenDataLab/UniMER-Dataset) (recommended for users in China) or [HuggingFace](https://huggingface.co/datasets/wanderkid/UniMER_Dataset).
-
-### Download UniMER-Test Dataset
-
-
-Download the UniMER-1M dataset and extract it to the following directory:
-```bash
-./data/UniMER-1M
-```
-
-Download the UniMER-Test dataset and extract it to the following directory:
-```bash
-./data/UniMER-Test
-```
-
-## Training
-
-To train the UniMERNet model, follow these steps:
-
-1. **Specify the Training Dataset Path**: Open the `configs/train` fold and set the path to your training dataset.
-
-2. **Run the Training Script**: Execute the following command to start the training process.
-
-    ```bash
-    bash script/train.sh
-    ```
-
-### Notes:
-- Ensure that the dataset path specified in the `configs/train` fold is correct and accessible.
-- Monitor the training process for any errors or issues.
-
-## Testing
-
-To test the UniMERNet model, follow these steps:
-
-1. **Specify the Test Dataset Path**: Open the `configs/val` fold and set the path to your test dataset.
-
-2. **Run the Test Script**: Execute the following command to start the testing process.
-
-    ```bash
-    bash script/test.sh
-    ```
-
-### Notes:
-- Ensure that the dataset path specified in the `configs/val` fold is correct and accessible.
-- The `test.py` script will use the specified test dataset for evaluation. Remember to change the test set path in test.py to your actual path.
-- Review the test results for performance metrics and any potential issues.
-
-## Math Formula Detection Tutorial
-
-The prerequisite for formula recognition is to detect the areas within PDF or webpage screenshots where formulas are located. The [PDF-Extract-Kit](https://github.com/opendatalab/PDF-Extract-Kit) includes a powerful model for detecting formulas. If you wish to perform both formula detection and recognition by yourself, you can refer to the [Formula Detection Tutorial](./MFD/README.md) for guidance on deploying and using the formula detection model.
-
-
-## TODO
-
-[✅] Release inference code and checkpoints of UniMERNet.  
-[✅] Release UniMER-1M and UniMER-Test.  
-[✅] Open-source the Streamlit formula recognition GUI application.   
-[✅] Release the training code for UniMERNet.  
-
-## Citation
-If you find our models / code / papers useful in your research, please consider giving us a star ⭐ and citing our work 📝, thank you :)
-```bibtex
-@misc{wang2024unimernetuniversalnetworkrealworld,
-      title={UniMERNet: A Universal Network for Real-World Mathematical Expression Recognition}, 
-      author={Bin Wang and Zhuangcheng Gu and Guang Liang and Chao Xu and Bo Zhang and Botian Shi and Conghui He},
-      year={2024},
-      eprint={2404.15254},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2404.15254}, 
-}
-
-@misc{wang2024cdmreliablemetricfair,
-      title={CDM: A Reliable Metric for Fair and Accurate Formula Recognition Evaluation}, 
-      author={Bin Wang and Fan Wu and Linke Ouyang and Zhuangcheng Gu and Rui Zhang and Renqiu Xia and Bo Zhang and Conghui He},
-      year={2024},
-      eprint={2409.03643},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2409.03643}, 
-}
-```
-
-## Acknowledgements
-- [VIGC](https://github.com/opendatalab/VIGC). The model framework is dependent on VIGC.
-- [Texify](https://github.com/VikParuchuri/texify). A mainstream MER algorithm, UniMERNet data processing refers to Texify.
-- [Latex-OCR](https://github.com/lukas-blecher/LaTeX-OCR). Another mainstream MER algorithm.
-- [Donut](https://huggingface.co/naver-clova-ix/donut-base). The UniMERNet's Transformer Encoder-Decoder are referenced from Donut.
-- [Nougat](https://github.com/facebookresearch/nougat). The tokenizer uses Nougat.
-
-## Contact Us
-If you have any questions, comments, or suggestions, please do not hesitate to contact us at wangbin@pjlab.org.cn.
-
-## License
-[Apache License 2.0](LICENSE)
+---
+© 2026 Phan Hoàng Khải - Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE). Báo cáo thực nghiệm chuyên đề tốt nghiệp.

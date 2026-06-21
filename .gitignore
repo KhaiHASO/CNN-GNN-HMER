@@ -85,3 +85,25 @@ chuyende_tamer_temp/GiaoDien/site/
 
 # Ignore MLflow local runs
 mlruns/
+
+# Ignore cloned PDF-Extract-Kit
+pdf_extract_kit/
+
+# Local third-party source checkout used as an editable dependency.
+pix2text/
+
+# app_hmer: generated datasets and runtime files.
+app_hmer/DataDemo/crohme/
+app_hmer/backend/cache/
+app_hmer/backend/*.log
+app_hmer/backend/.coverage
+
+# app_hmer frontend dependencies and generated build artifacts.
+app_hmer/frontend/node_modules/
+app_hmer/frontend/dist/
+app_hmer/frontend/.vite/
+app_hmer/frontend/.eslintcache
+app_hmer/frontend/npm-debug.log*
+app_hmer/frontend/yarn-debug.log*
+app_hmer/frontend/yarn-error.log*
+app_hmer/frontend/pnpm-debug.log*

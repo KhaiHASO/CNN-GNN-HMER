@@ -1,0 +1,199 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch import FloatTensor, LongTensor
+
+
+class GATLayer(nn.Module):
+    """Graph Attention Network Layer
+    
+    Implements multi-head graph attention mechanism for grid-based graphs.
+    """
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        num_heads: int = 8,
+        dropout: float = 0.1,
+        alpha: float = 0.2,
+    ):
+        super(GATLayer, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.num_heads = num_heads
+        self.head_dim = out_features // num_heads
+        assert out_features % num_heads == 0, "out_features must be divisible by num_heads"
+        
+        self.W = nn.Linear(in_features, out_features, bias=False)
+        self.a = nn.Parameter(torch.empty(size=(2 * self.head_dim, 1)))
+        
+        # Learnable relative position bias for 9 possible spatial relations on 8-connected grid (including self)
+        self.rel_bias = nn.Parameter(torch.zeros(num_heads, 9))
+        
+        self.leaky_relu = nn.LeakyReLU(alpha)
+        self.dropout = nn.Dropout(dropout)
+        
+        self.reset_parameters()
+    
+    def reset_parameters(self):
+        nn.init.xavier_uniform_(self.W.weight)
+        nn.init.xavier_uniform_(self.a)
+        nn.init.zeros_(self.rel_bias)
+    
+    def forward(
+        self,
+        h: FloatTensor,
+        adj_mask: LongTensor,
+        height: int,
+        width: int,
+    ) -> FloatTensor:
+        """
+        Parameters
+        ----------
+        h : FloatTensor
+            Node features [b, n_nodes, in_features]
+        adj_mask : LongTensor
+            Adjacency mask [b, n_nodes, n_nodes], 1 for connected, 0 for not connected
+        height : int
+            Height of the 2D feature grid
+        width : int
+            Width of the 2D feature grid
+        
+        Returns
+        -------
+        FloatTensor
+            Output features [b, n_nodes, out_features]
+        """
+        b, n, _ = h.shape
+        device = h.device
+        
+        # Linear transformation
+        Wh = self.W(h)  # [b, n, out_features]
+        Wh = Wh.view(b, n, self.num_heads, self.head_dim)  # [b, n, num_heads, head_dim]
+        
+        # Compute attention scores
+        Wh1 = Wh.transpose(1, 2)  # [b, num_heads, n, head_dim]
+        Wh2 = Wh.transpose(1, 2)  # [b, num_heads, n, head_dim]
+        
+        # Compute attention coefficients
+        e = self._compute_attention_scores(Wh1, Wh2)  # [b, num_heads, n, n]
+        
+        # Dynamically compute relative position index matrix [n, n]
+        y = torch.arange(height, device=device).view(height, 1).expand(height, width).flatten()
+        x = torch.arange(width, device=device).view(1, width).expand(height, width).flatten()
+        dy = y.unsqueeze(0) - y.unsqueeze(1)  # [n, n]
+        dx = x.unsqueeze(0) - x.unsqueeze(1)  # [n, n]
+        
+        # Clamp to safeguard coordinate bounds
+        dy = torch.clamp(dy, -1, 1)
+        dx = torch.clamp(dx, -1, 1)
+        
+        # Index range 0..8
+        rel_indices = (dy + 1) * 3 + (dx + 1)
+        
+        # Map relative bias [num_heads, n, n] and add to scores
+        bias = self.rel_bias[:, rel_indices]  # [num_heads, n, n]
+        e = e + bias.unsqueeze(0)  # [b, num_heads, n, n]
+        
+        # Apply LeakyReLU then mask connected nodes
+        e = self.leaky_relu(e)
+        adj_mask_expanded = adj_mask.unsqueeze(1)  # [b, 1, n, n]
+        e = e.masked_fill(adj_mask_expanded == 0, float('-inf'))
+        
+        # Softmax
+        attention = F.softmax(e, dim=-1)  # [b, num_heads, n, n]
+        attention = self.dropout(attention)
+        
+        # Apply attention to features
+        h_prime = torch.matmul(attention, Wh1)  # [b, num_heads, n, head_dim]
+        h_prime = h_prime.transpose(1, 2).contiguous()  # [b, n, num_heads, head_dim]
+        h_prime = h_prime.view(b, n, self.out_features)  # [b, n, out_features]
+        
+        return h_prime
+    
+    def _compute_attention_scores(self, Wh1: FloatTensor, Wh2: FloatTensor) -> FloatTensor:
+        """Compute attention scores using concatenation method (optimized to use O(N) memory)"""
+        # self.a has shape [2 * head_dim, 1]
+        a1 = self.a[:self.head_dim, :]
+        a2 = self.a[self.head_dim:, :]
+        
+        # Wh1 has shape [b, num_heads, n, head_dim]
+        # Wh2 has shape [b, num_heads, n, head_dim]
+        e1 = torch.matmul(Wh1, a1).squeeze(-1) # [b, num_heads, n]
+        e2 = torch.matmul(Wh2, a2).squeeze(-1) # [b, num_heads, n]
+        
+        e = e1.unsqueeze(-1) + e2.unsqueeze(-2) # [b, num_heads, n, n]
+        
+        return e
+
+
+class GAT(nn.Module):
+    """Multi-layer Graph Attention Network"""
+    def __init__(
+        self,
+        in_features: int,
+        hidden_features: int,
+        out_features: int,
+        num_layers: int = 2,
+        num_heads: int = 8,
+        dropout: float = 0.1,
+    ):
+        super(GAT, self).__init__()
+        self.num_layers = num_layers
+        
+        layers = []
+        # First layer
+        layers.append(
+            GATLayer(in_features, hidden_features, num_heads, dropout)
+        )
+        
+        # Hidden layers
+        for _ in range(num_layers - 2):
+            layers.append(
+                GATLayer(hidden_features, hidden_features, num_heads, dropout)
+            )
+        
+        # Last layer
+        if num_layers > 1:
+            layers.append(
+                GATLayer(hidden_features, out_features, num_heads, dropout)
+            )
+        else:
+            # If only one layer, adjust first layer output
+            layers[0] = GATLayer(in_features, out_features, num_heads, dropout)
+        
+        self.layers = nn.ModuleList(layers)
+        self.dropout = nn.Dropout(dropout)
+    
+    def forward(
+        self,
+        h: FloatTensor,
+        adj_mask: LongTensor,
+        height: int,
+        width: int,
+    ) -> FloatTensor:
+        """
+        Parameters
+        ----------
+        h : FloatTensor
+            Node features [b, n_nodes, in_features]
+        adj_mask : LongTensor
+            Adjacency mask [b, n_nodes, n_nodes]
+        height : int
+            Height of the 2D feature grid
+        width : int
+            Width of the 2D feature grid
+        
+        Returns
+        -------
+        FloatTensor
+            Output features [b, n_nodes, out_features]
+        """
+        for i, layer in enumerate(self.layers):
+            h = layer(h, adj_mask, height, width)
+            if i < len(self.layers) - 1:
+                h = F.elu(h)
+                h = self.dropout(h)
+        return h
+
+
