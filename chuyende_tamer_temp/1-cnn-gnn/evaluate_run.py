@@ -9,8 +9,8 @@ seed_everything(7)
 years = {'2014': 986, '2016': 1147, '2019': 1199}
 
 def main():
-    ckp_path = "/home/khai/Desktop/github/CNN-GNN-HMER/chuyende_tamer_temp/KetQua/cnn-gnn-hmer-cnn-gnn-run-skittish-worm-90/checkpoints/best_model.ckpt"
-    output_dir = "/home/khai/Desktop/github/CNN-GNN-HMER/chuyende_tamer_temp/KetQua/cnn-gnn-hmer-cnn-gnn-run-skittish-worm-90/evaluation_results"
+    ckp_path = "/home/khai/Desktop/github/CNN-GNN-HMER/chuyende_tamer_temp/KetQua/4_Coord_Aware_GAT_1L_4H/checkpoints/best_model.ckpt"
+    output_dir = "/home/khai/Desktop/github/CNN-GNN-HMER/chuyende_tamer_temp/KetQua/4_Coord_Aware_GAT_1L_4H/evaluation_results"
     
     os.makedirs(output_dir, exist_ok=True)
     print(f"Loading model from checkpoint: {ckp_path}")

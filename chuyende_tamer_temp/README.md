@@ -30,13 +30,19 @@ ChuyenDe-Tamer/
 ├── 1-cnn-gnn/                 # Phiên bản lai CNN-GNN (DenseNet + GAT + Transformer)
 │   ├── tamer/
 │   │   ├── model/
-│   │   │   ├── gat.py   # Cài đặt lớp Graph Attention
+│   │   │   ├── gat.py   # Cài đặt lớp Graph Attention và Relative Position Bias
 │   │   │   └── encoder.py # Encoder tích hợp GAT
 │   │   └── ...
 ├── data/
-│   └── CROHME.zip             # Dataset duy nhất, notebook sẽ tự giải nén khi chạy Kaggle
-├── KAGGLE_RUN_ALL_CNN_GNN_HMER.ipynb
-└── README.md            # Tài liệu dự án
+│   └── CROHME.zip             # Dataset duy nhất dùng chạy Kaggle
+├── notebooks/                 # Thư mục lưu trữ Jupyter Notebooks chạy trên Kaggle
+├── KetQua/                    # Thư mục chứa kết quả đánh giá thực nghiệm
+│   ├── 1_Baseline/            # Mô hình Baseline chuẩn (M1)
+│   ├── 2_Naive_GNN_PE_Before/ # Mô hình GNN cũ nhòe vị trí (M2)
+│   ├── 3_Corrected_GNN_PE_After/ # Mô hình GNN mới sửa vị trí (M3)
+│   ├── 4_Coord_Aware_GAT_1L_4H/  # Mô hình Coordinate-Aware GAT 1 lớp (M4 - Đề xuất tốt nhất)
+│   └── 5_Coord_Aware_GAT_2L_8H/  # Mô hình Coordinate-Aware GAT 2 lớp (M5)
+└── README.md            # Báo cáo kết quả và tài liệu dự án
 ```
 
 ## 🧠 Deep Dive: Graph Attention Networks (GAT)
@@ -145,11 +151,11 @@ Báo cáo này cung cấp cái nhìn toàn diện, mang tính học thuật về
 
 Dưới đây là bảng đối chiếu kết quả đánh giá (Evaluation) chính thức của cả 5 phiên bản mô hình trên 3 tập kiểm thử chuẩn **CROHME 2014, 2016, và 2019**:
 
-*   **M1: Baseline** (Run ID: `8ivyzmlm`) - DenseNet + Transformer Decoder (Không có GAT).
-*   **M2: Naive GAT (GNN Cũ)** (Run ID: `colorful-moose-173`) - GAT 2L, 8H, **PE đặt TRƯỚC GAT**.
-*   **M3: Corrected GAT (GNN Mới)** (Run ID: `defiant-mole-974`) - GAT 2L, 8H, **PE đặt SAU GAT**.
-*   **M4: Coord-Aware GAT (1L, 4H)** (Run ID: `skittish-worm-90`) - GAT 1L, 4H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng**.
-*   **M5: Coord-Aware GAT (2L, 8H)** (Run ID: `welcoming-dog-350`) - GAT 2L, 8H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng** (Thử nghiệm Scale-up).
+*   **M1: Baseline** (Thư mục: `1_Baseline`, Run ID: `8ivyzmlm`) - DenseNet + Transformer Decoder (Không có GAT).
+*   **M2: Naive GAT (GNN Cũ)** (Thư mục: `2_Naive_GNN_PE_Before`, Run ID: `colorful-moose-173`) - GAT 2L, 8H, **PE đặt TRƯỚC GAT**.
+*   **M3: Corrected GAT (GNN Mới)** (Thư mục: `3_Corrected_GNN_PE_After`, Run ID: `defiant-mole-974`) - GAT 2L, 8H, **PE đặt SAU GAT**.
+*   **M4: Coord-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) - GAT 1L, 4H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng**.
+*   **M5: Coord-Aware GAT (2L, 8H)** (Thư mục: `5_Coord_Aware_GAT_2L_8H`, Run ID: `welcoming-dog-350`) - GAT 2L, 8H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng** (Thử nghiệm Scale-up).
 
 | Tập dữ liệu (Dataset) | Chỉ số (Metric) | M1: Baseline | M2: GNN Cũ (PE trước GAT) | M3: GNN Mới (PE sau GAT) | M4: Coord-Aware GAT (1L, 4H) | M5: Coord-Aware GAT (2L, 8H) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -190,7 +196,7 @@ Sự phát triển của TAMER (CNN-GNN) trải qua 4 bước ngoặt thiết k�
 
 ### 3. Gợi ý Phiên bản Tốt nhất cho Đóng góp Khoa học (Scientific Recommendation)
 
-Mô hình **M4: Coordinate-Aware GAT (1L, 4H) (`skittish-worm-90`)** là phiên bản tốt nhất và phù hợp nhất để làm đóng góp khoa học chính của bài báo.
+Mô hình **M4: Coordinate-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) là phiên bản tốt nhất và phù hợp nhất để làm đóng góp khoa học chính của bài báo.
 
 #### Lý do lựa chọn học thuật (Academic Rationale):
 
