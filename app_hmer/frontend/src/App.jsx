@@ -3,7 +3,7 @@ import {
   Upload, FileText, RefreshCw, Copy, Edit, Check, 
   Cpu, Eye, EyeOff, LayoutGrid, HelpCircle, AlertTriangle, 
   Sparkles, CheckCircle, ListCollapse, BookOpen, Download, FileCode, Network,
-  ScanLine, Trash2
+  ScanLine, Trash2, SlidersHorizontal, Image as ImageIcon
 } from 'lucide-react';
 
 // API Base URL
@@ -625,6 +625,13 @@ export default function App() {
     return "badge-default";
   };
 
+  const scrollToSection = (sectionId) => {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <div className="d-flex flex-column min-vh-100 pb-5" style={{ backgroundColor: '#f8fafc' }}>
       
@@ -676,12 +683,50 @@ export default function App() {
       {/* 2. Workboard Workspace */}
       <main className="container-xxl px-4 mt-2">
         <div className="row g-4">
+
+          {/* LEFT NAVIGATION SIDEBAR */}
+          <aside className="col-12 col-lg-2">
+            <div className="glass-panel app-navigation-sidebar p-3">
+              <p className="uppercase-title mb-3">Điều hướng</p>
+              <nav className="d-flex flex-column gap-2">
+                <button type="button" className="sidebar-nav-item" onClick={() => scrollToSection("upload-section")}>
+                  <Upload className="w-5 h-5" />
+                  <span>Tải ảnh</span>
+                </button>
+                <button type="button" className="sidebar-nav-item" onClick={() => scrollToSection("analysis-section")} disabled={!docId}>
+                  <ImageIcon className="w-5 h-5" />
+                  <span>Khung phân tích</span>
+                </button>
+                <button type="button" className="sidebar-nav-item" onClick={() => scrollToSection("results-section")} disabled={!docId}>
+                  <ListCollapse className="w-5 h-5" />
+                  <span>Kết quả</span>
+                </button>
+              </nav>
+
+              <div className="sidebar-pipeline mt-4">
+                <p className="uppercase-title mb-2">Luồng M4</p>
+                <div className="pipeline-step"><span>1</span> Phát hiện vùng</div>
+                <div className="pipeline-step"><span>2</span> Chuẩn hóa CROHME</div>
+                <div className="pipeline-step"><span>3</span> M4 sinh LaTeX</div>
+              </div>
+
+              {recognitionEngine === "m4" && (
+                <div className="normalizer-status mt-3">
+                  <SlidersHorizontal className="w-5 h-5" />
+                  <div>
+                    <strong>Chuẩn hóa đang bật</strong>
+                    <small>H=128, giữ tỉ lệ, pad bội số 16</small>
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
           
           {/* LEFT COLUMN: Upload, Document Canvas & Stats (col-lg-5) */}
-          <div className="col-12 col-lg-5 d-flex flex-column gap-4">
+          <div className="col-12 col-lg-4 d-flex flex-column gap-4">
             
             {/* Uploader Card */}
-            <div className="glass-panel p-4">
+            <div id="upload-section" className="glass-panel p-4 section-anchor">
               <h2 className="h4 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
                 <Upload className="w-6 h-6 text-primary" />
                 Tải lên hình ảnh
@@ -787,7 +832,7 @@ export default function App() {
 
             {/* Document Canvas and SVG box outlines */}
             {docId && (
-              <div className="glass-panel p-4 d-flex flex-column gap-3">
+              <div id="analysis-section" className="glass-panel p-4 d-flex flex-column gap-3 section-anchor">
                 <h3 className="h5 fw-bold text-dark m-0 d-flex justify-content-between align-items-center">
                   <span>Khung Nhìn Ảnh Phân Tích</span>
                   <span className="badge bg-primary text-white fs-6 py-1.5 px-3 rounded-pill fw-bold">
@@ -943,7 +988,7 @@ export default function App() {
           </div>
 
           {/* RIGHT COLUMN: Tab switcher with detailed output cards & Markdown parser (col-lg-7) */}
-          <div className="col-12 col-lg-7">
+          <div id="results-section" className="col-12 col-lg-6 section-anchor">
             {docId ? (
               <div className="glass-panel p-4 d-flex flex-column gap-4 col-scroll">
                 
@@ -1070,7 +1115,7 @@ export default function App() {
                             
                             {/* Left part inside card: Crop preview */}
                             <div className="col-12 col-md-3 text-center text-md-start">
-                              <p className="uppercase-title mb-2" style={{ fontSize: '9px' }}>Ảnh phân tách</p>
+                              <p className="uppercase-title mb-2" style={{ fontSize: '9px' }}>Ảnh đầu vào</p>
                               <div className="crop-preview-frame">
                                 <img 
                                   src={el.image} 
@@ -1082,6 +1127,27 @@ export default function App() {
                               <p className="text-secondary font-monospace mt-1.5" style={{ fontSize: '10px' }}>
                                 {el.box[2] - el.box[0]}x{el.box[3] - el.box[1]}px
                               </p>
+                              {el.normalized_image && (
+                                <div className="mt-3">
+                                  <p className="uppercase-title mb-2" style={{ fontSize: '9px' }}>
+                                    Sau chuẩn hóa CROHME
+                                  </p>
+                                  <div className="crop-preview-frame normalized-preview">
+                                    <img
+                                      src={el.normalized_image}
+                                      alt={`Ảnh chuẩn hóa #${el.index + 1}`}
+                                      className="img-fluid rounded"
+                                      style={{ maxHeight: '100px', objectFit: 'contain' }}
+                                    />
+                                  </div>
+                                  <p className="text-secondary mt-2 mb-0" style={{ fontSize: '10px' }}>
+                                    {el.normalization?.variant?.toUpperCase()} · {el.normalization?.quality?.size?.join("×")}
+                                  </p>
+                                  <span className={`badge mt-1 ${el.normalization?.quality?.status === "ok" ? "bg-success" : "bg-warning text-dark"}`}>
+                                    {el.normalization?.quality?.status || "chưa kiểm tra"}
+                                  </span>
+                                </div>
+                              )}
                             </div>
 
                             {/* Right part inside card: Parsed text / math visual output */}

@@ -285,6 +285,12 @@ async def analyze_image_with_m4(file: UploadFile = File(...)):
                 "data:image/png;base64,"
                 + base64.b64encode(crop_buffer.getvalue()).decode("utf-8")
             )
+            normalized_buffer = io.BytesIO()
+            m4_result["normalized_image"].save(normalized_buffer, format="PNG")
+            normalized_uri = (
+                "data:image/png;base64,"
+                + base64.b64encode(normalized_buffer.getvalue()).decode("utf-8")
+            )
             elements.append(
                 {
                     "index": index,
@@ -294,8 +300,14 @@ async def analyze_image_with_m4(file: UploadFile = File(...)):
                     "box": list(box),
                     "text": m4_latex,
                     "image": crop_uri,
+                    "normalized_image": normalized_uri,
+                    "normalization": {
+                        "variant": m4_result["variant"],
+                        "quality": m4_result["quality"],
+                    },
                     "engine": "m4",
                     "detector": "pix2text_mfd",
+                    "pipeline": "pix2text_mfd -> crohme_normalizer -> m4",
                 }
             )
             markdown_parts.append(f"$$\n{m4_latex}\n$$")

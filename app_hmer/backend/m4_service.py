@@ -10,6 +10,7 @@ from PIL import Image, ImageOps
 
 from tamer.datamodule import vocab
 from tamer.model.tamer import TAMER
+from crohme_normalizer import CROHMENormalizer
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -34,6 +35,7 @@ class M4Service:
             "M4_CHECKPOINT_PATH", DEFAULT_CHECKPOINT_PATH
         )
         self.model = None
+        self.normalizer = CROHMENormalizer(target_height=128, width_multiple=16)
         self._load_lock = Lock()
         self._inference_lock = Lock()
 
@@ -265,7 +267,34 @@ class M4Service:
 
     def predict(self, image: Image.Image) -> Dict:
         self.load()
-        image_tensor = self._prepare_image(image).to(self.device)
+        variants = self.normalizer.normalize(image)
+        candidates = []
+        for variant in variants:
+            prediction = self.predict_normalized(variant.image)
+            model_score = prediction["score"]
+            final_score = model_score + variant.quality["score"]
+            candidates.append(
+                {
+                    **prediction,
+                    "variant": variant.name,
+                    "normalized_image": variant.image,
+                    "quality": variant.quality,
+                    "final_score": final_score,
+                }
+            )
+        return max(candidates, key=lambda item: item["final_score"])
+
+    def predict_normalized(self, image: Image.Image) -> Dict:
+        self.load()
+        normalized = np.asarray(ImageOps.grayscale(image), dtype=np.uint8)
+        image_tensor = (
+            torch.from_numpy(normalized.copy())
+            .float()
+            .div_(255.0)
+            .unsqueeze(0)
+            .unsqueeze(0)
+            .to(self.device)
+        )
         _, _, height, width = image_tensor.shape
         image_mask = torch.zeros(
             (1, height, width), dtype=torch.bool, device=self.device
