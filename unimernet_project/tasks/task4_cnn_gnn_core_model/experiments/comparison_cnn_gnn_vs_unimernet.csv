@@ -1,6 +1,0 @@
-model,role,exact_match_rate,render_success_rate,exprate,syntax_error_rate,avg_inference_time_ms,notes
-A0: CNN-GNN/GAT (Phan Hoàng Khải),Proposed Model (Main Thesis Model),2.0%,34.0%,52.27% (CROHME 2014) / 2.0% (50 images),66.0%,13662.10,CNN (DenseNet) + GAT Grid Graph. Tested locally on CPU using recovered chuyên đề checkpoint.
-A1: UniMERNet P0,Baseline (Direct Recognition),48.0%,82.0%,N/A (CROHME) / 48.0% (50 images),20.0%,4058.58,"Tested on 50 local images, no preprocessing. Vision Transformer SOTA."
-A2: UniMERNet P1,Baseline (Crop + Gray + Resize),16.0%,70.0%,N/A (CROHME) / 16.0% (50 images),30.0%,5297.41,Tested on 50 local images. Preprocessing degrades deep features.
-A3: UniMERNet P2,Baseline (Binarization + Resize),2.0%,56.0%,N/A (CROHME) / 2.0% (50 images),44.0%,7970.54,Tested on 50 local images. Binarization destroys fine-grained details.
-A4: UniMERNet + LaTeX graph validator,Supporting application / post-processing,48.0%,82.0%,N/A (CROHME) / 48.0% (50 images),20.0%,4058.58,100% of syntax errors (10/50 cases) detected/flagged by validator. Used as a filter.

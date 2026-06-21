@@ -1,2 +1,0 @@
-model,dataset,split,epoch,gpu,exprate,symbol_accuracy,edit_distance,notes
-CNN-GNN/GAT,CROHME 2014,test,N/A,N/A,52.27%,N/A,N/A,Inherited result from previous research phase (chuyên đề học tập)

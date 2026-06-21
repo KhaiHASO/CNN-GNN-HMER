@@ -1,4 +1,0 @@
-config,total_images,exact_match_count,exact_match_rate,render_success_count,render_success_rate,avg_inference_time_ms,bracket_error_count,frac_error_count,sup_sub_error_count,sqrt_error_count,symbol_error_count
-p0,50,24,0.48,41,0.82,4058.5831117630005,13,0,0,0,7
-p1,50,8,0.16,35,0.7,5297.4118185043335,22,4,3,3,6
-p2,50,1,0.02,28,0.56,7970.543828010559,12,6,15,9,6
