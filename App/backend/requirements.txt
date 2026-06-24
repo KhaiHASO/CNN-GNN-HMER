@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-multipart
+opencv-python
+numpy
+pillow
+pydantic
+requests
+torch
+torchvision
+pytorch-lightning
+torchmetrics
+einops
+editdistance
+wandb
