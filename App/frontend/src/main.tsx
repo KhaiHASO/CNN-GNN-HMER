@@ -126,12 +126,18 @@ function App() {
     () => currentPage?.expressions.filter((expr) => selectedIds.includes(expr.id)) ?? [],
     [currentPage, selectedIds]
   );
-  const selectedExpression = selectedExpressions[0];
+  const selectedExpression = useMemo(() => {
+    const activeId = selectedIds[selectedIds.length - 1];
+    return currentPage?.expressions.find((expr) => expr.id === activeId);
+  }, [currentPage, selectedIds]);
 
   const refreshPage = async (pageId = currentPageId) => {
     if (!project || !pageId) return;
     const page = await getPage(pageId);
-    setProject({ ...project, pages: project.pages.map((item) => (item.id === page.id ? page : item)) });
+    setProject((current) => {
+      if (!current) return current;
+      return { ...current, pages: current.pages.map((item) => (item.id === page.id ? page : item)) };
+    });
   };
 
   const handleUpload = async (files: FileList | null) => {
