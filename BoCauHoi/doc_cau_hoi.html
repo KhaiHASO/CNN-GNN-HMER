@@ -936,31 +936,6 @@
             xhtml: false
         });
 
-        // Initialize App
-        window.addEventListener('DOMContentLoaded', () => {
-            renderSidebar();
-            updateOverallProgress();
-            loadGroup(1);
-            
-            // Search Input listener
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                searchQuery = e.target.value.toLowerCase().trim();
-                if (searchQuery.length > 0) {
-                    currentView = 'list';
-                    document.getElementById('view-tab-list').classList.add('active');
-                    document.getElementById('view-tab-flashcard').classList.remove('active');
-                    document.getElementById('view-tab-extra').classList.remove('active');
-                    document.getElementById('active-group-subtitle').textContent = "Tìm kiếm";
-                    document.getElementById('active-group-title').textContent = `Kết quả cho: "${searchQuery}"`;
-                } else {
-                    const group = data.find(g => g.group_id === currentGroupId);
-                    document.getElementById('active-group-subtitle').textContent = `Nhóm ${currentGroupId}`;
-                    document.getElementById('active-group-title').textContent = group.title;
-                }
-                renderActiveView();
-            });
-        });
-
         // Save progress to LocalStorage
         function saveProgress(globalId, status) {
             progress[globalId] = status;
@@ -1045,7 +1020,7 @@
             // Highlight active sidebar item
             renderSidebar();
             
-            // Switch back to list view when changing groups
+            // Switch back to active view
             switchView(currentView);
         }
 
@@ -1223,7 +1198,6 @@
         // Handle dropdown status change
         window.changeQuestionStatus = function(globalId, value) {
             saveProgress(globalId, value);
-            // Update badge class
             const badge = document.getElementById(`status-badge-${globalId}`);
             if (badge) {
                 badge.className = `qa-status-badge status-${value}`;
@@ -1242,7 +1216,6 @@
                 return;
             }
             
-            // Ensure index is in bounds
             if (currentFlashcardIndex >= questions.length) {
                 currentFlashcardIndex = 0;
             }
@@ -1363,6 +1336,38 @@
                 extrasContainer.appendChild(card);
             });
             container.appendChild(extrasContainer);
+        }
+
+        // Initialize App
+        function initApp() {
+            renderSidebar();
+            updateOverallProgress();
+            loadGroup(1);
+            
+            // Search Input listener
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase().trim();
+                if (searchQuery.length > 0) {
+                    currentView = 'list';
+                    document.getElementById('view-tab-list').classList.add('active');
+                    document.getElementById('view-tab-flashcard').classList.remove('active');
+                    document.getElementById('view-tab-extra').classList.remove('active');
+                    document.getElementById('active-group-subtitle').textContent = "Tìm kiếm";
+                    document.getElementById('active-group-title').textContent = `Kết quả cho: "${searchQuery}"`;
+                } else {
+                    const group = data.find(g => g.group_id === currentGroupId);
+                    document.getElementById('active-group-subtitle').textContent = `Nhóm ${currentGroupId}`;
+                    document.getElementById('active-group-title').textContent = group.title;
+                }
+                renderActiveView();
+            });
+        }
+
+        // Bulletproof initialization that runs immediately if DOM is already parsed
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
         }
     </script>
 </body>
