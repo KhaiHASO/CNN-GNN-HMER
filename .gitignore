@@ -22,7 +22,7 @@ wandb/
 lightning_logs/
 lightning_logs_debug/
 safe_checkpoints/
-*.ckpt
+# *.ckpt
 *.pkl
 result.zip
 errors.json

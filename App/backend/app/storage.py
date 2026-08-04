@@ -4,6 +4,7 @@ import json
 import shutil
 from pathlib import Path
 from typing import Iterable, Optional
+from uuid import uuid4
 
 from fastapi import HTTPException, UploadFile
 from PIL import Image
@@ -147,7 +148,8 @@ def next_id(prefix: str, existing: Iterable[str]) -> str:
 async def save_upload(project: Project, upload: UploadFile) -> PageItem:
     suffix = Path(upload.filename or "page.jpg").suffix.lower() or ".jpg"
     page_id = next_id("page", [p.id for p in project.pages])
-    file_name = f"{page_id}{suffix}"
+    upload_token = uuid4().hex[:10]
+    file_name = f"{page_id}_{upload_token}{suffix}"
     file_path = UPLOADS_DIR / file_name
     with file_path.open("wb") as out:
         shutil.copyfileobj(upload.file, out)
@@ -155,7 +157,7 @@ async def save_upload(project: Project, upload: UploadFile) -> PageItem:
     with Image.open(file_path) as image:
         width, height = image.size
         image.thumbnail((360, 480))
-        thumb_name = f"{page_id}_thumb.jpg"
+        thumb_name = f"{page_id}_{upload_token}_thumb.jpg"
         image.convert("RGB").save(UPLOADS_DIR / thumb_name, quality=88)
 
     return PageItem(

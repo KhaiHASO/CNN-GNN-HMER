@@ -145,8 +145,7 @@ function App() {
     setBusy(true);
     setMessage("Đang tải ảnh lên backend...");
     const pages = await uploadPages(project.id, files);
-    const nextProject = { ...project, pages: [...project.pages, ...pages] };
-    setProject(nextProject);
+    setProject((current) => (current ? { ...current, pages: [...current.pages, ...pages] } : current));
     setCurrentPageId(pages[0].id);
     setSelectedIds([]);
     setMessage(`Đã tải ${pages.length} ảnh. Chọn Auto Scan để phát hiện biểu thức.`);
@@ -320,7 +319,16 @@ function App() {
           <label className="button primary">
             <ImagePlus size={17} />
             Upload Images
-            <input hidden type="file" accept="image/*" multiple onChange={(e) => void handleUpload(e.target.files)} />
+            <input
+              hidden
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                void handleUpload(e.target.files);
+                e.currentTarget.value = "";
+              }}
+            />
           </label>
           <button className="button" onClick={handleScan} disabled={!currentPage || isBusy}>
             <ScanLine size={17} /> Auto Scan
