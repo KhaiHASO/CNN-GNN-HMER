@@ -1,7 +1,7 @@
 # MỤC LỤC ĐỀ XUẤT LUẬN VĂN THẠC SĨ
 
 > **Định hướng:** Cân bằng nghiên cứu và ứng dụng  
-> **Đề tài:** Nhận dạng biểu thức toán học viết tay bằng kiến trúc kết hợp DenseNet, GAT và Transformer  
+> **Đề tài:** Nghiên cứu mô hình lai CNN-GNN trong nhận dạng biểu thức toán học viết tay  
 > **Nguyên tắc:** Mục lục chính chỉ giữ các luận điểm cần thiết để tạo một câu chuyện liền mạch. Các cấu hình chi tiết, bảng thống kê, log, mã nguồn, trường hợp lỗi và câu trả lời phòng thủ được đặt ở phụ lục hoặc hồ sơ minh chứng riêng.  
 > **Cấp mục:** Sử dụng chủ yếu đến cấp 3. Cấp 4 chỉ bổ sung khi một mục thật sự cần tách thành nhiều thí nghiệm hoặc quy trình độc lập.
 

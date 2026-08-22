@@ -14,7 +14,7 @@ Mọi câu trả lời nên theo cấu trúc:
 
 Ví dụ:
 
-> **Quan sát:** M4 có Mean Edit Distance trung bình 2,06, thấp hơn M1 là 2,20.  
+> **Quan sát:** M4 có Mean Edit Distance trung bình 2,06, thấp hơn M1 là 2,10.  
 > **Diễn giải:** prediction của M4 cần ít phép sửa token hơn trung bình.  
 > **Giới hạn:** M4 vẫn có Avg ExpRate thấp hơn M1.  
 > **Kiểm chứng:** xem histogram distance, cấu trúc lỗi và nhiều seed.
@@ -124,7 +124,7 @@ M1 MED 1,99 trên 2014 chỉ kém M4 0,01. Không có nhiều seed thì chênh l
 
 - M1 Avg ExpRate: 50,10%.
 - M4 Avg ExpRate: 48,98%.
-- M1 MED: 2,20.
+- M1 MED: 2,10.
 - M4 MED: 2,06.
 
 Nếu ứng dụng yêu cầu output tự động không sửa:

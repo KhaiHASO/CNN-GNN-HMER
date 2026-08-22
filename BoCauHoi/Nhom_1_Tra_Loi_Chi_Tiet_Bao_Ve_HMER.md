@@ -1424,7 +1424,7 @@ Kết quả trung bình trong repo:
 
 | Mô hình | ExpRate | ≤1 | ≤2 | Mean Edit Distance |
 |---|---:|---:|---:|---:|
-| M1 — Baseline | **50.10%** | **68.68%** | **76.98%** | 2.20 |
+| M1 — Baseline | **50.10%** | **68.68%** | **76.98%** | 2.10 |
 | M2 — PE trước GAT | 47.84% | 66.12% | 75.29% | 2.21 |
 | M3 — PE sau GAT | 49.17% | 67.17% | 76.40% | 2.14 |
 | M4 — Coord-Aware 1L 4H | 48.98% | 67.43% | 76.61% | **2.06** |
@@ -1647,7 +1647,7 @@ Câu trả lời an toàn:
 
 ## 8.12. Bản trả lời đầy đủ khoảng 2 phút
 
-> **Kết quả hiện tại không cho phép em nói GAT vượt baseline trên mọi tập và mọi metric. M1 vẫn có ExpRate trung bình cao nhất là 50,10%, còn M4 đạt 48,98%. Tuy nhiên M4 có Mean Edit Distance thấp nhất là 2,06 so với 2,20 của baseline, nghĩa là đầu ra của M4 trung bình gần ground truth hơn dù nhiều mẫu vẫn còn một hoặc vài lỗi nên chưa được tính Exact Match.**
+> **Kết quả hiện tại không cho phép em nói GAT vượt baseline trên mọi tập và mọi metric. M1 vẫn có ExpRate trung bình cao nhất là 50,10%, còn M4 đạt 48,98%. Tuy nhiên M4 có Mean Edit Distance thấp nhất là 2,06 so với 2,10 của baseline, nghĩa là đầu ra của M4 trung bình gần ground truth hơn dù nhiều mẫu vẫn còn một hoặc vài lỗi nên chưa được tính Exact Match.**
 >
 > **Giá trị khoa học của luận văn nằm ở chuỗi ablation. M2 cho thấy đặt PE trước GAT làm kết quả giảm; M3 chuyển PE ra sau và phục hồi; M4 thêm relative position bias và đạt edit distance tốt nhất với kiến trúc gọn; M5 tăng lên hai lớp tám head nhưng giảm mạnh. Từ đó nghiên cứu rút ra rằng hiệu quả của GAT phụ thuộc vào cách xử lý vị trí và độ sâu, chứ không phải cứ thêm GAT hoặc tăng tham số là tốt hơn.**
 >

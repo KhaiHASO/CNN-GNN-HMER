@@ -1,9 +1,11 @@
 # TAMER - Handwritten Mathematical Expression Recognition
 
-Dự án này triển khai mô hình **TAMER** (Two-way Attention-based Model for Expression Recognition) cho nhận dạng biểu thức toán học viết tay (Handwritten Mathematical Expression - HME).
+Dự án này triển khai mô hình **TAMER** (Two-way Attention-based Model for Expression Recognition) cho nhận dạng biểu thức toán học viết tay (Handwritten Mathematical Expression - HMER) theo hướng nghiên cứu mô hình lai **CNN-GNN**.
 
-**Tác giả:** Phan Hoàng Khải  
-**Đơn vị:** Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE)
+* **Đề tài:** Nghiên cứu mô hình lai CNN-GNN trong nhận dạng biểu thức toán học viết tay
+* **Tác giả:** Phan Hoàng Khải (MSHV: 2531308)  
+* **Người hướng dẫn:** TS. Bùi Mạnh Quân  
+* **Đơn vị:** Trường Đại học Công nghệ Kỹ thuật TP.HCM
 
 ## 📋 Mục lục
 
@@ -13,81 +15,80 @@ Dự án này triển khai mô hình **TAMER** (Two-way Attention-based Model fo
 - [Cài đặt](#cài-đặt)
 - [Sử dụng](#sử-dụng)
 - [Cấu hình](#cấu-hình)
-- [Kết quả](#kết-quả)
+- [Báo cáo Tổng hợp Thực nghiệm](#báo-cáo-tổng-hợp-thực-nghiệm-quá-trình-tiến-bộ--đóng-góp-khoa-học)
 
 ## 🎯 Tổng quan
 
-TAMER là một kiến trúc mạnh mẽ kết hợp giữa CNN và Transformer để chuyển đổi hình ảnh biểu thức toán học viết tay thành chuỗi LaTeX. Dự án này bao gồm hai phiên bản chính:
+TAMER là một kiến trúc end-to-end kết hợp giữa CNN và Transformer để chuyển đổi hình ảnh biểu thức toán học viết tay thành chuỗi LaTeX. Dự án này bao gồm hai nhánh nghiên cứu chính:
 
-1.  **0-cnn-transformer-baseline**: Phiên bản chuẩn sử dụng DenseNet làm Encoder và Transformer làm Decoder.
-2.  **1-cnn-gnn**: Phiên bản lai **CNN-GNN** tích hợp Graph Attention Networks (GAT) vào bộ mã hóa để tăng cường khả năng trích xuất đặc trưng không gian và cấu trúc của biểu thức.
+1. **0-cnn-transformer-baseline**: Phiên bản chuẩn sử dụng DenseNet làm Encoder và Transformer làm Decoder (không dùng GAT).
+2. **1-cnn-gnn**: Phiên bản lai **CNN-GNN** tích hợp Graph Attention Networks (GAT) trên lưới đặc trưng ảnh (feature-grid graph) để tăng cường mô hình hóa quan hệ không gian 2D trước khi giải mã.
 
 ## 📁 Cấu trúc dự án
 
-```
-ChuyenDe-Tamer/
-├── 0-cnn-transformer-baseline/ # Phiên bản TAMER gốc (DenseNet + Transformer)
+```text
+CNN-GNN-HMER/
+├── 0-cnn-transformer-baseline/ # Phiên bản baseline chuẩn (DenseNet + Transformer)
 ├── 1-cnn-gnn/                 # Phiên bản lai CNN-GNN (DenseNet + GAT + Transformer)
 │   ├── tamer/
 │   │   ├── model/
-│   │   │   ├── gat.py   # Cài đặt lớp Graph Attention và Relative Position Bias
-│   │   │   └── encoder.py # Encoder tích hợp GAT
+│   │   │   ├── gat.py         # Cài đặt Graph Attention và Relative Position Bias
+│   │   │   └── encoder.py     # Encoder tích hợp GAT trên feature map
 │   │   └── ...
 ├── data/
-│   └── CROHME.zip             # Dataset duy nhất dùng chạy Kaggle
-├── notebooks/                 # Thư mục lưu trữ Jupyter Notebooks chạy trên Kaggle
-├── KetQua/                    # Thư mục chứa kết quả đánh giá thực nghiệm
-│   ├── 1_Baseline/            # Mô hình Baseline chuẩn (M1)
-│   ├── 2_Naive_GNN_PE_Before/ # Mô hình GNN cũ nhòe vị trí (M2)
-│   ├── 3_Corrected_GNN_PE_After/ # Mô hình GNN mới sửa vị trí (M3)
-│   ├── 4_Coord_Aware_GAT_1L_4H/  # Mô hình Coordinate-Aware GAT 1 lớp (M4 - Đề xuất tốt nhất)
-│   └── 5_Coord_Aware_GAT_2L_8H/  # Mô hình Coordinate-Aware GAT 2 lớp (M5)
-└── README.md            # Báo cáo kết quả và tài liệu dự án
+│   └── CROHME.zip             # Dataset CROHME dùng trong thực nghiệm
+├── notebooks/                 # Thư mục lưu trữ Jupyter Notebooks chạy trên Kaggle (2x Tesla T4)
+├── KetQua/                    # Thư mục chứa kết quả đánh giá thực nghiệm đóng băng
+│   ├── 1_Baseline/            # Mô hình M1: Baseline chuẩn
+│   ├── 2_Naive_GNN_PE_Before/ # Mô hình M2: GNN đặt PE trước GAT
+│   ├── 3_Corrected_GNN_PE_After/ # Mô hình M3: GNN chuẩn của luận văn (PE sau GAT)
+│   ├── 4_Coord_Aware_GAT_1L_4H/  # Mô hình M4: Coordinate-Aware GAT 1L4H
+│   └── 5_Coord_Aware_GAT_2L_8H/  # Mô hình M5: Coordinate-Aware GAT 2L8H (Negative result)
+├── App/                       # Ứng dụng Expression Page Explorer (FastAPI + React Konva)
+├── BoCauHoi/                  # Bộ 140 câu hỏi - đáp chuẩn bị bảo vệ luận văn
+├── LuanVan/                   # Tài liệu luận văn tốt nghiệp
+└── README.md                  # Tài liệu tổng hợp dự án
 ```
 
 ## 🧠 Deep Dive: Graph Attention Networks (GAT)
 
-Điểm nhấn của dự án này là việc tích hợp **Graph Attention Networks (GAT)** vào kiến trúc Encoder. Dưới đây là phân tích chi tiết kỹ thuật về cách GAT hoạt động trong bài toán này:
+Điểm nhấn của dự án là việc tích hợp **Graph Attention Networks (GAT)** trực tiếp trên feature map của Encoder:
 
 ### Tại sao lại dùng GAT?
 
-Các mạng CNN truyền thống (như DenseNet) rất giỏi trong việc trích xuất đặc trưng cục bộ (local features). Tuy nhiên, đối với biểu thức toán học, mối quan hệ giữa các ký tự không chỉ nằm ở vị trí lân cận mà còn phụ thuộc vào cấu trúc ngữ nghĩa 2D (ví dụ: phân số, số mũ, chỉ số dưới).
+Các mạng CNN truyền thống (như DenseNet) trích xuất tốt đặc trưng cục bộ (local visual features). Tuy nhiên, đối với biểu thức toán học, mối quan hệ giữa các ký hiệu chứa cấu trúc không gian 2D đa hướng (phân số, số mũ, chỉ số dưới, căn thức, tích phân).
 
-GAT cho phép mô hình coi bản đồ đặc trưng (feature map) như một đồ thị, nơi mỗi điểm ảnh (pixel) hoặc vùng đặc trưng là một nút (node). Cơ chế Attention giúp mỗi nút có thể "tập trung" (attend) vào các nút lân cận quan trọng nhất để tổng hợp thông tin, thay vì nhân chập cố định như CNN.
+GAT cho phép coi bản đồ đặc trưng (feature map $H' \times W'$) như một đồ thị lưới (feature-grid graph), nơi mỗi ô đặc trưng là một nút (node). Cơ chế Attention giúp các nút lân cận truyền tin và tổng hợp ngữ cảnh không gian có trọng số.
 
 ### Kiến trúc chi tiết (Implementation Details)
 
-Module GAT được cài đặt trong `1-cnn-gnn/tamer/model/gat.py` và `1-cnn-gnn/tamer/model/encoder.py`.
+Module GAT được cài đặt trong `1-cnn-gnn/tamer/model/gat.py` và `1-cnn-gnn/tamer/model/encoder.py`:
 
-1.  **Xây dựng Đồ thị (Graph Construction)**:
-    *   Feature map đầu ra từ DenseNet có kích thước `[H, W, D]`.
-    *   Ta biến đổi feature map này thành một lưới đồ thị (grid graph) với `N = H * W` nút.
-    *   **Adjacency Matrix**: Xây dựng ma trận kề dựa trên kết nối 4 hướng (4-connectivity: trên, dưới, trái, phải). Mỗi nút được kết nối với 4 nút lân cận của nó.
-
-2.  **Cơ chế GAT Layer**:
-    *   Mỗi lớp GAT (`GATLayer`) sử dụng **Multi-head Attention**.
-    *   Đầu vào là các features của nút $h_i$.
-    *   Hệ số attention $e_{ij}$ giữa nút $i$ và nút lân cận $j$ được tính toán thông qua một mạng nơ-ron truyền thẳng (feed-forward neural network):
-        $$e_{ij} = \text{LeakyReLU}(\vec{a}^T [W\vec{h}_i || W\vec{h}_j])$$
-    *   Hệ số này sau đó được chuẩn hóa bằng Softmax để tạo ra trọng số $\alpha_{ij}$.
-    *   Đầu ra của nút $i$ là tổng có trọng số của các nút lân cận:
-        $$\vec{h}'_i = \sigma(\sum_{j \in \mathcal{N}_i} \alpha_{ij} W\vec{h}_j)$$
-
-3.  **Tích hợp vào Encoder**:
-    *   Quy trình xử lý: `Image -> DenseNet -> Feature Map -> Flatten -> GAT Layers -> Reshape -> Feature Map -> Positional Encoding -> Transformer Decoder`.
-    *   Việc chèn GAT vào giữa DenseNet và Transformer giúp làm giàu feature map với thông tin ngữ cảnh cấu trúc trước khi giải mã.
+1. **Xây dựng Đồ thị (Graph Construction)**:
+   * Feature map đầu ra từ DenseNet có kích thước `[B, D, H', W']` được chiếu về chiều $D = 256$.
+   * Biến đổi feature map thành đồ thị lưới với $N = H' \times W'$ nút.
+   * **Adjacency Matrix**: Ma trận kề kết nối theo lưới 8 hướng (ngang, dọc, 2 đường chéo và self-loop).
+2. **Cơ chế GAT Layer**:
+   * Mỗi lớp GAT sử dụng **Multi-head Attention**.
+   * Hệ số chú ý $e_{ij}$ giữa nút $i$ và lân cận $j$ được tính:
+     $$e_{ij} = \text{LeakyReLU}(\vec{a}^T [W\vec{h}_i \,||\, W\vec{h}_j] + b_{ij})$$
+     *(trong đó $b_{ij}$ là Relative Position Bias 9 trạng thái ở biến thể M4/M5)*.
+   * Chuẩn hóa bằng Softmax trên tập lân cận $\mathcal{N}_i$ thành $\alpha_{ij}$.
+   * Cập nhật đặc trưng nút:
+     $$\vec{h}'_i = \sigma\left(\sum_{j \in \mathcal{N}_i} \alpha_{ij} W\vec{h}_j\right)$$
+3. **Tích hợp vào Encoder**:
+   * Quy trình xử lý: `Image -> DenseNet -> Feature Map -> Feature Grid Graph -> GAT Layers -> Positional Encoding -> Transformer Decoder -> LaTeX Sequence`.
+   * Thứ tự đặt Positional Encoding (PE) **sau** GAT là mấu chốt để tránh hiện tượng làm nhòe tọa độ (PE blurring).
 
 ## 🔧 Cài đặt
 
 Yêu cầu môi trường:
-- Python 3.7+
+- Python 3.8+
 - PyTorch 1.8+
 - CUDA (nếu dùng GPU)
 
-Cài đặt các gói phụ thuộc:
-
 ```bash
-# Cài đặt cho phiên bản GAT (Khuyên dùng)
+# Cài đặt cho phiên bản GAT
 cd 1-cnn-gnn
 pip install -r requirements.txt
 pip install -e .
@@ -100,119 +101,55 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-## � Sử dụng
+## 🚀 Sử dụng
 
 ### Quá trình Huấn luyện (Training)
 
-Để huấn luyện mô hình, sử dụng script `train.py`. Bạn có thể thay đổi cấu hình trong thư mục `config/`.
-
 ```bash
-# Di chuyển vào thư mục source code
 cd 1-cnn-gnn
-
-# Chạy huấn luyện với file config mặc định
 python train.py fit --config config/crohme.yaml
-
-# Debug nhanh với dữ liệu nhỏ
-python train.py fit --config config/crohme_debug.yaml
 ```
 
 ### Đánh giá (Evaluation)
 
-Sử dụng các script trong thư mục `eval/` để đánh giá mô hình đã huấn luyện.
-
 ```bash
 cd 1-cnn-gnn/eval
-
-# Đánh giá trên tập dữ liệu CROHME
 bash eval_crohme.sh
 ```
 
-## ⚙️ Cấu hình
-
-Các tham số quan trọng trong `config/crohme.yaml`:
-
-- **model**:
-    - `d_model`: 256 (Kích thước vector đặc trưng)
-    - `use_gat`: true (Bật tắt module GAT)
-    - `gat_num_layers`: 2 (Số lớp GAT chồng lên nhau)
-    - `gat_num_heads`: 8 (Số đầu attention trong GAT)
-- **data**:
-    - `folder`: Đường dẫn đến dữ liệu ảnh
-    - `batch_size`: Kích thước batch
-
 ## 📊 Báo cáo Tổng hợp Thực nghiệm: Quá trình Tiến bộ & Đóng góp Khoa học
 
-Báo cáo này cung cấp cái nhìn toàn diện, mang tính học thuật về quá trình tiến hóa kiến trúc của mô hình **TAMER (CNN-GNN)**, phân tích các phát hiện khoa học cốt lõi từ thực nghiệm và đề xuất phiên bản tối ưu nhất để thực hiện công bố khoa học (paper contribution).
+### 1. Bảng Tổng hợp Kết quả Định lượng Đóng băng (Frozen Results)
 
----
+Dưới đây là bảng đối chiếu kết quả đánh giá chính thức của 5 phiên bản mô hình trên 3 tập kiểm thử chuẩn **CROHME 2014, 2016, và 2019** (huấn luyện 100 epochs trên 2x NVIDIA Tesla T4):
 
-### 1. Bảng Tổng hợp Kết quả Định lượng (Quantitative Synthesis)
+* **M1: Baseline** (`1_Baseline`, W&B `8ivyzmlm`) — DenseNet + Transformer Decoder (Không có GAT).
+* **M2: Naive GAT** (`2_Naive_GNN_PE_Before`, MLflow `8b964c54a2d94b8ca0e667db6ceba820`) — GAT 2L, 8H, **PE đặt TRƯỚC GAT**.
+* **M3: Corrected GAT** (`3_Corrected_GNN_PE_After`, MLflow `2e2611189af24ca5955fd73ceaa57d9c`, run `defiant-mole-974`) — GAT 2L, 8H, **PE đặt SAU GAT** (*Mô hình CNN-GAT chính của luận văn*).
+* **M4: Coord-Aware GAT (1L, 4H)** (`4_Coord_Aware_GAT_1L_4H`, MLflow `c861d5eb87304ca0933fa8c603c9dac9`) — GAT 1L, 4H, PE sau GAT + Relative Position Bias kề 8 hướng (*Thử nghiệm mở rộng*).
+* **M5: Coord-Aware GAT (2L, 8H)** (`5_Coord_Aware_GAT_2L_8H`, MLflow `e44ee12972f8447482b89d0a5f1acbf2`) — GAT 2L, 8H, PE sau GAT + Relative Position Bias kề 8 hướng (*Scale-up Negative Result*).
 
-Dưới đây là bảng đối chiếu kết quả đánh giá (Evaluation) chính thức của cả 5 phiên bản mô hình trên 3 tập kiểm thử chuẩn **CROHME 2014, 2016, và 2019**:
-
-*   **M1: Baseline** (Thư mục: `1_Baseline`, Run ID: `8ivyzmlm`) - DenseNet + Transformer Decoder (Không có GAT).
-*   **M2: Naive GAT (GNN Cũ)** (Thư mục: `2_Naive_GNN_PE_Before`, Run ID: `colorful-moose-173`) - GAT 2L, 8H, **PE đặt TRƯỚC GAT**.
-*   **M3: Corrected GAT (GNN Mới)** (Thư mục: `3_Corrected_GNN_PE_After`, Run ID: `defiant-mole-974`) - GAT 2L, 8H, **PE đặt SAU GAT**.
-*   **M4: Coord-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) - GAT 1L, 4H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng**.
-*   **M5: Coord-Aware GAT (2L, 8H)** (Thư mục: `5_Coord_Aware_GAT_2L_8H`, Run ID: `welcoming-dog-350`) - GAT 2L, 8H, **PE đặt SAU GAT + Relative Position Bias kề 8-hướng** (Thử nghiệm Scale-up).
-
-| Tập dữ liệu (Dataset) | Chỉ số (Metric) | M1: Baseline | M2: GNN Cũ (PE trước GAT) | M3: GNN Mới (PE sau GAT) | M4: Coord-Aware GAT (1L, 4H) | M5: Coord-Aware GAT (2L, 8H) |
+| Tập dữ liệu (Dataset) | Chỉ số (Metric) | M1: Baseline | M2: Naive GAT (PE trước GAT) | M3: Corrected GAT (PE sau GAT) | M4: Coord-Aware (1L, 4H) | M5: Coord-Aware (2L, 8H) |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **CROHME 2014** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **51.12%** <br> **69.98%** <br> **77.69%** <br> 1.99 | 49.39% <br> 66.53% <br> 75.25% <br> 2.22 | 48.88% <br> 66.73% <br> 75.35% <br> 2.19 | 49.90% <br> 67.44% <br> 77.18% <br> **1.98** *(Best)* | 46.65% <br> 63.99% <br> 73.43% <br> 2.48 |
-| **CROHME 2016** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | 50.65% <br> **67.92%** <br> **76.02%** <br> 2.21 | 47.43% <br> 64.95% <br> 74.72% <br> 2.45 | **50.74%** *(Best)* <br> 66.96% <br> 75.85% <br> 2.19 | 49.17% <br> 67.13% <br> 75.76% <br> **2.13** *(Best)* | 45.68% <br> 63.03% <br> 73.23% <br> 2.53 |
-| **CROHME 2019** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **48.54%** <br> **68.14%** <br> 77.23% <br> 2.40 | 46.71% <br> 66.89% <br> 75.90% <br> 2.62 | 47.87% <br> 67.81% <br> **77.98%** *(Best)* <br> **2.02** *(Best)* | 47.87% <br> 67.72% <br> 76.90% <br> 2.08 | 37.70% <br> 58.97% <br> 70.14% <br> 2.93 |
-| **Trung bình (Avg)** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance | **50.10%** <br> **68.68%** <br> **76.98%** <br> 2.20 | 47.84% <br> 66.12% <br> 75.29% <br> 2.21 | 49.17% <br> 67.17% <br> 76.40% <br> 2.14 | 48.98% <br> 67.43% <br> 76.61% <br> **2.06** *(Best)* | 43.35% <br> 62.00% <br> 72.27% <br> 2.65 |
+| **CROHME 2014** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance (MED) | **51.12%** <br> **69.98%** <br> **77.69%** <br> 1.99 | 49.39% <br> 66.53% <br> 75.25% <br> 2.22 | 48.88% <br> 66.73% <br> 75.36% <br> 2.19 | 49.90% <br> 67.44% <br> 77.18% <br> **1.98** | 46.65% <br> 63.99% <br> 73.43% <br> 2.48 |
+| **CROHME 2016** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance (MED) | 50.65% <br> **67.92%** <br> **76.02%** <br> 2.17 | 47.43% <br> 64.95% <br> 74.72% <br> 2.31 | **50.74%** <br> 66.96% <br> 75.85% <br> 2.19 | 49.17% <br> 67.13% <br> 75.76% <br> **2.13** | 45.68% <br> 63.03% <br> 73.23% <br> 2.53 |
+| **CROHME 2019** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance (MED) | **48.54%** <br> **68.14%** <br> 77.23% <br> 2.14 | 46.71% <br> 66.89% <br> 75.90% <br> 2.11 | 47.87% <br> 67.81% <br> **77.98%** <br> **2.02** | 47.87% <br> 67.72% <br> 76.90% <br> 2.08 | 37.70% <br> 58.97% <br> 70.14% <br> 2.93 |
+| **Trung bình (Macro Avg)** | ExpRate (Khớp 100%) <br> ExpRate $\le$ 1 <br> ExpRate $\le$ 2 <br> Mean Edit Distance (MED) | **50.10%** <br> **68.68%** <br> **76.98%** <br> 2.10 | 47.84% <br> 66.12% <br> 75.29% <br> 2.21 | **49.17%** <br> 67.17% <br> 76.40% <br> 2.14 | 48.98% <br> 67.43% <br> 76.61% <br> **2.06** | 43.35% <br> 62.00% <br> 72.27% <br> 2.65 |
 
 ---
 
-### 2. Phân tích Toàn bộ Quá trình Tiến bộ (Progression History Analysis)
+### 2. Phân tích Các Phát hiện Khoa học Cốt lõi
 
-Sự phát triển của TAMER (CNN-GNN) trải qua 4 bước ngoặt thiết kế kiến trúc quan trọng, mỗi giai đoạn mang lại một bài học khoa học sâu sắc:
-
-#### Giai đoạn 1: Naive GNN (M2) - Thất bại do nhòe vị trí (Position Encoding Blurring)
-*   **Thiết kế:** GAT chồng lên feature map DenseNet sau khi đã cộng 2D Positional Encoding (PE).
-*   **Hậu quả:** ExpRate giảm **-2.26%** so với Baseline. 
-*   **Bài học:** Cơ chế truyền tin đồ thị (message passing) thực chất là phép trung bình hóa có trọng số (weighted pooling) trên các node lân cận. Phép toán này vô tình làm mịn/nhòe các vector PE tuyệt đối sắc nét của từng pixel, dẫn đến lỗi dịch chuyển attention (Attention Alignment Shift) ở decoder khi giải mã cấu trúc 2D (như số mũ, chỉ số dưới).
-
-#### Giai đoạn 2: Corrected GNN (M3) - Khôi phục thông tin tọa độ tuyệt đối
-*   **Thiết kế:** Chuyển khối PE xuống **sau** khối GAT. Pixel truyền tin cục bộ trên feature map visual thuần túy trước, sau đó mới được đánh dấu tọa độ tuyệt đối sắc nét gửi tới decoder.
-*   **Kết quả:** ExpRate hồi phục mạnh mẽ lên **49.17%** (+1.33% từ GNN cũ), tiệm cận sát Baseline (50.10%), thậm chí vượt Baseline trên tập CROHME 2016.
-*   **Bài học:** Sự tuần tự giữa biểu diễn ngữ cảnh không gian và tọa độ tuyệt đối là cực kỳ quan trọng. Tọa độ địa lý phải là nhãn cố định được dán lên đặc trưng ngữ cảnh đồ thị hoàn chỉnh, không được phép tham gia vào quá trình truyền tin làm mịn đặc trưng.
-
-#### Giai đoạn 3: Coordinate-Aware GAT (M4) - Thiết lập Inductive Bias không gian
-*   **Thiết kế:** GAT tiêu chuẩn chỉ chú ý đến sự tương đồng visual của các pixel mà mất nhận thức về hướng (Direction-Agnostic). Phiên bản này tích hợp **Relative Position Bias kề 8-hướng** (9 trạng thái quan hệ tọa độ $\Delta x, \Delta y \in \{-1, 0, 1\}$) vào Attention logits, đồng thời tinh giảm số layer/head (1 Layer, 4 Heads) để tránh overfitting.
-*   **Kết quả:** Dù số tham số giảm mạnh, ExpRate đạt **48.98%**, và **Mean Edit Distance đạt kỷ lục 2.06** (vượt qua tất cả các mô hình, kể cả Baseline là 2.20).
-*   **Bài học:** Việc bổ sung **Relative Spatial Inductive Bias** hoạt động như một hướng dẫn hình học cho Attention Heads. Khi mô hình dự đoán sai, sai sót chỉ nằm ở mức 1-2 ký tự cục bộ chứ không bao giờ làm sụp đổ cấu trúc phân tầng phức tạp (như phân số hay căn thức).
-
-#### Giai đoạn 4: Scale-up Coordinate-Aware GAT (M5) - Điểm nghẽn truyền tin phi tuyến
-*   **Thiết kế:** Nâng cấp Coordinate-Aware GAT lên 2 layers và 8 heads với mong muốn tăng dung lượng biểu diễn.
-*   **Hậu quả:** Hiệu năng sụt giảm nghiêm trọng xuống **43.35%** (giảm tới **-5.63%** so với phiên bản 1 lớp).
-*   **Bài học (Negative Result quý giá):** 
-    1.  **Nghẽn đồ thị thưa:** Đồ thị lưới pixel rất thưa (mỗi node chỉ có tối đa 8 liên kết). Áp dụng `dropout=0.2` trên Attention và feature map liên tiếp qua 2 layers gây đứt gãy luồng lan truyền thông tin nghiêm trọng.
-    2.  **Méo mó phi tuyến:** Relative Bias được cộng vào logits *trước* khi qua các hàm kích hoạt phi tuyến (`LeakyReLU` ở lớp 1, rồi `ELU`, rồi `LeakyReLU` ở lớp 2). Việc đi qua chuỗi kích hoạt phi tuyến liên tiếp đã bẻ cong quan hệ khoảng cách tuyến tính ban đầu, biến thông tin tọa độ tương đối thành nhiễu phi tuyến phức tạp.
+1. **Baseline M1 là đối chứng mạnh nhất về ExpRate (50.10%):**
+   Mô hình DenseNet + Transformer Decoder không dùng GAT đạt tỷ lệ khớp chính xác 100% cao nhất trên trung bình 3 tập kiểm thử. Nghiên cứu giữ nguyên M1 làm đối chứng minh bạch, không loại bỏ kết quả bất lợi.
+2. **Ảnh hưởng của Vị trí Positional Encoding (M2 vs M3):**
+   * *M2 (PE trước GAT):* Message passing trên vector đã chứa PE làm mịn và nhòe thông tin tọa độ tuyệt đối, khiến ExpRate trung bình sụt giảm xuống 47.84% (-2.26% so với Baseline).
+   * *M3 (PE sau GAT):* Để GAT truyền tin trên đặc trưng visual thuần túy rồi mới cộng PE trước khi đưa vào Decoder giúp phục hồi ExpRate lên **49.17%** (+1.33% so với M2), vượt Baseline trên CROHME 2016 (50.74%) và đạt ExpRate $\le 2$ cao nhất trên CROHME 2019 (77.98%).
+3. **Khảo sát Coordinate-Aware Relative Bias (M4):**
+   * M4 bổ sung 9 quan hệ relative position bias trên lưới 8 hướng, đồng thời rút gọn cấu hình xuống 1 lớp / 4 heads. M4 đạt Mean Edit Distance trung bình thấp nhất (**2.06** so với **2.10** của Baseline), cho thấy khả năng bảo toàn cấu trúc tốt hơn khi gặp dự đoán sai.
+4. **Giới hạn Scale-up trên Đồ thị Lưới Thưa (M5 - Negative Result):**
+   * M5 nâng lên 2 lớp / 8 heads làm hiệu năng giảm mạnh xuống **43.35%**. Việc xếp chồng nhiều lớp phi tuyến (LeakyReLU/ELU) lên relative bias logits và dropout trên đồ thị lưới thưa gây đứt gãy luồng thông tin và làm biến dạng quan hệ khoảng cách tương đối.
 
 ---
+© 2026 Phan Hoàng Khải — Trường Đại học Công nghệ Kỹ thuật TP.HCM (HCMUTE). Đề án Thạc sĩ Khoa học Máy tính.
 
-### 3. Gợi ý Phiên bản Tốt nhất cho Đóng góp Khoa học (Scientific Recommendation)
-
-Mô hình **M4: Coordinate-Aware GAT (1L, 4H)** (Thư mục: `4_Coord_Aware_GAT_1L_4H`, Run ID: `skittish-worm-90`) là phiên bản tốt nhất và phù hợp nhất để làm đóng góp khoa học chính của bài báo.
-
-#### Lý do lựa chọn học thuật (Academic Rationale):
-
-1.  **Chỉ số Mean Edit Distance tối ưu nhất (2.06 vs 2.20 of Baseline):**
-    Trong bài toán nhận diện biểu thức toán học (HMER), tỷ lệ khớp 100% (ExpRate) rất nhạy cảm với các nét chữ viết tay dị biệt của con người. Tuy nhiên, **Mean Edit Distance** (Khoảng cách chỉnh sửa trung bình) mới là thước đo chính xác nhất cho thấy khả năng bảo toàn cấu trúc toán học của mô hình. Kết quả **2.06** của M4 cho thấy sự vượt trội về mặt cấu trúc so với Baseline.
-2.  **Tính hiệu quả và tối giản tham số (Efficiency & Parsimony):**
-    M4 chỉ sử dụng **1 lớp GAT và 4 heads** (lượng tham số cực kỳ nhỏ) nhưng mang lại hiệu năng tương đương bản GAT thông thường 2 lớp 8 heads và vượt trội về độ chính xác cấu trúc. Đây là minh chứng vàng cho việc áp dụng đúng đắn **Inductive Bias** thay vì tăng số lượng tham số mù quáng (càng nhiều tham số trên tập dữ liệu nhỏ càng dễ overfitting).
-3.  **Tính mới về mặt khoa học (Scientific Novelty):**
-    *   **Phát hiện 1: PE Blurring Effect:** Minh chứng toán học và thực nghiệm về sự triệt tiêu thông tin vị trí khi GAT đứng trước Positional Encoding trên lưới pixel.
-    *   **Phát hiện 2: Coordinate-Aware Relative Bias on Pixel Grids:** Thiết kế ma trận Relative Bias 9 trạng thái hoạt động hiệu quả trên cấu trúc kề 8-hướng của ảnh, một thay thế hoàn hảo cho cơ chế tích chập định hướng truyền thống của CNN.
-    *   **Phát hiện 3: Không nên chồng nhiều tầng GAT trên đồ thị lưới ảnh:** Phân tích thực nghiệm từ M5 chỉ ra giới hạn của việc chồng lớp phi tuyến lên ma trận relative bias logits và dropout trên đồ thị thưa.
-
-#### Đề xuất cấu trúc luận điểm trong Paper:
-*   **Abstract/Introduction:** Đặt vấn đề về việc Transformer Decoder trong HMER thường gặp lỗi lệch dòng (alignment shift) do DenseNet thiếu liên kết ngữ cảnh cấu trúc cục bộ. Đề xuất TAMER (CNN-GNN) kết hợp GAT để giải quyết.
-*   **Methodology:** Trình bày chi tiết toán học của **GAT trên lưới đồ thị kề 8-hướng**, giải pháp chuyển **PE ra sau GAT** để tránh Blurring Effect, và thuật toán **Coordinate-Aware Relative Bias** kề 8-hướng.
-*   **Experiments & Discussion:** Đưa bảng tổng hợp 5 mô hình trên vào. Nhấn mạnh việc M4 đạt **Mean Edit Distance 2.06** và phân tích kết quả âm (negative result) của M5 để làm bài học định hướng thiết kế mạng GNN trên cấu trúc ảnh cho cộng đồng khoa học.
-
----
-© 2026 Phan Hoàng Khải - Đại học Sư phạm Kỹ thuật TPHCM (HCMUTE). Báo cáo thực nghiệm chuyên đề tốt nghiệp.

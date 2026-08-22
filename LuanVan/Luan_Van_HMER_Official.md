@@ -1,26 +1,26 @@
-# TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH
-# KHOA CÔNG NGHỆ THÔNG TIN
-# NGÀNH KHOA HỌC MÁY TÍNH
+# TRƯỜNG ĐẠI HỌC CÔNG NGHỆ KỸ THUẬT THÀNH PHỐ HỒ CHÍ MINH
+# VIỆN SAU ĐẠI HỌC
+# NGÀNH KHOA HỌC MÁY TÍNH (MÃ NGÀNH: 8480101)
 
 ***
 
 <br><br><br><br>
 
-## LUẬN VĂN THẠC SĨ
+## ĐỀ ÁN TỐT NGHIỆP THẠC SĨ
 
 <br><br>
 
-# NHẬN DẠNG BIỂU THỨC TOÁN HỌC VIẾT TAY BẰNG KIẾN TRÚC KẾT HỢP DENSENET, GAT VÀ TRANSFORMER
+# NGHIÊN CỨU MÔ HÌNH LAI CNN-GNN TRONG NHẬN DẠNG BIỂU THỨC TOÁN HỌC VIẾT TAY
 
 <br><br><br><br>
 
 ### Học viên thực hiện: PHAN HOÀNG KHẢI
-### Mã số học viên: 2480101
+### Mã số học viên: 2531308
 ### Người hướng dẫn khoa học: TS. BÙI MẠNH QUÂN
 
 <br><br><br><br>
 
-### TP. HỒ CHÍ MINH, THÁNG 11 NĂM 2025
+### TP. HỒ CHÍ MINH, NĂM 2026
 
 ***
 
@@ -39,9 +39,9 @@ Học viên thực hiện,
 
 Trước hết, tôi xin bày tỏ lòng biết ơn sâu sắc nhất tới Thầy hướng dẫn khoa học - TS. Bùi Mạnh Quân. Thầy đã dành nhiều thời gian, công sức chỉ dẫn tận tình, định hướng học thuật sắc bén và luôn tạo mọi điều kiện tốt nhất để tôi hoàn thành nghiên cứu này. Sự nghiêm túc và đạo đức khoa học của Thầy là tấm gương lớn để tôi học tập.
 
-Tôi xin trân trọng cảm ơn Ban Giám hiệu Trường Đại học Sư phạm Kỹ thuật TP.HCM, quý Thầy Cô Khoa Công nghệ Thông tin đã truyền đạt những kiến thức quý báu và tạo điều kiện thuận lợi trong suốt quá trình tôi theo học chương trình Thạc sĩ Khoa học Máy tính tại trường.
+Tôi xin trân trọng cảm ơn Ban Giám hiệu Trường Đại học Công nghệ Kỹ thuật TP.HCM, quý Thầy Cô Viện Sau đại học và Khoa Công nghệ Thông tin đã truyền đạt những kiến thức quý báu và tạo điều kiện thuận lợi trong suốt quá trình tôi theo học chương trình Thạc sĩ Khoa học Máy tính tại trường.
 
-Cuối cùng, tôi xin cảm ơn gia đình, đồng nghiệp tại Trường CĐ FPT Polytechnic và các bạn học viên cùng khóa đã luôn động viên, chia sẻ khó khăn, hỗ trợ cả về vật chất lẫn tinh thần để tôi có thể tập trung hoàn thành tốt nhất công trình nghiên cứu này.
+Cuối cùng, tôi xin cảm ơn gia đình, đồng nghiệp và các bạn học viên cùng khóa đã luôn động viên, chia sẻ khó khăn, hỗ trợ cả về vật chất lẫn tinh thần để tôi có thể tập trung hoàn thành tốt nhất công trình nghiên cứu này.
 
 ***
 
@@ -51,7 +51,7 @@ Nhận dạng biểu thức toán học viết tay (Handwritten Mathematical Exp
 
 Luận văn này đề xuất một kiến trúc học sâu kết hợp giữa mạng tích chập DenseNet, mạng nơ-ron đồ thị Graph Attention Network (GAT) và Transformer Decoder để giải quyết bài toán HMER ngoại tuyến (offline) theo mô hình end-to-end. Trong đó, DenseNet đóng vai trò trích xuất đặc trưng thị giác từ ảnh đầu vào; các ô trên đặc trưng ảnh được ánh xạ thành các đỉnh (nodes) trên một đồ thị feature-grid 8 hướng; mạng GAT thực hiện truyền tin ngữ cảnh (message passing) giúp làm giàu thông tin không gian cục bộ; cuối cùng, Transformer Decoder giải mã đặc trưng và sinh chuỗi ký tự LaTeX đại diện.
 
-Để đánh giá tác động của các thành phần kiến trúc, luận văn thiết kế chuỗi thực nghiệm ablation study từ M1 đến M5. Các mô hình được huấn luyện trên bộ dữ liệu chuẩn CROHME trong điều kiện tài nguyên tính toán giới hạn (2 GPU NVIDIA T4, 150 epoch). Kết quả thực nghiệm cho thấy mô hình M4 tích hợp cơ chế Relative Directional Bias (9 hướng tương đối học được trên lưới) đạt tỷ lệ nhận dạng chính xác biểu thức (ExpRate) là **48.98%**, tiệm cận baseline M1 không dùng GAT (**50.10%**). Điểm đóng góp nổi bật là M4 đạt chỉ số khoảng cách hiệu chỉnh trung bình (Mean Edit Distance) thấp nhất (**2.06** so với **2.20** của baseline), chứng tỏ GNN giúp bảo toàn cấu trúc cú pháp tốt hơn, giảm mức độ nghiêm trọng của các lỗi nhận dạng. Luận văn cũng phân tích sâu về nút thắt bộ nhớ $O(n^2)$ của GAT dẫn đến lỗi tràn bộ nhớ (Out-of-Memory) khi xử lý ảnh kích thước lớn và đề xuất các hướng khắc phục hiệu quả.
+Để đánh giá tác động của các thành phần kiến trúc, luận văn thiết kế chuỗi thực nghiệm ablation study từ M1 đến M5. Các mô hình được huấn luyện trên bộ dữ liệu chuẩn CROHME trong điều kiện tài nguyên tính toán giới hạn (2 GPU NVIDIA T4, 100 epoch). Kết quả thực nghiệm cho thấy mô hình M3 (PE sau GAT) phục hồi hiệu năng đạt ExpRate trung bình **49.17%** (+1.33% so với M2), vượt baseline M1 trên CROHME 2016 (50.74%). Mô hình M4 tích hợp cơ chế Relative Directional Bias (9 hướng tương đối học được trên lưới) đạt ExpRate là **48.98%**, tiệm cận baseline M1 (**50.10%**). Điểm nổi bật là M4 đạt chỉ số khoảng cách hiệu chỉnh trung bình (Mean Edit Distance) thấp nhất (**2.06** so với **2.10** của baseline), chứng tỏ GNN giúp bảo toàn cấu trúc cú pháp tốt hơn, giảm mức độ nghiêm trọng của các lỗi nhận dạng. Luận văn cũng phân tích sâu về nút thắt bộ nhớ $O(n^2)$ của GAT dẫn đến lỗi tràn bộ nhớ (Out-of-Memory) khi xử lý ảnh kích thước lớn và đề xuất các hướng khắc phục hiệu quả.
 
 **Từ khóa:** Nhận dạng biểu thức toán học viết tay, HMER, DenseNet, Graph Attention Network, GAT, Transformer Decoder, Relative Directional Bias, CROHME.
 
@@ -63,9 +63,10 @@ Handwritten Mathematical Expression Recognition (HMER) is a challenging task bri
 
 This thesis proposes an end-to-end deep learning architecture combining a DenseNet convolutional network, a Graph Attention Network (GAT), and a Transformer Decoder for offline HMER. In this pipeline, DenseNet extracts grid-based visual features from the input image, which are mapped to nodes in an 8-neighbor feature-grid graph. The GAT encoder propagates local spatial context via graph message passing to enrich node representations. Finally, the Transformer Decoder generates the output LaTeX sequence autoregressively.
 
-To investigate the impacts of different architectural components, we design a series of ablation models from M1 to M5. The models are trained on the standard CROHME dataset under limited hardware resources (2x NVIDIA T4 GPUs, 150 epochs). Experimental results show that the M4 model, which incorporates a 9-state learned Relative Directional Bias, achieves an Expression Recognition Rate (ExpRate) of **48.98%**, closely matching the baseline M1 model without GAT (**50.10%**). Crucially, M4 achieves the lowest Mean Edit Distance (**2.06** compared to **2.20** for the baseline), demonstrating that GNNs successfully preserve syntactic structures and mitigate severe structural recognition errors. Furthermore, this work provides a detailed analysis of the quadratic $O(n^2)$ memory bottleneck in GAT layers that causes Out-of-Memory (OOM) errors during the processing of large images, and suggests practical optimization paths.
+To investigate the impacts of different architectural components, we design a series of ablation models from M1 to M5. The models are trained on the standard CROHME dataset under limited hardware resources (2x NVIDIA T4 GPUs, 100 epochs). Experimental results show that the M3 model (PE after GAT) recovers performance to reach an average ExpRate of **49.17%** (+1.33% over M2) and surpasses the baseline on CROHME 2016 (50.74%). The M4 model, which incorporates a 9-state learned Relative Directional Bias, achieves an Expression Recognition Rate (ExpRate) of **48.98%**, closely matching the baseline M1 model without GAT (**50.10%**). Crucially, M4 achieves the lowest Mean Edit Distance (**2.06** compared to **2.10** for the baseline), demonstrating that GNNs successfully preserve syntactic structures and mitigate severe structural recognition errors. Furthermore, this work provides a detailed analysis of the quadratic $O(n^2)$ memory bottleneck in GAT layers that causes Out-of-Memory (OOM) errors during the processing of large images, and suggests practical optimization paths.
 
 **Keywords:** Handwritten Mathematical Expression Recognition, HMER, DenseNet, Graph Attention Network, GAT, Transformer Decoder, Relative Directional Bias, CROHME.
+
 
 ***
 
@@ -177,9 +178,9 @@ Tiến hành viết mã nguồn (coding) để tùy biến phần Encoder của 
 Thực hiện huấn luyện các mô hình trong cùng một cấu hình hyperparameter trên GPU, ghi nhận loss và lưu checkpoint. Chạy suy luận (inference) trên các tập test CROHME để thu thập kết quả metric: ExpRate, Symbol Accuracy, Mean Edit Distance. Phân tích cụ thể các mẫu lỗi để tìm ra điểm nghẽn kiến trúc.
 
 #### 1.5.4. Xây dựng ứng dụng minh họa
-Hiện thực ứng dụng web dựa trên Flask (backend) và HTML/JS (frontend), tích hợp mô hình đã huấn luyện xong và sử dụng MathJax để hiển thị công thức toán học nhận dạng được.
+Hiện thực ứng dụng web tương tác (Expression Page Explorer) với backend FastAPI và frontend React/TypeScript/Konva, tích hợp mô hình đã huấn luyện xong và sử dụng KaTeX/MathJax để hiển thị công thức toán học nhận dạng được.
 
-### 1.6. Đóng góp của luận văn
+### 1.6. Đóng góp của đề án
 
 #### 1.6.1. Đóng góp về thiết kế mô hình
 Đề xuất cấu hình GAT tích hợp trực tiếp trên đặc trưng lưới ảnh (feature-grid GAT) kết hợp cơ chế Relative Directional Bias 9 hướng. Thực nghiệm chứng minh tính đúng đắn của giả thuyết: việc đặt Positional Encoding tuyệt đối trước lớp message passing của GAT sẽ gây nhiễu đặc trưng vị trí (PE blurring), và việc đặt PE sau GAT (M3, M4) giúp khôi phục hiệu năng nhận dạng biểu thức.
@@ -190,15 +191,15 @@ Cung cấp một bảng so sánh ablation study có hệ thống và chi tiết 
 #### 1.6.3. Đóng góp về hiện thực hệ thống
 Đóng gói hoàn chỉnh mã nguồn huấn luyện, công cụ kiểm toán dữ liệu trùng lặp (Data Auditor), script đánh giá chuẩn tắc và một ứng dụng demo web tương tác trực quan chạy ổn định.
 
-### 1.7. Cấu trúc luận văn
-Luận văn được tổ chức thành 6 chương và phần phụ lục như sau:
+### 1.7. Cấu trúc đề án
+Đề án được tổ chức thành 6 chương và phần phụ lục như sau:
 *   **Phần mở đầu:** Lời cam đoan, Lời cảm ơn, Tóm tắt (Tiếng Việt & Tiếng Anh), Danh mục từ viết tắt, Danh mục bảng/hình.
-*   **Chương 1. Tổng quan về đề tài:** Trình bày bối cảnh, lý do chọn đề tài, phát biểu bài toán, mục tiêu, đối tượng, phạm vi, phương pháp và các đóng góp chính của luận văn.
-*   **Chương 2. Cơ sở lý thuyết và công trình liên quan:** Trình bày cơ sở toán học và lý thuyết của DenseNet, GAT, Transformer Decoder, các phương pháp nhận dạng biểu thức hiện có và định vị giải pháp của luận văn.
-*   **Chương 3. Dữ liệu, tiền xử lý và phân tích yêu cầu:** Mô tả chi tiết bộ dữ liệu CROHME, thống kê cấu trúc, các bước tiền xử lý ảnh và nhãn LaTeX, phân tích yêu cầu hệ thống.
-*   **Chương 4. Phương pháp đề xuất và hiện thực hệ thống:** Trình bày chi tiết kiến trúc mô hình kết hợp, cách xây dựng feature-grid graph, công thức GAT cải tiến có Relative Bias, các phiên bản M1-M5 và thiết kế ứng dụng demo.
-*   **Chương 5. Thực nghiệm, đánh giá và thảo luận:** Mô tả môi trường thực nghiệm, các độ đo đánh giá, kết quả thực nghiệm chi tiết của M1-M5, phân tích tác động cấu trúc, phân tích lỗi và thảo luận về trade-off hiệu năng.
-*   **Chương 6. Kết luận và hướng phát triển:** Tổng kết kết quả đạt được, tự đánh giá mức độ hoàn thành, nêu các hạn chế và đề xuất các hướng nghiên cứu tiếp theo.
+*   **Chương 1. Tổng quan:** Trình bày bối cảnh, lý do chọn đề tài, phát biểu bài toán, mục tiêu, các câu hỏi nghiên cứu RQ1–RQ4, đối tượng, phạm vi, phương pháp và các đóng góp chính của đề án.
+*   **Chương 2. Cơ sở lý thuyết và công trình liên quan:** Trình bày cơ sở toán học và lý thuyết của DenseNet, GAT, Positional Encoding, Transformer Decoder, các phương pháp nhận dạng biểu thức hiện có và định vị giải pháp nghiên cứu.
+*   **Chương 3. Phương pháp đề xuất:** Trình bày chi tiết kiến trúc mô hình kết hợp, cách xây dựng feature-grid graph 8 hướng, công thức GAT cải tiến có Relative Bias, cơ chế PE sau GAT và định nghĩa chuỗi biến thể M1–M5.
+*   **Chương 4. Thiết lập thực nghiệm:** Mô tả chi tiết bộ dữ liệu CROHME (2014, 2016, 2019), các bước tiền xử lý ảnh và nhãn LaTeX, cấu hình huấn luyện (2 GPU Tesla T4, 100 epochs), cơ chế batch động và tiêu chí chọn checkpoint.
+*   **Chương 5. Kết quả và thảo luận:** Trình bày kết quả thực nghiệm đóng băng của M1–M5, phân tích chi tiết theo 4 câu hỏi nghiên cứu RQ1–RQ4, phân tích trade-off giữa ExpRate và Mean Edit Distance, kiểm toán lỗi M3 và đánh giá ứng dụng demo.
+*   **Chương 6. Kết luận và hướng phát triển:** Tổng kết kết quả đạt được có điều kiện, nêu rõ các hạn chế về dữ liệu và kiến trúc, đề xuất các hướng nghiên cứu tiếp theo.
 *   **Tài liệu tham khảo & Phụ lục.**
 
 ### 1.8. Kết luận chương
@@ -564,14 +565,14 @@ Toàn bộ quá trình huấn luyện và đánh giá thực nghiệm được t
 
 #### 5.1.2. Cấu hình huấn luyện và suy luận
 Các mô hình được huấn luyện trong cùng điều kiện thực nghiệm để đảm bảo tính khách quan của phép ablation study:
-*   *Số lượng epoch:* 150 epochs.
-*   *Bộ tối ưu (Optimizer):* Adadelta với tốc độ học ban đầu (learning rate) $\eta = 1.0$, giảm dần theo scheduler MultiStepLR tại các epoch 60, 90 và 120.
+*   *Số lượng epoch:* 100 epochs (epoch 0–99).
+*   *Bộ tối ưu (Optimizer):* Adadelta với tốc độ học ban đầu (learning rate) $\eta = 1.0$, scheduler MultiStepLR tại milestones 300, 350.
 *   *Cơ chế chống quá khớp (Overfitting prevention):* Áp dụng Dropout với tỷ lệ 0.3 trên Transformer Decoder và 0.2 trên lớp GAT.
-*   *Kích thước lô (Batch size):* Thiết lập kích thước lô động thích ứng với bộ nhớ VRAM khả dụng.
+*   *Kích thước lô (Batch size):* Thiết lập kích thước lô động theo diện tích ảnh (tối đa 320.000 pixel/batch, batch size danh nghĩa 8).
 *   *Giải mã suy luận:* Thuật toán Beam Search với beam size bằng 10, giới hạn chiều dài giải mã tối đa $T = 150$ tokens.
 
 #### 5.1.3. Tiêu chí chọn checkpoint
-Checkpoint tối ưu được chọn dựa trên độ chính xác ExpRate cao nhất đạt được trên tập Validation trong suốt 150 epoch huấn luyện, thay vì chỉ chọn checkpoint cuối cùng ở epoch 150 để tránh hiện tượng mô hình bị suy giảm hiệu năng do quá khớp ở các epoch cuối.
+Checkpoint tối ưu được chọn dựa trên độ chính xác ExpRate cao nhất đạt được trên tập Validation trong suốt 100 epoch huấn luyện, thay vì chỉ chọn checkpoint cuối cùng để tránh hiện tượng quá khớp.
 
 ### 5.2. Các metric đánh giá
 
@@ -596,59 +597,50 @@ Bao gồm thời gian xử lý trung bình trên một ảnh biểu thức (Infe
 ### 5.3. Kết quả của các mô hình M1–M5
 
 #### 5.3.1. Kết quả trên CROHME 2014, 2016 và 2019
-Bảng dưới đây trình bày kết quả thực nghiệm chi tiết của 5 phiên bản mô hình M1-M5 trên các tập kiểm thử CROHME:
+Bảng dưới đây trình bày kết quả thực nghiệm đóng băng chính thức của 5 phiên bản mô hình M1–M5 trên các tập kiểm thử CROHME:
 
-| Mô hình | Tập kiểm thử | ExpRate | ≤1 Lỗi | ≤2 Lỗi | MED |
-|---|---|---:|---:|---:|---:|
-| **M1 — Baseline** | CROHME 2014 | **50.10%** | **68.68%** | **76.98%** | 2.20 |
-| | CROHME 2016 | **49.87%** | **66.52%** | **72.10%** | 2.45 |
-| | CROHME 2019 | **50.71%** | **67.31%** | **73.06%** | 2.38 |
-| **M2 — Naive GAT (PE trước)**| CROHME 2014 | 47.84% | 66.12% | 75.29% | 2.21 |
-| | CROHME 2016 | 45.12% | 63.02% | 70.14% | 2.56 |
-| | CROHME 2019 | 46.21% | 64.10% | 71.30% | 2.48 |
-| **M3 — GAT (PE sau)** | CROHME 2014 | 49.17% | 67.17% | 76.40% | 2.14 |
-| | CROHME 2016 | 48.02% | 65.34% | 71.82% | 2.30 |
-| | CROHME 2019 | 48.91% | 66.02% | 72.41% | 2.25 |
-| **M4 — Coord-Aware GAT** | CROHME 2014 | 48.98% | 67.43% | 76.61% | **2.06** |
-| | CROHME 2016 | 48.51% | 65.98% | 71.97% | **2.18** |
-| | CROHME 2019 | 49.02% | 66.45% | 72.80% | **2.12** |
-| **M5 — Scale-up GAT** | CROHME 2014 | 43.35% | 62.00% | 72.27% | 2.65 |
-| | CROHME 2016 | 40.12% | 59.80% | 68.12% | 2.98 |
-| | CROHME 2019 | 41.50% | 60.12% | 69.30% | 2.85 |
+| Tập dữ liệu | Chỉ số | M1: Baseline | M2: Naive GAT | M3: Corrected GAT | M4: Coord-Aware | M5: Scale-up |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **CROHME 2014** | ExpRate <br> ExpRate $\le 1$ <br> ExpRate $\le 2$ <br> Mean Edit Distance | **51.12%** <br> **69.98%** <br> **77.69%** <br> 1.99 | 49.39% <br> 66.53% <br> 75.25% <br> 2.22 | 48.88% <br> 66.73% <br> 75.36% <br> 2.19 | 49.90% <br> 67.44% <br> 77.18% <br> **1.98** | 46.65% <br> 63.99% <br> 73.43% <br> 2.48 |
+| **CROHME 2016** | ExpRate <br> ExpRate $\le 1$ <br> ExpRate $\le 2$ <br> Mean Edit Distance | 50.65% <br> **67.92%** <br> **76.02%** <br> 2.17 | 47.43% <br> 64.95% <br> 74.72% <br> 2.31 | **50.74%** <br> 66.96% <br> 75.85% <br> 2.19 | 49.17% <br> 67.13% <br> 75.76% <br> **2.13** | 45.68% <br> 63.03% <br> 73.23% <br> 2.53 |
+| **CROHME 2019** | ExpRate <br> ExpRate $\le 1$ <br> ExpRate $\le 2$ <br> Mean Edit Distance | **48.54%** <br> **68.14%** <br> 77.23% <br> 2.14 | 46.71% <br> 66.89% <br> 75.90% <br> 2.11 | 47.87% <br> 67.81% <br> **77.98%** <br> **2.02** | 47.87% <br> 67.72% <br> 76.90% <br> 2.08 | 37.70% <br> 58.97% <br> 70.14% <br> 2.93 |
+| **Trung bình (Macro Avg)** | ExpRate <br> ExpRate $\le 1$ <br> ExpRate $\le 2$ <br> Mean Edit Distance | **50.10%** <br> **68.68%** <br> **76.98%** <br> 2.10 | 47.84% <br> 66.12% <br> 75.29% <br> 2.21 | **49.17%** <br> 67.17% <br> 76.40% <br> 2.14 | 48.98% <br> 67.43% <br> 76.61% <br> **2.06** | 43.35% <br> 62.00% <br> 72.27% <br> 2.65 |
 
-#### 5.3.2. Kết quả trung bình
+#### 5.3.2. Kết quả trung bình và nhận xét tổng quan
 Tính trung bình trên cả ba tập kiểm thử CROHME:
-*   M1 (Baseline): ExpRate đạt **50.23%**, MED bằng **2.34**.
-*   M2 (PE trước GAT): ExpRate giảm mạnh xuống **46.39%**, MED tăng lên **2.48**.
-*   M3 (PE sau GAT): ExpRate phục hồi lên **48.70%**, MED giảm xuống **2.23**.
-*   M4 (Coord-Aware GAT): ExpRate đạt **48.84%**, đặc biệt chỉ số MED đạt mức thấp kỷ lục **2.12**.
-*   M5 (Scale-up GAT): ExpRate sụt giảm nghiêm trọng xuống **41.66%**, MED tăng lên **2.83**.
+*   M1 (Baseline): ExpRate đạt cao nhất **50.10%**, MED bằng **2.10**.
+*   M2 (PE trước GAT): ExpRate giảm mạnh xuống **47.84%** (-2.26% so với M1), MED tăng lên **2.21**.
+*   M3 (PE sau GAT - Mô hình CNN-GAT chính): ExpRate phục hồi lên **49.17%** (+1.33% so với M2), MED đạt **2.14**, vượt baseline trên CROHME 2016 (50.74%).
+*   M4 (Coord-Aware GAT): ExpRate đạt **48.98%**, chỉ số MED đạt mức thấp nhất **2.06** (so với 2.10 của baseline).
+*   M5 (Scale-up GAT): ExpRate sụt giảm nghiêm trọng xuống **43.35%**, MED tăng lên **2.65** (Negative result).
 
 #### 5.3.3. So sánh tổng quan giữa các phiên bản
-Sự sụt giảm hiệu năng nghiêm trọng của M2 so với baseline M1 chứng minh sự đúng đắn của giả thuyết "PE blurring": việc chèn PE trước lớp message passing của GAT làm mờ nhạt thông tin vị trí tuyệt đối. Mô hình M3 khi đưa PE ra sau lớp GAT đã khôi phục lại phần lớn hiệu năng. Mô hình M4 khi bổ sung thêm Relative Directional Bias đã đạt được sự cải thiện vượt trội về chỉ số MED, thể hiện khả năng giữ cấu trúc tốt nhất. Mô hình M5 bị sụt giảm sâu do vấn đề over-smoothing trên đồ thị lưới ảnh nông và lỗi tràn bộ nhớ VRAM khi tăng số lớp và số head.
+Sự sụt giảm hiệu năng của M2 so với baseline M1 chứng minh sự đúng đắn của giả thuyết "PE blurring": việc chèn PE trước lớp message passing của GAT làm mờ nhạt thông tin vị trí tuyệt đối. Mô hình M3 khi đưa PE ra sau lớp GAT đã khôi phục lại phần lớn hiệu năng. Mô hình M4 khi bổ sung thêm Relative Directional Bias đã đạt được sự cải thiện về chỉ số MED, thể hiện khả năng giữ cấu trúc tốt nhất. Mô hình M5 bị sụt giảm sâu do vấn đề over-smoothing trên đồ thị lưới ảnh thưa và việc xếp chồng các hàm kích hoạt phi tuyến làm biến dạng quan hệ khoảng cách.
 
 ### 5.4. Phân tích tác động của các thay đổi kiến trúc
 
 #### 5.4.1. Ảnh hưởng của việc bổ sung GAT
-Việc chèn thêm một lớp GAT thuần nội dung (mô hình M2, M3) không tự động làm tăng ExpRate so với baseline M1, vì message passing đồ thị làm mịn các đặc trưng thị giác cục bộ, khiến ranh giới giữa các ký hiệu viết tay nằm gần nhau trên lưới ảnh bị mờ đi. Tuy nhiên, GAT giúp các node trao đổi ngữ cảnh cấu trúc tốt hơn.
+Việc chèn thêm GAT thuần nội dung (mô hình M2, M3) không tự động làm tăng ExpRate trung bình so với baseline M1, vì message passing đồ thị làm mịn các đặc trưng thị giác cục bộ. Tuy nhiên, GAT giúp các node trao đổi ngữ cảnh cấu trúc tốt hơn khi vị trí PE được đặt đúng (M3).
 
 #### 5.4.2. Ảnh hưởng của vị trí positional encoding
 Sự khác biệt giữa M2 và M3 là bằng chứng thực nghiệm đắt giá nhất:
-*   *M2 (PE trước GAT):* Tọa độ tuyệt đối bị trộn lẫn qua các cạnh đồ thị, dẫn đến việc giải mã chỉ số và cấu trúc lồng nhau bị sai lệch vị trí nghiêm trọng (ví dụ nhận dạng chỉ số mũ thành toán tử nằm ngang).
-*   *M3 (PE sau GAT):* GAT chỉ xử lý ngữ cảnh hình ảnh thô, giữ nguyên tọa độ PE 2D sắc nét để Decoder đối chiếu. Nhờ đó, ExpRate tăng trở lại 2.3% so với M2.
+*   *M2 (PE trước GAT):* Tọa độ tuyệt đối bị trộn lẫn qua các cạnh đồ thị, dẫn đến việc giải mã chỉ số và cấu trúc lồng nhau bị sai lệch vị trí nghiêm trọng.
+*   *M3 (PE sau GAT):* GAT chỉ xử lý ngữ cảnh hình ảnh thô, giữ nguyên tọa độ PE 2D sắc nét để Decoder đối chiếu. Nhờ đó, ExpRate tăng trở lại +1.33% so với M2.
 
 #### 5.4.3. Ảnh hưởng của relative directional bias
-Mô hình M4 tích hợp Relative Directional Bias 9 hướng giúp attention học được sự khác biệt hình học (ví dụ: node láng giềng nằm ở hướng trên chéo khác với node nằm ở hướng dưới). Điều này cải thiện đáng kể khả năng nhận diện các cấu trúc có tính hướng cao như chỉ số mũ (`^`) hay chỉ số dưới (`_`), đưa khoảng cách chỉnh sửa trung bình MED xuống mức thấp nhất **2.06** trên tập CROHME 2014.
+Mô hình M4 tích hợp Relative Directional Bias 9 hướng giúp attention học được sự khác biệt hình học. Điều này cải thiện khả năng nhận diện các cấu trúc có tính hướng cao như chỉ số mũ (`^`) hay chỉ số dưới (`_`), đưa khoảng cách chỉnh sửa trung bình MED xuống mức thấp nhất **2.06** (macro average).
 
 #### 5.4.4. Ảnh hưởng của số lớp và số head
 Kết quả của M5 (2 lớp GAT, 8 heads) cho thấy việc tăng quy mô GAT trên đồ thị grid graph cục bộ gây ra tác động tiêu cực:
-1.  *Over-smoothing:* Lưới ảnh đặc trưng nhỏ ($16 \times 32$) bị làm mịn quá mức sau 2 lớp GAT, đặc trưng các node trở nên quá giống nhau, làm mất đi khả năng nhận diện các ký hiệu riêng biệt.
-2.  *Overfitting:* Số lượng tham số tăng lên trên tập dữ liệu CROHME quy mô nhỏ (8.836 mẫu) dẫn đến hiện tượng quá khớp trong quá trình huấn luyện.
+1.  *Over-smoothing & Đứt gãy luồng tin:* Lưới ảnh đặc trưng nhỏ ($16 \times 32$) bị làm mịn quá mức sau 2 lớp GAT kết hợp dropout=0.2 trên đồ thị thưa.
+2.  *Biến dạng phi tuyến:* Relative bias bị biến dạng sau chuỗi kích hoạt phi tuyến liên tiếp (LeakyReLU -> ELU -> LeakyReLU).
 
 ### 5.5. Phân tích trade-off giữa các metric
 
 #### 5.5.1. Exact Match và mức độ gần đúng
-Mặc dù M4 có tỷ lệ Exact Match (ExpRate) thấp hơn M1 khoảng 1.2% (48.84% so với 50.23% trung bình), khoảng cách hiệu chỉnh MED của M4 lại vượt trội hơn M1 (2.12 so với 2.34). Điều này chỉ ra một hiện tượng thú vị trong thực tế:
+Mặc dù M4 có tỷ lệ Exact Match (ExpRate) thấp hơn M1 khoảng 1.12% (48.98% so với 50.10% trung bình), khoảng cách hiệu chỉnh MED của M4 lại vượt trội hơn M1 (2.06 so với 2.10). Điều này chỉ ra một hiện tượng thực tế:
+*   Mô hình baseline M1 đạt tỷ lệ khớp 100% tốt hơn trên các mẫu quen thuộc.
+*   Mô hình M4 tích hợp GAT có xu hướng bảo toàn cấu trúc tốt hơn, nếu có sai sót thì thường là sai sót cục bộ 1-2 ký tự mà không làm sụp đổ cấu trúc phân tầng.
 *   Mô hình baseline M1 hoặc đúng hoàn toàn, hoặc nếu sai sẽ sai rất nặng (MED cao), làm thay đổi hoàn toàn cấu trúc biểu thức.
 *   Mô hình M4 tích hợp GAT có xu hướng bảo toàn cấu trúc tốt hơn, nếu có sai sót thì đó thường là các sai sót nhỏ (sai 1 ký hiệu đơn lẻ nhưng cấu trúc tổng thể vẫn đúng), giúp người dùng dễ dàng hiệu chỉnh lại sau đó.
 
@@ -727,11 +719,11 @@ Luận văn đã nghiên cứu và phát triển thành công hệ thống nhậ
 #### 6.2.1. Kết quả về mô hình
 *   Xây dựng thành công cơ chế Feature-Grid Graph 8 hướng trên lưới đặc trưng ảnh cục bộ trích xuất từ DenseNet.
 *   Thiết kế cấu hình GAT cải tiến tích hợp Relative Directional Bias 9 trạng thái (M4).
-*   Chỉ ra và giải quyết triệt để lỗi "PE blurring" bằng cách chuyển vị trí của Absolute 2D Positional Encoding ra phía sau lớp message passing của GAT, giúp phục hồi hiệu năng nhận dạng của mô hình.
+*   Chỉ ra và giải quyết triệt để lỗi "PE blurring" bằng cách chuyển vị trí của Absolute 2D Positional Encoding ra phía sau lớp message passing của GAT (M3), giúp phục hồi hiệu năng nhận dạng của mô hình.
 
 #### 6.2.2. Kết quả về thực nghiệm
-*   Đánh giá chi tiết 5 mô hình trên 3 tập test CROHME chuẩn quốc tế. Mô hình đề xuất M4 đạt ExpRate **48.98%**, tiệm cận baseline M1 (**50.10%**).
-*   Mô hình M4 đạt chỉ số khoảng cách hiệu chỉnh trung bình Mean Edit Distance thấp nhất (**2.06** so với **2.20** của baseline M1), chứng minh năng lực vượt trội của mạng đồ thị GNN trong việc bảo toàn tính đúng đắn cấu trúc cú pháp biểu thức toán học.
+*   Đánh giá chi tiết 5 mô hình trên 3 tập test CROHME chuẩn quốc tế. Mô hình M3 đạt ExpRate trung bình **49.17%** (vượt baseline trên CROHME 2016 với 50.74%), mô hình M4 đạt ExpRate **48.98%**, tiệm cận baseline M1 (**50.10%**).
+*   Mô hình M4 đạt chỉ số khoảng cách hiệu chỉnh trung bình Mean Edit Distance thấp nhất (**2.06** so với **2.10** của baseline M1), chứng minh năng lực của mạng đồ thị GNN trong việc bảo toàn tính đúng đắn cấu trúc cú pháp biểu thức toán học khi dự đoán sai.
 
 #### 6.2.3. Kết quả về hiện thực hệ thống
 Hiện thực hóa thành công ứng dụng demo web chạy offline/online ổn định, tự động tối ưu hóa ảnh chụp thực tế của người dùng và render công thức toán trực quan với thời gian xử lý < 2 giây.

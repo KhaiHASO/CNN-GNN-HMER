@@ -1194,7 +1194,7 @@ M4 thay nhiều yếu tố; cần ablation tách biến.
 
 | Model | Thay đổi chính | Giả thuyết | Kết quả quan sát | Kết luận an toàn |
 |---|---|---|---|---|
-| M1 | Không GAT | Control | Avg ExpRate 50,10%; MED 2,20 | Baseline rất mạnh |
+| M1 | Không GAT | Control | Avg ExpRate 50,10%; MED 2,10 | Baseline rất mạnh |
 | M2 | GAT 2L 8H, PE trước | GAT làm giàu feature | Avg ExpRate 47,84%; MED 2,21 | Naive integration gây giảm |
 | M3 | GAT 2L 8H, PE sau | Giữ absolute position rõ hơn | Avg ExpRate 49,17%; MED 2,14 | PE sau tốt hơn PE trước |
 | M4 | 8-neighbor + relative bias, 1L 4H | Direction bias và model gọn giúp | Avg ExpRate 48,98%; MED 2,06 | Gần GT hơn trung bình, chưa thắng exact |

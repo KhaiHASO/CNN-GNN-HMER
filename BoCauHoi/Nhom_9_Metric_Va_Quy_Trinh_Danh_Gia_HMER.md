@@ -199,9 +199,9 @@ $$
 
 ## 4.2. Cách diễn giải đúng
 
-M4 có MED 2,06 và M1 có 2,20:
+M4 có MED 2,06 và M1 có 2,10:
 
-- trung bình M4 cần ít hơn 0,14 phép chỉnh sửa token/mẫu;
+- trung bình M4 cần ít hơn 0,04 phép chỉnh sửa token/mẫu;
 - không có nghĩa mỗi mẫu M4 tốt hơn;
 - không có nghĩa M4 có nhiều exact matches hơn;
 - không chứng minh lỗi cấu trúc cụ thể giảm.

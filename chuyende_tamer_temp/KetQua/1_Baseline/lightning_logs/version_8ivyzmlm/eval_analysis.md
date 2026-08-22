@@ -45,9 +45,10 @@
 
 ---
 
-## 🚀 4. Kỳ vọng Cải tiến từ phiên bản CNN-GNN (DenseNet + GAT)
+## 🚀 4. Định hướng Cải tiến từ phiên bản CNN-GNN (DenseNet + GAT)
 
 Mô hình lai **CNN-GNN** được thiết kế để giải quyết trực tiếp các điểm yếu nêu trên của baseline:
-* **Tích hợp Graph Attention Network (GAT):** GAT cho phép coi mỗi vùng đặc trưng (pixel-region) từ DenseNet là một nút trong đồ thị kề 4 hướng (4-connectivity).
+* **Tích hợp Graph Attention Network (GAT):** GAT cho phép coi mỗi vùng đặc trưng từ DenseNet là một nút trong đồ thị lưới (feature-grid graph kề 8 hướng).
 * **Truyền tin không gian (Spatial Message Passing):** Cơ chế Multi-head Attention trong GAT giúp các node tự học cách chú ý và truyền thông tin cấu trúc 2D đến các node lân cận một cách chủ động.
-* **Mục tiêu cải thiện:** Dự kiến khi chạy phiên bản CNN-GNN tối ưu bộ nhớ (đã sửa lỗi tràn VRAM bằng Broadcasting), ExpRate tuyệt đối sẽ được đẩy từ mức **50%** lên **55% - 60%** nhờ khắc phục triệt để các lỗi cấu trúc 2D phức tạp (như phân số, căn thức, ma trận).
+* **Kết quả thực nghiệm:** Kết quả thực nghiệm thực tế cho thấy mô hình M3 (PE sau GAT) phục hồi ExpRate đạt 49.17% (vượt baseline trên CROHME 2016 với 50.74%), và mô hình M4 (Coordinate-Aware GAT) đạt Mean Edit Distance thấp nhất là 2.06 (so với 2.10 của baseline).
+
